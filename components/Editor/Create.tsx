@@ -6,7 +6,7 @@ import React, {
   useContext,
   useCallback,
 } from "react";
-import { createEditor, Editor } from "slate";
+import { createEditor, Editor, Range } from "slate";
 import { Slate, Editable, withReact, useSlate, ReactEditor } from "slate-react";
 import { withHistory } from "slate-history";
 import { onKeyDown } from "./Editor";
@@ -24,10 +24,12 @@ import { onDragover, onDrop } from "./Dragndrop";
 import EditorNav from "./EditorNav";
 
 function Create() {
-  const [editor, setEditor] = useState(
-    withImage(
-      withLink(withTable(withHistory(withReact(createEditor() as any))))
-    )
+  const editor = useMemo(
+    () =>
+      withImage(
+        withLink(withTable(withHistory(withReact(createEditor() as any))))
+      ),
+    []
   );
 
   const [value, setValue] = useState<any>(initialValue);
@@ -44,37 +46,37 @@ function Create() {
     }
   }, [editor.selection]);
 
-  const [id, setId] = useState(localStorage.getItem("contentID") || "");
+  // const [id, setId] = useState("");
 
-  useEffect(() => {
-    if (id) {
-      localStorage.setItem("contentID", id);
-    }
-    setId(localStorage.getItem("contentID")!);
+  // useEffect(() => {
+  //   if (id) {
+  //     localStorage.setItem("contentID", id);
+  //   }
+  //   setId(localStorage.getItem("contentID")!);
 
-    (async function () {
-      const res = await fetch(`/api/task?id=${id}`);
-      const data = await res.json();
+  //   (async function () {
+  //     const res = await fetch(`/api/task?id=${id}`);
+  //     const data = await res.json();
 
-      setValue(JSON.parse(data.data.data));
-    })();
-  }, [id]);
+  //     setValue(JSON.parse(data.data.data));
+  //   })();
+  // }, [id]);
 
   const { renderElement, renderLeaf } = useEditorConfig();
 
   function onChange(value: any) {
     setValue(value);
 
-    const content = value;
+    // const content = value;
 
-    if (id) {
-      fetcher({ id, data: content });
-    } else {
-      fetcher({ data: content }, setId);
-    }
+    // if (id) {
+    //   fetcher({ id, data: content });
+    // } else {
+    //   fetcher({ data: content }, setId);
+    // }
   }
 
-  function getDragAfterElement(container: any, y: any) {
+  function getDragAfterElement(container: any, y: number) {
     const draggableEle = [
       ...container.querySelectorAll(".my-2:not(.draggable--dragging)"),
     ];
@@ -113,7 +115,7 @@ function Create() {
             <Toolbar />
             <EditorNav isWriting={isWriting} setWriting={setWriting} />
 
-            <HoveringToolbar />
+            {/* <HoveringToolbar /> */}
             {/* <h1 contentEditable={true} placeholder="Title..."></h1>
             <hr /> */}
 
@@ -127,7 +129,7 @@ function Create() {
                 onDragover(e, getDragAfterElement, dragEle, setDragEle);
               }}
               onDrop={() => {
-                onDrop(editor, dragEle, onChange);
+                onDrop(editor, dragEle, value, onChange);
               }}
               readOnly={!isWriting}
             />

@@ -90,6 +90,7 @@ export const onDragover = (
 export const onDrop = (
   editor: EditorType,
   dragEle: HTMLElement | undefined,
+  value: any,
   setValue: Function
 ) => {
   // e.preventDefault();
@@ -118,34 +119,59 @@ export const onDrop = (
 
   const newEditor = JSON.parse(JSON.stringify(editor));
 
+  const newArr = swapArray(index!, position, value);
+
+  newEditor.children = newArr;
+
+  editor.children = newEditor.children;
+
+  // console.log(newArr);
+  // setValue(newArr);
+
+  // console.log(index, position, value);
+
+  // console.log(editor);
+
+  // setValue();
+
   // console.log(Editor.node(editor, editor.selection!));
 
   // useTransform(editor, index!, position);
 
-  //   if (ele && editorParent) {
-  //     if (!dragEle) {
-  //       editorParent.appendChild(ele);
-  //     } else {
-  //       editorParent?.insertBefore(ele, dragEle);
-  //     }
-  //   }
+  if (ele && editorParent) {
+    if (!dragEle) {
+      editorParent.appendChild(ele);
+    } else {
+      editorParent?.insertBefore(ele, dragEle);
+    }
+  }
 
-  //   ReactEditor.focus(editor);
+  // ReactEditor.blur(editor);
   //   editor.undo();
 };
+
+function swapArray(fromindex: number, toIndex: number, arr: any) {
+  let updatedArr = [...arr];
+  const removedArr = updatedArr.splice(fromindex, 1);
+
+  updatedArr.splice(toIndex, 0, removedArr[0]);
+  return updatedArr;
+
+  // for(let )
+}
 
 function useTransform(editor: EditorType, index: number, position: number) {
   const newEditor = JSON.parse(JSON.stringify(editor));
   const selection = JSON.parse(JSON.stringify(editor.selection));
   const removedNode = newEditor.children[index];
 
-  console.log(
-    editor.selection,
-    selection,
-    editor.children,
-    removedNode,
-    position
-  );
+  // console.log(
+  //   editor.selection,
+  //   selection,
+  //   editor.children,
+  //   removedNode,
+  //   position
+  // );
 
   selection.anchor.path[0] = position;
   selection.focus.path[0] = position;

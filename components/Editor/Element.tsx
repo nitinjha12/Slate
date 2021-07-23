@@ -233,7 +233,7 @@ export const Leaf = function (props: any) {
     el = <code>{el}</code>;
   }
 
-  return (
+  const DefaultLeaf = (props: any) => (
     <span
       {...props.attributes}
       style={{
@@ -246,12 +246,27 @@ export const Leaf = function (props: any) {
             ? "line-through"
             : props.leaf.underline && "underline",
         verticalAlign: props.leaf.super ? "super " : props.leaf.sub && "sub",
-        // textDecoration:props.leaf.strikeThrough?"":""
       }}
     >
       {el}
     </span>
   );
+
+  if (props.leaf.placeholder) {
+    return (
+      <>
+        <DefaultLeaf {...props} />
+        <span
+          style={{ opacity: 0.8, position: "absolute", top: 0, color: "black" }}
+          contentEditable={false}
+        >
+          Type / to open menu
+        </span>
+      </>
+    );
+  }
+
+  return <DefaultLeaf {...props} />;
 
   // if (props.leaf.bold) {
   //   el = <strong>{el}</strong>;

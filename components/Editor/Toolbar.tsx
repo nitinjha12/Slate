@@ -94,7 +94,10 @@ function Toolbar() {
       >
         <Plus size="24" />
       </button>
-      <button
+
+      {/* drag and dropp   */}
+
+      {/* <button
         className="toolbar__dragndrop"
         onMouseEnter={() => onMouseEnter(editor, setDraggableEle)}
         onMouseLeave={() => onMouseLeave(draggableEle!)}
@@ -104,7 +107,7 @@ function Toolbar() {
           size="20"
           color="black"
         />
-      </button>
+      </button> */}
       <div className="toolbar__buttons toolbar__buttons--hide">
         <select
           className="toolbar__dropdown toolbar__option"
