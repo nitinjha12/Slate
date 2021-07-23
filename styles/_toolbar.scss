@@ -1,0 +1,256 @@
+.toolbar {
+  position: absolute;
+  display: inline-block;
+  z-index: 10;
+}
+
+.toolbar__buttons {
+  padding: 5px;
+  position: absolute;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: 10px;
+  top: 30px;
+  opacity: 1;
+  transition: all 0.4s ease-in-out;
+  visibility: visible;
+  background: #111;
+  border-radius: 5px;
+
+  &.toolbar__buttons--hide {
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s ease-in-out;
+  }
+  &.toolbar__buttons--none {
+    display: none;
+  }
+}
+
+.toolbar__addButton {
+  background-color: black;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+}
+
+.toolbar__dragndrop {
+  margin-left: 8px;
+  background-color: transparent;
+  outline: none;
+  border: none;
+  cursor: grab;
+
+  .dragIndicator__icon {
+    cursor: grab;
+  }
+}
+
+.toolbar__option {
+  background: #333;
+  color: white;
+  border-radius: 3px;
+}
+
+.toolbar__dropdown {
+  position: relative;
+  // font-size: 16px;
+  // font-weight: bold;
+  padding: 7px 0px;
+  border: none;
+  margin-right: 2px;
+  outline: none;
+  cursor: pointer;
+
+  .toolbar__dropdownContent {
+    // font-weight: bold;
+    font-size: 16px;
+  }
+}
+
+.draggable--dragging {
+  background-color: #ccc;
+  opacity: 0.5;
+}
+
+.btn--toolbar {
+  width: 30px;
+  height: 30px;
+  padding: 3px 3px;
+  cursor: pointer;
+  text-align: center;
+  margin: 0px 2px;
+  outline: none;
+  border: none;
+  color: white;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn--toolbar:hover {
+  background-color: #002b64;
+}
+
+.btn--toolbar__active {
+  background-color: #0056c8;
+}
+
+.selectToolbar__linkEditor {
+  position: relative;
+  // height: 100px;
+  min-width: 293px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  padding: 5px;
+  background-color: white;
+  z-index: 10;
+  background: #111;
+}
+
+.hoveringToolbar {
+  background: #111;
+  border-radius: 5px;
+  padding: 1px 2px;
+}
+
+.hoveringToolbar__button {
+  margin: 2px;
+}
+
+.link__preview {
+  background-color: #111;
+  color: white;
+  padding: 5px;
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+
+  a {
+    // background-color: #222;
+    padding: 5px;
+    color: white;
+  }
+}
+
+.imageToolbar {
+  position: absolute;
+  background: #111;
+  top: -50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+}
+
+.imageToolbar__buttons {
+  padding: 5px 5px;
+  padding-left: 7px;
+  min-width: 220px;
+}
+
+.slate__imgContainer {
+  position: relative;
+  display: flex;
+}
+
+.slate__image {
+  position: relative;
+  height: 100%;
+
+  &:hover {
+    outline: 3px solid #a1c8fd;
+  }
+
+  &.slate__image--outline {
+    outline: 3px solid #006cfa;
+  }
+}
+
+.videoEditor {
+  position: absolute;
+  top: 40px;
+  // right: -30px;
+  color: white;
+  background-color: #111;
+  border-radius: 5px;
+  padding: 5px;
+  form {
+    padding: 0px;
+  }
+
+  span {
+    font-size: 12px;
+    display: block;
+  }
+}
+
+.tableView {
+  position: absolute;
+  top: 40px;
+  background-color: #111;
+  border-radius: 5px;
+  right: 0px;
+
+  .table__boxContainer {
+    display: flex;
+    flex-wrap: wrap;
+    grid-gap: 0.2rem;
+    width: calc(15 * 10px);
+    padding: 5px;
+
+    .table__box {
+      width: 11px;
+      height: 10px;
+      border-radius: 2px;
+      border: 1px solid white;
+    }
+
+    .table__box--active {
+      background-color: #006cfa;
+      border: 1px solid #006cfa;
+    }
+  }
+
+  .table__dimension {
+    color: rgb(255, 255, 255, 0.8);
+    text-align: center;
+    padding: 2px;
+    padding-top: 0px;
+    font-family: "Lato";
+    span {
+      font-size: 14px;
+    }
+  }
+}
+
+.tabletoolbar {
+  padding: 5px 3px;
+  background: #111;
+  position: absolute;
+  top: -50px;
+  border-radius: 5px;
+  z-index: 10;
+
+  .dropdown {
+    position: absolute;
+    background: #111;
+    top: 40px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 5px;
+    padding: 10px 0px;
+
+    .dropdown__item {
+      cursor: pointer;
+      padding: 10px;
+      width: 20ch;
+
+      &:hover {
+        background-color: #002b64;
+      }
+    }
+  }
+}
