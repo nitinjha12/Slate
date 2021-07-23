@@ -38,8 +38,6 @@ function Create() {
   const [isWriting, setWriting] = useState(true);
   const [isDragging, setDragging] = useState(false);
 
-  const editorRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     if (editor && editor.selection) {
       modelCtx.getEditor(editor);
@@ -115,7 +113,7 @@ function Create() {
             <Toolbar />
             <EditorNav isWriting={isWriting} setWriting={setWriting} />
 
-            {/* <HoveringToolbar /> */}
+            <HoveringToolbar />
             {/* <h1 contentEditable={true} placeholder="Title..."></h1>
             <hr /> */}
 
