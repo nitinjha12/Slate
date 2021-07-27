@@ -4,7 +4,7 @@ import { toolbarButtonData } from "./data";
 import { Plus } from "@styled-icons/bootstrap/Plus";
 import { ReactEditor, useSlate } from "slate-react";
 import Context from "context/context";
-import { VideoEditor, TableView } from "./SelectEditor";
+import { VideoEditor, TableView, GridLayout } from "./SelectEditor";
 import { DragIndicator } from "@styled-icons/material-sharp/DragIndicator";
 import { onMouseEnter, onMouseLeave } from "./Dragndrop";
 
@@ -18,6 +18,8 @@ function Toolbar() {
   const [activeNum, setActiveNum] = useState(0);
   const [isVideoEditor, setVideoEditor] = useState(false);
   const [isTable, setTable] = useState(false);
+  const [layoutNum, setLayoutNum] = useState(false);
+  // const [toolbarBtn, setToolbarBtn] = useState(false);
   const [draggableEle, setDraggableEle] = useState<HTMLElement | null>(null);
   const previousSelection = useRef<any>(null);
 
@@ -82,11 +84,26 @@ function Toolbar() {
     !isTable && toolbar?.classList.add("toolbar__buttons--none");
   }, [isTable]);
 
+  useEffect(() => {
+    !layoutNum && toolbar?.classList.add("toolbar__buttons--none");
+  }, [layoutNum]);
+
   return (
     <section className="toolbar" ref={toolbarRef}>
       <button
         className="toolbar__addButton"
         onClick={() => {
+          // if (!toolbarBtn) {
+          //   setToolbarBtn(true);
+          // }
+          // if (
+          //   toolbar?.classList.contains("toolbar__buttons--none") &&
+          //   !layoutNum &&
+          //   !isTable
+          // ) {
+          //   toolbar?.classList.remove("toolbar__buttons--none");
+          //   return;
+          // }
           toolbar?.classList.remove("toolbar__buttons--none");
           toolbar?.classList.toggle("toolbar__buttons--hide");
         }}
@@ -97,7 +114,7 @@ function Toolbar() {
 
       {/* drag and dropp   */}
 
-      {/* <button
+      <button
         className="toolbar__dragndrop"
         onMouseEnter={() => onMouseEnter(editor, setDraggableEle)}
         onMouseLeave={() => onMouseLeave(draggableEle!)}
@@ -107,64 +124,71 @@ function Toolbar() {
           size="20"
           color="black"
         />
-      </button> */}
-      <div className="toolbar__buttons toolbar__buttons--hide">
-        <select
-          className="toolbar__dropdown toolbar__option"
-          onChange={(e) => {
-            toolbarButtonData[Number(e.target.value)].onMouseDown(
-              e as any,
-              editor
-            );
-            ReactEditor.focus(editor);
-          }}
-          value={activeNum}
-        >
-          {toolbarButtonData.slice(0, 4).map((data, i) => (
-            <option className="toolbar__dropdownContent" key={i} value={i}>
-              {useEffect(() => {
-                data.isActive(editor) && setActiveNum(i);
-              })}
-              {data.children}
-            </option>
-          ))}
-        </select>
-
-        {toolbarButtonData.slice(4).map((data, i) => (
-          <button
-            key={i}
-            onPointerDown={(e) => {
-              if (data.name === "image") {
-                modelCtx.changeSetModel(true);
-                return;
-              }
-
-              if (data.name === "video") {
-                setVideoEditor(true);
-                return;
-              }
-              if (data.name === "table") {
-                setTable(true);
-                return;
-              }
-              data.onMouseDown(e, editor);
-              toolbar?.classList.add("toolbar__buttons--hide");
+      </button>
+      {
+        <div className="toolbar__buttons toolbar__buttons--hide">
+          <select
+            className="toolbar__dropdown toolbar__option"
+            onChange={(e) => {
+              toolbarButtonData[Number(e.target.value)].onMouseDown(
+                e as any,
+                editor
+              );
               ReactEditor.focus(editor);
             }}
-            className={`btn--toolbar toolbar__option ${
-              data.isActive(editor) ? "btn--toolbar__active" : ""
-            }`}
-            style={data.style}
-            title={data.title}
+            value={activeNum}
           >
-            {data.children}
-          </button>
-        ))}
-        {isVideoEditor && (
-          <VideoEditor editor={editor} setVideoEditor={setVideoEditor} />
-        )}
-        {isTable && <TableView setTable={setTable} editor={editor} />}
-      </div>
+            {toolbarButtonData.slice(0, 4).map((data, i) => (
+              <option className="toolbar__dropdownContent" key={i} value={i}>
+                {useEffect(() => {
+                  data.isActive(editor) && setActiveNum(i);
+                })}
+                {data.children}
+              </option>
+            ))}
+          </select>
+
+          {toolbarButtonData.slice(4).map((data, i) => (
+            <button
+              key={i}
+              onPointerDown={(e) => {
+                if (data.name === "image") {
+                  modelCtx.changeSetModel(true);
+                  return;
+                }
+
+                if (data.name === "video") {
+                  setVideoEditor(true);
+                  return;
+                }
+                if (data.name === "table") {
+                  setTable(true);
+                  return;
+                }
+                if (data.name === "grid-layout") {
+                  setLayoutNum(true);
+                  return;
+                }
+                data.onMouseDown(e, editor);
+                toolbar?.classList.add("toolbar__buttons--hide");
+                ReactEditor.focus(editor);
+              }}
+              className={`btn--toolbar toolbar__option ${
+                data.isActive(editor) ? "btn--toolbar__active" : ""
+              }`}
+              style={data.style}
+              title={data.title}
+            >
+              {data.children}
+            </button>
+          ))}
+          {isVideoEditor && (
+            <VideoEditor editor={editor} setVideoEditor={setVideoEditor} />
+          )}
+          {isTable && <TableView setTable={setTable} editor={editor} />}
+          {layoutNum && <GridLayout setLayout={setLayoutNum} editor={editor} />}
+        </div>
+      }
     </section>
   );
 }

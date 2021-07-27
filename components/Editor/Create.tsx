@@ -24,19 +24,16 @@ import { onDragover, onDrop } from "./Dragndrop";
 import EditorNav from "./EditorNav";
 
 function Create() {
-  const editor = useMemo(
-    () =>
-      withImage(
-        withLink(withTable(withHistory(withReact(createEditor() as any))))
-      ),
-    []
+  const [editor] = useState(
+    withImage(
+      withLink(withTable(withHistory(withReact(createEditor() as any))))
+    )
   );
 
   const [value, setValue] = useState<any>(initialValue);
   const modelCtx = useContext(Context);
   const [dragEle, setDragEle] = useState<HTMLElement>();
   const [isWriting, setWriting] = useState(true);
-  const [isDragging, setDragging] = useState(false);
 
   useEffect(() => {
     if (editor && editor.selection) {
@@ -44,7 +41,7 @@ function Create() {
     }
   }, [editor.selection]);
 
-  // const [id, setId] = useState("");
+  // const [id, setId] = useState(localStorage.getItem("contentID") || "");
 
   // useEffect(() => {
   //   if (id) {
@@ -96,6 +93,37 @@ function Create() {
     ).element;
   }
 
+  function replaceListItem() {
+    const newValue = JSON.parse(JSON.stringify(value));
+    for (let val of newValue) {
+      if (val.type === "list-item") {
+        val.type = "paragraph";
+        setValue(newValue);
+        break;
+      }
+    }
+  }
+  replaceListItem();
+
+  function removeGridLayout() {
+    const newValue = JSON.parse(JSON.stringify(value));
+    for (let i = 0; i < newValue.length; i++) {
+      if (newValue[i].type === "grid-layout") {
+        for (let child of newValue[i].children) {
+          if (child.type === "grid-layout-child") return;
+        }
+
+        newValue.splice(i, 1);
+
+        setValue(newValue);
+        break;
+      }
+    }
+  }
+  removeGridLayout();
+  // ReactEditor.findPath
+  // console.log(editor.selection);
+
   return (
     <>
       {modelCtx.isModel && <ModelWindow />}
@@ -124,7 +152,7 @@ function Create() {
               className="editor__editable"
               autoFocus={true}
               onDragOver={(e) => {
-                onDragover(e, getDragAfterElement, dragEle, setDragEle);
+                onDragover(e, getDragAfterElement, dragEle, setDragEle, editor);
               }}
               onDrop={() => {
                 onDrop(editor, dragEle, value, onChange);

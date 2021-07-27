@@ -1,5 +1,13 @@
 import ImageElement from "./Image";
-import { useSelected, useFocused, ReactEditor, useSlate } from "slate-react";
+import {
+  useSelected,
+  useFocused,
+  ReactEditor,
+  useSlate,
+  useSlateStatic,
+  useReadOnly,
+} from "slate-react";
+import { Editor, Transforms } from "slate";
 import TableToolbar from "./TableToolbar";
 import { useState, useEffect } from "react";
 import ToggleList from "./ToggleList";
@@ -57,6 +65,9 @@ const Element = {
         {props.children}
       </ol>
     );
+  },
+  ToggleList(props: any) {
+    return <ToggleList {...props} />;
   },
   BoldText(props: any) {
     return <strong {...props.attributes}>{props.children}</strong>;
@@ -207,8 +218,53 @@ const Element = {
   TableColumn(props: any) {
     return <td {...props.attributes}>{props.children}</td>;
   },
-  ToggleList(props: any) {
-    return <ToggleList {...props} />;
+
+  GridLayout(props: any) {
+    return (
+      <section
+        {...props.attributes}
+        className="my-2 gridLayout"
+        onKeyDown={(e) => console.log(e.key)}
+      >
+        {props.children}
+      </section>
+    );
+  },
+  GridLayoutChildren(props: any) {
+    // console.log(props);
+
+    const editor = useSlate();
+    const readonly = useReadOnly();
+
+    // console.log(editor.selection);
+
+    const path = editor.selection?.anchor.path;
+    if (path) {
+      const children: any = editor.children;
+      const child = children[path[0]]?.children[path[1]];
+    }
+
+    // if (child.type === "grid-layout-child" && path.length > 3) {
+    //   console.log("maximum");
+
+    //   Transforms.unwrapNodes(editor);
+    //   const block = { type: "grid-layout-child", children: [] };
+
+    //   Transforms.wrapNodes(editor, block);
+    // }
+
+    return (
+      <div
+        className="gridLayout__children"
+        {...props.attributes}
+        style={{
+          width: props.element.width + "%",
+          border: readonly ? "none" : "1px solid black",
+        }}
+      >
+        {props.children}
+      </div>
+    );
   },
 
   ParaGraph(props: any) {

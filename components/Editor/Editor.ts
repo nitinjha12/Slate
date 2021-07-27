@@ -1,14 +1,13 @@
-import React, { useRef } from "react";
+import React, { Children, useRef } from "react";
 import { Editor, Transforms, Text, Element, Range, Point } from "slate";
 // import { useSlateStatic } from "slate-react";
 import { EditorType, EditorInterface } from "types";
 import { customEditorData } from "./data";
 import { isLinkNodeAtSelection } from "./helper";
-import Toolbar from "./Toolbar";
 import { EmbedUrl } from "./EmbedUrl";
 import { ReactEditor } from "slate-react";
 
-const LIST_TYPES = ["bulleted-list", "ordered-list"];
+const LIST_TYPES = ["bulleted-list", "ordered-list", "toggle-list"];
 const ALIGN_TYPES = ["left-align", "right-align", "center-align"];
 
 const CustomEditor = {
@@ -16,13 +15,10 @@ const CustomEditor = {
 
   isBlockActive({ editor, value }: EditorInterface) {
     const [match] = Editor.nodes(editor, {
-      match: (n: any) => {
-        if (value) {
-          return n.type === value;
-        }
-        return false;
-      },
-      // mode: "all",
+      match: (n: any) =>
+        !Editor.isEditor(n) &&
+        (Element.isElement(n) as any) &&
+        n.type === value,
     }) as any;
 
     return !!match;
@@ -48,11 +44,7 @@ const CustomEditor = {
     markBlock = false
   ) {
     const isActive = this.isBlockActive({ editor, value, type });
-
-    if (value && LIST_TYPES.includes(value)) {
-      this.toggleListBlock(editor, isActive, value);
-      return;
-    }
+    const isList = LIST_TYPES.includes(value!);
 
     if (value && ALIGN_TYPES.includes(value)) {
       this.toggleAlignBlock(editor, isActive, value);
@@ -69,9 +61,31 @@ const CustomEditor = {
       return;
     }
 
-    Transforms.setNodes(editor, { type: isActive ? null : value } as any, {
-      match: (n: any) => Editor.isBlock(editor, n),
+    const [match] = Editor.nodes(editor, {
+      match: (n: any) => n.type === value,
+    }) as any;
+
+    Transforms.unwrapNodes(editor, {
+      match: (n: any) =>
+        LIST_TYPES.includes(
+          !Editor.isEditor(n) && (Element.isElement(n) as any) && n.type
+        ),
+      split: true,
     });
+    const newProperties: Partial<any> = {
+      type: isActive ? "paragraph" : isList ? "list-item" : value,
+    };
+    Transforms.setNodes(editor, newProperties);
+
+    if (!isActive && isList) {
+      const block = { type: value, children: [] };
+      Transforms.wrapNodes(
+        editor,
+        ["toggle-list"].includes(value!)
+          ? ({ ...block, title: "Title" } as any)
+          : block
+      );
+    }
   },
 
   toggleCodeBlock(editor: EditorType, isActive: boolean, format: string) {
@@ -92,29 +106,6 @@ const CustomEditor = {
     }
   },
 
-  toggleListBlock(editor: EditorType, isActive: boolean, format: string) {
-    Transforms.unwrapNodes(editor, {
-      match: (n: any) => {
-        return LIST_TYPES.includes(
-          !Editor.isEditor(n) && (Element.isElement(n) as any) && n.type
-        );
-      },
-      split: true,
-    });
-
-    const isList = LIST_TYPES.includes(format);
-
-    const newProperties = {
-      type: isActive ? "paragraph" : isList ? "list-item" : format,
-    } as any;
-    Transforms.setNodes(editor, newProperties);
-
-    if (!isActive && isList) {
-      const block = { type: format, children: [] };
-      Transforms.wrapNodes(editor, block);
-    }
-  },
-
   toggleAlignBlock(editor: EditorType, isActive: boolean, format: string) {
     Transforms.unwrapNodes(editor, {
       match: (n: any) =>
@@ -128,6 +119,21 @@ const CustomEditor = {
       const block = { type: format, children: [] };
       Transforms.wrapNodes(editor, block);
     }
+  },
+  addGridLayout(editor: EditorType, num: number) {
+    const children = [];
+
+    for (let i = 0; i < num; i++) {
+      children.push({
+        type: "grid-layout-child",
+        width: 100 / num,
+        children: [{ text: "" }],
+      });
+    }
+
+    const block = { type: "grid-layout", children: children };
+
+    Transforms.insertNodes(editor, block);
   },
 
   toggleLinkAtSelection(editor: EditorType) {

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { Transforms, Editor } from "slate";
-import { useSlate, useReadOnly, useSelected } from "slate-react";
+import { useSlate, useReadOnly, useSelected, useFocused } from "slate-react";
 import ImageToolbar from "./ImageToolbar";
 import ImageWithLoader from "components/ImageWithLoader";
 
@@ -11,6 +11,7 @@ function ImageCompo(props: any) {
   const editor = useSlate();
   const readOnly = useReadOnly();
   const selected = useSelected();
+  const focused = useFocused();
 
   useEffect(() => {
     if (editor && editor.selection) {
@@ -76,7 +77,9 @@ function ImageCompo(props: any) {
     >
       <div
         className={`slate__image ${
-          isSelected && selected && !readOnly ? "slate__image--outline" : ""
+          isSelected && selected && focused && !readOnly
+            ? "slate__image--outline"
+            : ""
         }`}
         style={{
           ...props.element.style,

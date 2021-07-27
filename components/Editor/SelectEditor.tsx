@@ -251,3 +251,29 @@ export function TableView({ editor, setTable }: any) {
     </div>
   );
 }
+
+export function GridLayout({ setLayout, editor }: any) {
+  const gridOptionArr = [2, 3];
+
+  function clickHandler(e: React.MouseEvent, num: number) {
+    setLayout(false);
+
+    CustomEditor.addGridLayout(editor, num);
+  }
+
+  return (
+    <section className=" gridLayout__sizeoptions">
+      {gridOptionArr.map((num) => (
+        <button
+          key={num}
+          className="grid--btn"
+          onClick={(e) => clickHandler(e, num)}
+        >
+          {num}
+        </button>
+      ))}
+    </section>
+  );
+}
+
+export default GridLayout;

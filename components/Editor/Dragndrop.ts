@@ -1,7 +1,8 @@
 import React from "react";
 import { EditorType } from "types";
-import { ReactEditor } from "slate-react";
-import { Transforms, Location, Range, Editor } from "slate";
+import { ReactEditor, useSlateStatic } from "slate-react";
+import { Transforms, Location, Range, Editor, Path, Node } from "slate";
+import CustomEditor from "./Editor";
 
 export const onMouseEnter = (editor: EditorType, setDraggableEle: Function) => {
   const index: number = editor.selection!.anchor.path[0];
@@ -74,13 +75,17 @@ export const onDragover = (
   e: React.DragEvent,
   getDragAfterElement: Function,
   dragEle: HTMLElement | undefined,
-  setDragEle: Function
+  setDragEle: Function,
+  editor: EditorType
 ) => {
   e.preventDefault();
+
   const editorParent =
     document.querySelector<HTMLDivElement>(".editor__editable")!;
 
   const afterEle: HTMLElement = getDragAfterElement(editorParent, e.clientY);
+
+  // const elementMouseIsOver = document.elementFromPoint(e.clientX, e.clientY);
 
   if (afterEle !== dragEle) {
     setDragEle(afterEle);
@@ -116,38 +121,47 @@ export const onDrop = (
     }
     position++;
   }
+  // console.log(editor, dragEle, position);
+
+  // console.log(Path.ancestors([0]));
+
+  //  editor.children[position].selection?.anchor.path[0];
+
+  // CustomEditor.addGridLayout(editor, "grid-layout", newSelection);
 
   const newEditor = JSON.parse(JSON.stringify(editor));
 
+  console.log(index, position);
+
   const newArr = swapArray(index!, position, value);
 
-  newEditor.children = newArr;
+  // const gridLayout = document.querySelector(".gridLayout");
+  // ele && gridLayout?.appendChild(ele);
 
-  editor.children = newEditor.children;
+  console.log(ReactEditor.findPath(editor, newArr[3]));
+  // for (const e of Node.) {
+  //   console.log(e);
+  // }
 
-  // console.log(newArr);
-  // setValue(newArr);
+  // newEditor.children
 
-  // console.log(index, position, value);
+  console.log(ele);
 
-  // console.log(editor);
-
-  // setValue();
-
-  // console.log(Editor.node(editor, editor.selection!));
-
-  // useTransform(editor, index!, position);
-
-  if (ele && editorParent) {
-    if (!dragEle) {
-      editorParent.appendChild(ele);
-    } else {
-      editorParent?.insertBefore(ele, dragEle);
+  try {
+    if (ele && editorParent) {
+      if (!dragEle) {
+        editorParent.appendChild(ele);
+      } else {
+        editorParent?.insertBefore(ele, dragEle);
+      }
     }
+  } catch (err) {
+    console.log(err);
   }
 
-  // ReactEditor.blur(editor);
-  //   editor.undo();
+  editor.onChange();
+
+  setValue(newArr);
 };
 
 function swapArray(fromindex: number, toIndex: number, arr: any) {

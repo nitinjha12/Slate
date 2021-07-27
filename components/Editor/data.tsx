@@ -11,7 +11,9 @@ import { LinkAlt } from "@styled-icons/boxicons-regular/LinkAlt";
 import { Image } from "@styled-icons/boxicons-regular/Image";
 import { Video } from "@styled-icons/entypo/Video";
 import { LineHorizontal1 } from "@styled-icons/fluentui-system-filled/LineHorizontal1";
+import { PlaylistPlay } from "@styled-icons/material-outlined/PlaylistPlay";
 import { Table } from "@styled-icons/bootstrap/Table";
+import { Grid } from "@styled-icons/boxicons-regular/Grid";
 import CustomEditor from "./Editor";
 import { EditorType, ToolbarButtonDataInterface } from "types";
 
@@ -178,6 +180,20 @@ export const customEditorData = {
     style: {},
     title: "Table",
   },
+  toggleList: {
+    editorData: { value: "toggle-list", type: undefined },
+    markBlock: false,
+    children: <PlaylistPlay size="18" />,
+    style: {},
+    title: "Toggle List",
+  },
+  gridLayout: {
+    editorData: { value: "grid-layout", type: undefined },
+    markBlock: false,
+    children: <Grid size="18" />,
+    style: {},
+    title: "Toggle List",
+  },
 };
 
 const imageEditorData = {
@@ -238,7 +254,8 @@ for (let data of customEditorDataArr) {
         if (
           data.editorData.value === "image" ||
           data.editorData.value === "video" ||
-          data.editorData.value === "table"
+          data.editorData.value === "table" ||
+          data.editorData.value === "grid-layout"
         ) {
           return;
         }

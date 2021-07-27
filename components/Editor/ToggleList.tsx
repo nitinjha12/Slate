@@ -1,6 +1,9 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { ToggleListStyle } from "styles/block";
 import { ChevronDown } from "@styled-icons/boxicons-regular/ChevronDown";
+import { Transforms, Editor } from "slate";
+import { useSlate, useReadOnly } from "slate-react";
+import { Play } from "@styled-icons/boxicons-regular/Play";
 
 // interface ToggleListInterface {
 //   title: string;
@@ -9,36 +12,73 @@ import { ChevronDown } from "@styled-icons/boxicons-regular/ChevronDown";
 
 function ToggleList({ element, attributes, children }: any) {
   const [toggle, setToggle] = useState(false);
-  const [description, setDescription] = useState<string>(element.description);
+  const [title, setTitle] = useState<string>(element.title || "");
+  const editor = useSlate();
+  const readonly = useReadOnly();
+
+  // console.log(element.title);
+
+  const titleChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const toggleListNode = Editor.nodes(editor, {
+      match: (n: any) => {
+        console.log(n);
+        return n.type === "toggle-list";
+      },
+    });
+    setTitle(e.target.value);
+
+    console.log(toggleListNode);
+
+    Transforms.setNodes(
+      editor,
+      {
+        title: title,
+      } as any,
+      {
+        match: (n: any) => {
+          console.log(n);
+          return n.type === "toggle-list";
+        },
+      }
+    );
+    // console.log(title);
+  };
 
   return (
-    <ToggleListStyle className={toggle ? "pb-3" : ""} {...attributes}>
-      <div
-        className="faq__title"
-        onClick={() => setToggle((tog) => !tog)}
-        aria-controls="collapse-text"
-        aria-expanded={toggle}
-      >
-        <span>{children}</span>
-        <ChevronDown
+    <ToggleListStyle
+      className={`faqStyle ${toggle ? "pb-3" : ""}`}
+      {...attributes}
+    >
+      <div className="faq__title" contentEditable={false}>
+        <Play
           size="28"
           style={
             toggle
-              ? { transform: "rotate(-180deg)", transition: "all 0.5s" }
-              : { transform: "rotate(0deg)", transition: "all 0.5s" }
+              ? { transform: "rotate(-90deg)", transition: "all 0.2s" }
+              : { transform: "rotate(0deg)", transition: "all 0.2s" }
           }
           className="faq__downArrow"
+          onClick={() => setToggle((tog) => !tog)}
         />
+        {!readonly ? (
+          <input
+            value={title}
+            onChange={titleChangeHandler}
+            className="faq__input"
+          />
+        ) : (
+          // {/* {title} */}
+
+          <input
+            value={title}
+            readOnly
+            style={{ cursor: "default" }}
+            className="faq__input"
+          />
+        )}
       </div>
 
-      {toggle && (
-        <span
-          id="collapse-text"
-          onChange={(e) => setDescription(e.currentTarget.innerText)}
-        >
-          {description}
-        </span>
-      )}
+      {toggle && <div className={`faq__toggleChildren`}>{children}</div>}
     </ToggleListStyle>
   );
 }

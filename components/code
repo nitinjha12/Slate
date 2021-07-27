@@ -1,0 +1,201 @@
+import { Editor, Transforms, Text, Element, Range } from "slate";
+// import { useSlateStatic } from "slate-react";
+import { EditorType, EditorInterface } from "type";
+import { customEditorData } from "./data";
+import { isLinkNodeAtSelection } from "./helper";
+import Toolbar from "./Toolbar";
+
+const LIST_TYPES = ["bulleted-list", "ordered-list"];
+const ALIGN_TYPES = ["left-align", "right-align", "center-align"];
+
+const CustomEditor = {
+  // editor: useSlateStatic(),
+
+  isBlockActive({ editor, value, type }: EditorInterface) {
+    const [match] = Editor.nodes(editor, {
+      match: (n: any) => {
+        if (value) {
+          return n.type === value;
+        }
+        if (type) {
+          return n[type] === true;
+        }
+
+        return false;
+      },
+    }) as any;
+
+    return !!match;
+  },
+
+  toggleBlock(
+    { editor, value, type = "" }: EditorInterface,
+    markBlock = false
+  ) {
+    const isActive = this.isBlockActive({ editor, value, type });
+
+    if (value && LIST_TYPES.includes(value)) {
+      this.toggleListBlock(editor, isActive, value);
+      return;
+    }
+
+    if (value && ALIGN_TYPES.includes(value)) {
+      this.toggleAlignBlock(editor, isActive, value);
+      return;
+    }
+
+    if (value === "code") {
+      this.toggleCodeBlock(editor, isActive, value);
+      return;
+    }
+
+    Transforms.setNodes(
+      editor,
+      markBlock
+        ? { [type]: isActive ? null : true }
+        : ({ type: isActive ? null : value } as any),
+      {
+        match: (n: any) =>
+          markBlock ? Text.isText(n) : Editor.isBlock(editor, n),
+        split: markBlock ? true : false,
+      }
+    );
+
+    // Transforms.wrapNodes(editor, {type:"section",children:[{text:}]});
+  },
+
+  toggleCodeBlock(editor: EditorType, isActive: boolean, format: string) {
+    Transforms.unwrapNodes(editor, {
+      match: (n: any) =>
+        !Editor.isEditor(n) &&
+        (Element.isElement(n) as any) &&
+        n.type === format,
+      split: true,
+    });
+
+    Transforms.setNodes(editor, {
+      type: isActive ? "paragraph" : "span",
+    } as any);
+
+    if (!isActive) {
+      Transforms.wrapNodes(editor, { type: format, children: [] } as any);
+    }
+  },
+
+  toggleListBlock(editor: EditorType, isActive: boolean, format: string) {
+    Transforms.unwrapNodes(editor, {
+      match: (n: any) => {
+        return LIST_TYPES.includes(
+          !Editor.isEditor(n) && (Element.isElement(n) as any) && n.type
+        );
+      },
+      split: true,
+    });
+
+    const isList = LIST_TYPES.includes(format);
+
+    const newProperties = {
+      type: isActive ? "paragraph" : isList ? "list-item" : format,
+    } as any;
+    Transforms.setNodes(editor, newProperties);
+
+    if (!isActive && isList) {
+      const block = { type: format, children: [] };
+      Transforms.wrapNodes(editor, block);
+    }
+  },
+
+  toggleAlignBlock(editor: EditorType, isActive: boolean, format: string) {
+    Transforms.unwrapNodes(editor, {
+      match: (n: any) =>
+        ALIGN_TYPES.includes(
+          !Editor.isEditor(n) && (Element.isElement(n) as any) && n.type
+        ),
+      split: true,
+    });
+
+    if (!isActive) {
+      const block = { type: format, children: [] };
+      Transforms.wrapNodes(editor, block);
+    }
+  },
+
+  toggleLinkAtSelection(editor: EditorType, url?: string) {
+    const { selection } = editor;
+
+    this.removeLink(editor);
+
+    if (!isLinkNodeAtSelection(editor, selection!)) {
+      const isSelectionCollapsed = selection && Range.isCollapsed(selection);
+
+      if (isSelectionCollapsed) {
+        Transforms.insertNodes(
+          editor,
+          {
+            type: "link",
+            url: "https://google.com",
+            children: [{ text: "link" }],
+          } as any
+          // { at: selection! }
+        );
+      } else {
+        Transforms.wrapNodes(
+          editor,
+          {
+            type: "link",
+            url: "https://google.com",
+            children: [{ text: "" }],
+          } as any,
+          { split: true }
+        );
+      }
+    } else {
+      Transforms.unwrapNodes(editor, {
+        match: (n: any) => (Element.isElement(n) as any) && n.type === "link",
+      });
+    }
+  },
+  removeLink(editor: EditorType) {
+    Transforms.unwrapNodes(editor, {
+      match: (n: any) =>
+        !Editor.isEditor(n) &&
+        (Element.isElement(n) as any) &&
+        n.type === "link",
+    });
+  },
+};
+
+export default CustomEditor;
+
+export const onKeyDown = function (
+  e: React.KeyboardEvent<HTMLElement>,
+  editor: EditorType
+) {
+  if (!e.ctrlKey) return;
+  e.preventDefault();
+
+  switch (e.key) {
+    case "`": {
+      CustomEditor.toggleBlock({ editor, ...customEditorData.code.editorData });
+      break;
+    }
+
+    case "b": {
+      CustomEditor.toggleBlock(
+        { editor, ...customEditorData.bold.editorData },
+        true
+      );
+      break;
+    }
+
+    case "z": {
+      editor.undo();
+      break;
+    }
+
+    case "y": {
+      editor.redo();
+      break;
+    }
+  }
+};

@@ -17,23 +17,37 @@ export const ToggleListStyle = styled.section`
     position: relative;
     display: flex;
     transition: all 0.5s;
-    padding: 15px 0px;
-    cursor: pointer;
 
-    span {
-      margin-right: 10px;
-    }
     .faq__downArrow {
       position: absolute;
-      right: 10px;
+      left: -15px;
+      top: 5px;
+      cursor: pointer;
 
-      @media (max-width: 705px) {
-        right: 0px;
+      &:hover {
+        background-color: rgb(233, 233, 233);
+        border-radius: 5px;
       }
-
-      @media (max-width: 500px) {
-        right: -12px;
+      &:active {
+        background-color: rgb(211, 211, 211);
+        border-radius: 5px;
       }
     }
+  }
+
+  .faq__input {
+    position: relative;
+    left: 25px;
+    padding: 10px 5px;
+    border: none;
+    width: 95%;
+    outline: none;
+    font-size: 16px;
+    height: 100%;
+    resize: none;
+  }
+
+  li {
+    list-style: none;
   }
 `;

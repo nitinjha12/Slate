@@ -50,6 +50,8 @@ const renderElement = (props: any) => {
       return <Element.BulletedList {...props} />;
     case "ordered-list":
       return <Element.OrderedList {...props} />;
+    case "toggle-list":
+      return <Element.ToggleList {...props} />;
     case "line":
       return <Element.Line {...props} />;
     case "list-item":
@@ -66,8 +68,10 @@ const renderElement = (props: any) => {
       return <Element.Image {...props} />;
     case "video":
       return <Element.Video {...props} />;
-    case "toggle-list":
-      return <Element.ToggleList {...props} />;
+    case "grid-layout":
+      return <Element.GridLayout {...props} />;
+    case "grid-layout-child":
+      return <Element.GridLayoutChildren {...props} />;
     case "paragraph":
       return <Element.ParaGraph {...props} />;
     default:
@@ -96,6 +100,8 @@ export const initialValue = [
       { text: "." },
     ],
   },
+
+  { type: "paragraph", children: [{ text: "" }] },
 
   {
     type: "video",
