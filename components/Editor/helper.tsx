@@ -100,7 +100,12 @@ export const initialValue = [
       { text: "." },
     ],
   },
-
+  {
+    type: "image",
+    src: "/bigo.png",
+    caption: "Big O",
+    children: [{ text: "" }],
+  },
   { type: "paragraph", children: [{ text: "" }] },
 
   {
