@@ -4,20 +4,55 @@
   z-index: 10;
 }
 
+.toolbar__buttonsTooltip {
+  position: absolute;
+  top: -8px;
+  z-index: 10;
+  left: 8px;
+  margin: 0px;
+  padding: 0px;
+  display: block;
+  border-color: transparent transparent rgba(180, 180, 180, 0.8);
+  border-style: solid;
+  border-width: 0 8px 8px;
+
+  &::after {
+    content: "";
+    position: absolute;
+    margin: 0px;
+    padding: 0px;
+    top: 1px;
+    left: -6.7px;
+    display: block;
+    border-color: transparent transparent white;
+    border-style: solid;
+    border-width: 0 7px 7px;
+  }
+
+  &.dark {
+    &::after {
+      border-color: transparent transparent #111;
+    }
+  }
+}
+
 .toolbar__buttons {
   padding: 5px;
   position: absolute;
-  background: white;
   display: flex;
+  width: 150px;
+  flex-wrap: wrap;
+  background-color: white;
   justify-content: center;
+  grid-gap: 0.5rem;
   align-items: center;
-  left: 10px;
-  top: 30px;
+  left: 5px;
+  top: 40px;
   opacity: 1;
   transition: all 0.4s ease-in-out;
   visibility: visible;
-  background: #111;
   border-radius: 5px;
+  border: 1px solid rgb(180, 180, 180, 0.8);
 
   &.toolbar__buttons--hide {
     opacity: 0;
@@ -30,15 +65,18 @@
 }
 
 .toolbar__addButton {
-  background-color: black;
-  color: white;
-  border-radius: 5px;
+  // background-color: white;
+  // color: black;
+  border-radius: 50%;
+  height: 30px;
+  width: 30px;
   cursor: pointer;
-  border: none;
+  top: 4px;
+  margin-right: 7px;
 }
 
 .toolbar__dragndrop {
-  margin-left: 8px;
+  position: relative !important;
   background-color: transparent;
   outline: none;
   border: none;
@@ -46,27 +84,41 @@
 
   .dragIndicator__icon {
     cursor: grab;
+    z-index: 1000;
   }
 }
 
 .toolbar__option {
-  background: #333;
-  color: white;
   border-radius: 3px;
 }
 
 .toolbar__dropdown {
   position: relative;
-  // font-size: 16px;
-  // font-weight: bold;
   padding: 7px 0px;
   border: none;
   margin-right: 2px;
   outline: none;
   cursor: pointer;
 
+  &.dark:hover {
+    background-color: #002b64;
+  }
+
+  &.dark {
+    background-color: #222;
+    color: white;
+    box-shadow: rgba(249, 249, 249, 0.2) 0px 2px 8px 0px;
+  }
+
+  &.light {
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  }
+
+  &.light:hover {
+    background-color: rgb(100, 180, 245);
+  }
+
   .toolbar__dropdownContent {
-    // font-weight: bold;
     font-size: 16px;
   }
 }
@@ -85,16 +137,34 @@
   margin: 0px 2px;
   outline: none;
   border: none;
-  color: white;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
-}
+  background-color: white;
+  &.light {
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  }
 
-.btn--toolbar:hover {
-  background-color: #002b64;
+  &.dark:hover {
+    background-color: #002b64;
+  }
+
+  &.dark {
+    background-color: #222;
+    color: white;
+    box-shadow: rgba(180, 180, 180, 0.3) 0px 2px 8px 0px;
+  }
+
+  &.light:hover {
+    background-color: rgb(100, 180, 245);
+  }
 }
 
 .btn--toolbar__active {
-  background-color: #0056c8;
+  &.light {
+    background-color: #4386dd;
+  }
+
+  &.dark {
+    background-color: #0056c8;
+  }
 }
 
 .selectToolbar__linkEditor {
@@ -110,9 +180,20 @@
 }
 
 .hoveringToolbar {
-  background: #111;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
   border-radius: 5px;
-  padding: 1px 2px;
+  padding: 2px 2px;
+
+  &.light {
+    background-color: white;
+  }
+
+  &.dark {
+    background: #111;
+  }
 }
 
 .hoveringToolbar__button {
@@ -137,12 +218,20 @@
 
 .imageToolbar {
   position: absolute;
-  background: #111;
+  border: 1px solid rgba(180, 180, 180, 0.6);
   top: -50px;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 3px;
+
+  &.light {
+    background-color: white;
+  }
+
+  &.dark {
+    background: #111;
+  }
 }
 
 .imageToolbar__buttons {
@@ -159,6 +248,20 @@
 .slate__image {
   position: relative;
   height: 100%;
+
+  .elementImage__optionCaption {
+    position: absolute;
+    display: inline-block;
+    padding: 10px;
+    border-radius: 5px;
+    bottom: 20px;
+    font-weight: 500;
+    font-size: 15px;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+      rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+    cursor: pointer;
+    background-color: white;
+  }
 
   &:hover {
     outline: 3px solid #a1c8fd;
@@ -189,10 +292,12 @@
 
 .tableView {
   position: absolute;
-  top: 40px;
-  background-color: #111;
+  bottom: 0px;
   border-radius: 5px;
-  right: 0px;
+  right: -150px;
+  background-color: white;
+  color: black;
+  border: 1px solid rgba(0, 0, 0, 0.2);
 
   .table__boxContainer {
     display: flex;
@@ -205,23 +310,37 @@
       width: 11px;
       height: 10px;
       border-radius: 2px;
-      border: 1px solid white;
+      border: 1px solid black;
     }
 
     .table__box--active {
       background-color: #006cfa;
-      border: 1px solid #006cfa;
+      border: 1px solid #006cfa !important;
     }
   }
 
   .table__dimension {
-    color: rgb(255, 255, 255, 0.8);
+    color: rgb(0, 0, 0, 0.8);
     text-align: center;
     padding: 2px;
     padding-top: 0px;
     font-family: "Lato";
     span {
       font-size: 14px;
+    }
+  }
+
+  &.dark {
+    background-color: #111;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+
+    .table__box {
+      border: 1px solid white;
+    }
+
+    .table__dimension {
+      color: rgb(255, 255, 255, 0.8);
     }
   }
 }
@@ -231,12 +350,44 @@
   background: #111;
   position: absolute;
   top: -50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   border-radius: 5px;
   z-index: 10;
 
+  &.light {
+    background-color: white;
+    border: 1px solid rgb(220, 220, 220, 0.8);
+
+    .dropdown {
+      background: white;
+
+      .dropdown__item {
+        &:hover {
+          background-color: #2880f3;
+        }
+      }
+    }
+  }
+
+  &.dark {
+    background: #111;
+
+    .dropdown {
+      background: #111;
+
+      .dropdown__item {
+        &:hover {
+          background-color: #002b64;
+        }
+      }
+    }
+  }
+
   .dropdown {
     position: absolute;
-    background: #111;
+
     top: 40px;
     display: flex;
     flex-direction: column;
@@ -247,10 +398,6 @@
       cursor: pointer;
       padding: 10px;
       width: 20ch;
-
-      &:hover {
-        background-color: #002b64;
-      }
     }
   }
 }

@@ -1,4 +1,4 @@
-import ImageElement from "./Image";
+import ImageElement from "./Elements/Image";
 import {
   useSelected,
   useFocused,
@@ -8,9 +8,10 @@ import {
   useReadOnly,
 } from "slate-react";
 import { Editor, Transforms } from "slate";
-import TableToolbar from "./TableToolbar";
 import { useState, useEffect } from "react";
 import ToggleList from "./ToggleList";
+import Video from "./Elements/Video";
+import Table from "./Elements/Table";
 
 const Element = {
   Anchor(props: any) {
@@ -149,62 +150,10 @@ const Element = {
     );
   },
   Video(props: any) {
-    return (
-      <div {...props.attributes} className="my-2" style={{ height: "100%" }}>
-        <div
-          contentEditable={false}
-          style={{
-            position: "relative",
-            paddingTop: "40%",
-            display: "block",
-          }}
-          className="videoContainer"
-        >
-          <iframe
-            src={props.element.src}
-            style={{
-              position: "absolute",
-              top: 0,
-            }}
-            width="100%"
-            height="100%"
-            frameBorder="0"
-            allowFullScreen
-            title="Video Player"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          />
-          {props.children}
-        </div>
-      </div>
-    );
+    return <Video {...props} />;
   },
-
   Table(props: any) {
-    const selected = useSelected();
-    const focused = useFocused();
-    const editor = useSlate();
-    const [dropDown, setDropdown] = useState(true);
-
-    return (
-      <section className="my-2 table--block">
-        {selected && (
-          <TableToolbar
-            editor={editor}
-            focused={focused}
-            dropDown={dropDown}
-            setDropdown={setDropdown}
-          />
-        )}
-        <table
-          style={{ width: "100%" }}
-          className="render__table"
-          {...props.attributes}
-          onPointerDown={() => setDropdown(false)}
-        >
-          {props.children}
-        </table>
-      </section>
-    );
+    return <Table {...props} />;
   },
   TableHead(props: any) {
     return <thead {...props.attributes}>{props.children}</thead>;
@@ -216,16 +165,21 @@ const Element = {
     return <tr {...props.attributes}>{props.children}</tr>;
   },
   TableColumn(props: any) {
-    return <td {...props.attributes}>{props.children}</td>;
+    return (
+      <td
+        {...props.attributes}
+        colSpan={props.element.colSpan}
+        rowSpan={props.element.rowSpan}
+        style={props.element.display ? {} : { display: "none" }}
+      >
+        {props.children}
+      </td>
+    );
   },
 
   GridLayout(props: any) {
     return (
-      <section
-        {...props.attributes}
-        className="my-2 gridLayout"
-        onKeyDown={(e) => console.log(e.key)}
-      >
+      <section {...props.attributes} className="my-2 gridLayout">
         {props.children}
       </section>
     );
@@ -235,6 +189,7 @@ const Element = {
 
     const editor = useSlate();
     const readonly = useReadOnly();
+    const selected = useSelected();
 
     // console.log(editor.selection);
 
@@ -244,26 +199,29 @@ const Element = {
       const child = children[path[0]]?.children[path[1]];
     }
 
-    // if (child.type === "grid-layout-child" && path.length > 3) {
-    //   console.log("maximum");
-
-    //   Transforms.unwrapNodes(editor);
-    //   const block = { type: "grid-layout-child", children: [] };
-
-    //   Transforms.wrapNodes(editor, block);
-    // }
-
     return (
-      <div
-        className="gridLayout__children"
-        {...props.attributes}
-        style={{
-          width: props.element.width + "%",
-          border: readonly ? "none" : "1px solid black",
-        }}
-      >
-        {props.children}
-      </div>
+      <>
+        <div
+          className="gridLayout__children"
+          {...props.attributes}
+          style={{
+            width: props.element.width + "%",
+            border: readonly ? "none" : "1px solid black",
+            position: "relative",
+          }}
+        >
+          {/* {selected && (
+            <button
+              style={{ position: "absolute", bottom: "0px" }}
+              onClick={() => Transforms.removeNodes(editor)}
+              contentEditable={false}
+            >
+              Delete
+            </button>
+          )} */}
+          {props.children}
+        </div>
+      </>
     );
   },
 

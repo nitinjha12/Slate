@@ -13,6 +13,16 @@
   }
 }
 
+.mode--light {
+  background-color: white;
+  color: #111;
+}
+
+.mode--dark {
+  background-color: #111;
+  color: white;
+}
+
 .customParentLoader {
   position: relative;
   min-height: 100px;

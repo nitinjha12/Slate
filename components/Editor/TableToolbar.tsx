@@ -1,14 +1,17 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useContext } from "react";
 import { TableFreezeRow } from "@styled-icons/fluentui-system-regular/TableFreezeRow";
 import { TableFreezeColumn } from "@styled-icons/fluentui-system-regular/TableFreezeColumn";
 import { TableDismiss } from "@styled-icons/fluentui-system-regular/TableDismiss";
+import { TableCellsMerge } from "@styled-icons/fluentui-system-filled/TableCellsMerge";
 import CustomEditor from "./Editor";
 import { EditorType } from "types";
 import { ReactEditor } from "slate-react";
 import { Transforms } from "slate";
+import Context from "context/context";
 
 function TableToolbar({ editor, focused, dropDown, setDropdown }: any) {
   const selectionRef = useRef<any>(null);
+  const lightCtx = useContext(Context);
 
   useEffect(() => {
     if (selectionRef.current !== editor.selection) {
@@ -42,11 +45,13 @@ function TableToolbar({ editor, focused, dropDown, setDropdown }: any) {
   // const buttonClickHandler = function () {};
 
   return (
-    <section className="tabletoolbar">
+    <section className={`tabletoolbar ${lightCtx.isLight ? "light" : "dark"}`}>
       {tableToolbarArr.map((data: any, i: number) => {
         return data.list ? (
           <button
-            className="btn--toolbar toolbar__option "
+            className={`btn--toolbar toolbar__option ${
+              lightCtx.isLight ? "light" : "dark"
+            }`}
             key={i}
             onClick={(e) => dropdownClickHandler(e, i)}
           >
@@ -83,7 +88,9 @@ function TableToolbar({ editor, focused, dropDown, setDropdown }: any) {
           </button>
         ) : (
           <button
-            className="btn--toolbar toolbar__option "
+            className={`btn--toolbar toolbar__option ${
+              lightCtx.isLight ? "light" : "dark"
+            }`}
             key={i}
             onClick={(e) => {
               data.onMouseDown(e, editor);
@@ -114,6 +121,16 @@ const tableDataArr: any = [
     value: "table-remove",
     children: <TableDismiss size="20" />,
   },
+  {
+    value: "merge-table",
+    children: <TableCellsMerge size="20" />,
+    list: [
+      "Merge Row Up",
+      "Merge Row Down",
+      "Merge Column Left",
+      "Merge Column Right",
+    ],
+  },
 ];
 
 const tableToolbarArr: any = [];
@@ -124,16 +141,21 @@ for (let data of tableDataArr) {
       e.preventDefault();
 
       if (data.value === "table-row") {
-        return CustomEditor.rowOperations(editor, str);
+        return CustomEditor.rowOperation(editor, str);
       }
       if (data.value === "table-column") {
-        return CustomEditor.addColumn(editor, str);
+        return CustomEditor.columnOperation(editor, str);
       }
 
       if (data.value === "table-remove") {
         Transforms.removeNodes(editor, {
           match: (n: any) => n.type === "table",
         });
+        return;
+      }
+
+      if (data.value === "merge-table") {
+        CustomEditor.mergeTable(editor, str);
         return;
       }
     },

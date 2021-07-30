@@ -1,7 +1,7 @@
 import React from "react";
 import { EditorType } from "types";
 import { ReactEditor, useSlateStatic } from "slate-react";
-import { Transforms, Location, Range, Editor, Path, Node } from "slate";
+import { Transforms, Location, Range, Editor, Path, Node, Span } from "slate";
 import CustomEditor from "./Editor";
 
 export const onMouseEnter = (editor: EditorType, setDraggableEle: Function) => {
@@ -33,8 +33,8 @@ export const onMouseEnter = (editor: EditorType, setDraggableEle: Function) => {
 
   dragBtn!.style.visibility = "hidden";
   dragIcon!.style.position = "absolute";
-  dragIcon!.style.top = `${eleHeight}px`;
-  dragIcon!.style.left = "-28px";
+  dragIcon!.style.top = `${eleHeight - 3}px`;
+  dragIcon!.style.left = "-23px";
   dragIcon!.style.cursor = "grab";
 
   ele.setAttribute("draggable", true);
@@ -43,10 +43,12 @@ export const onMouseEnter = (editor: EditorType, setDraggableEle: Function) => {
   setDraggableEle(ele);
 
   ele!.addEventListener("dragstart", () => {
+    editor.isDragging = true;
     ele?.classList.add("draggable--dragging");
   });
 
   ele!.addEventListener("dragend", () => {
+    editor.isDragging = false;
     ele?.classList.remove("draggable--dragging");
   });
 };
@@ -96,7 +98,8 @@ export const onDrop = (
   editor: EditorType,
   dragEle: HTMLElement | undefined,
   value: any,
-  setValue: Function
+  setValue: Function,
+  layout: boolean
 ) => {
   // e.preventDefault();
   const dragBtn = document.querySelector<HTMLButtonElement>(
@@ -114,52 +117,85 @@ export const onDrop = (
     document.querySelector<HTMLDivElement>(".editor__editable")!;
 
   let position = 0;
+  let node;
 
-  for (let node of dragEle?.parentElement?.childNodes as any) {
+  for (node of dragEle?.parentElement?.childNodes as any) {
     if (node === dragEle) {
       break;
     }
     position++;
   }
-  // console.log(editor, dragEle, position);
 
-  // console.log(Path.ancestors([0]));
+  // if (dragEle === dragEle?.parentElement?.childNodes[position]) return;
+
+  const [dragPosition]: any = Editor.positions(editor);
+  const [dropPosition]: any = Editor.positions(editor, {
+    at: [position],
+  });
+
+  // console.log(dragPosition, dropPosition,);
+
+  if (layout) {
+    const before =
+      Path.isBefore(dragPosition.path, dropPosition.path) &&
+      Path.isSibling(dragPosition.path, dropPosition.path);
+
+    const to = before ? dropPosition.path : Path.next(dropPosition.path);
+
+    CustomEditor.addGridLayout(editor, position, setValue);
+
+    // const nodes = Editor.node(editor, [position]);
+
+    return;
+  }
+
+  // console.log(node);
 
   //  editor.children[position].selection?.anchor.path[0];
 
-  // CustomEditor.addGridLayout(editor, "grid-layout", newSelection);
+  //
 
   const newEditor = JSON.parse(JSON.stringify(editor));
 
-  console.log(index, position);
+  Transforms.moveNodes(editor, {});
+  console.log(editor);
+  // Transforms.removeNodes(editor, { at: editor.selection?.anchor.path });
+  // Transforms.collapse(editor);
+
+  // Transforms.insertNodes(editor, newEditor.children[index!], {
+  //   at: [position],
+  // });
+
+  // console.log(index, position);
 
   const newArr = swapArray(index!, position, value);
 
   // const gridLayout = document.querySelector(".gridLayout");
   // ele && gridLayout?.appendChild(ele);
 
-  console.log(ReactEditor.findPath(editor, newArr[3]));
+  // const movePath = ReactEditor.findPath(editor, value[position]);
+
+  // console.log(movePath);
+
+  // console.log(editor.history);
+
+  // Node.
+
+  // console.log(ReactEditor.toDOMRange(editor, value[3]));
+
   // for (const e of Node.) {
   //   console.log(e);
   // }
 
   // newEditor.children
 
-  console.log(ele);
-
-  try {
-    if (ele && editorParent) {
-      if (!dragEle) {
-        editorParent.appendChild(ele);
-      } else {
-        editorParent?.insertBefore(ele, dragEle);
-      }
-    }
-  } catch (err) {
-    console.log(err);
-  }
-
-  editor.onChange();
+  // if (ele && editorParent) {
+  //   if (!dragEle) {
+  //     editorParent.appendChild(ele);
+  //   } else {
+  //     editorParent?.insertBefore(ele, dragEle);
+  //   }
+  // }
 
   setValue(newArr);
 };
@@ -170,22 +206,12 @@ function swapArray(fromindex: number, toIndex: number, arr: any) {
 
   updatedArr.splice(toIndex, 0, removedArr[0]);
   return updatedArr;
-
-  // for(let )
 }
 
 function useTransform(editor: EditorType, index: number, position: number) {
   const newEditor = JSON.parse(JSON.stringify(editor));
   const selection = JSON.parse(JSON.stringify(editor.selection));
   const removedNode = newEditor.children[index];
-
-  // console.log(
-  //   editor.selection,
-  //   selection,
-  //   editor.children,
-  //   removedNode,
-  //   position
-  // );
 
   selection.anchor.path[0] = position;
   selection.focus.path[0] = position;
@@ -216,3 +242,59 @@ function useTransform(editor: EditorType, index: number, position: number) {
 
   console.log(editor.children);
 }
+
+export const findNode = (editor: any, options: any) => {
+  try {
+    const {
+      match: _match = () => true,
+      at = editor.selection || [],
+      reverse = false,
+      voids = false,
+    } = options;
+
+    let from;
+    let to;
+    if (Span.isSpan(at)) {
+      [from, to] = at;
+    } else if (Range.isRange(at)) {
+      const first = Editor.path(editor, at, { edge: "start" });
+      const last = Editor.path(editor, at, { edge: "end" });
+      from = reverse ? last : first;
+      to = reverse ? first : last;
+    }
+
+    let root = [editor, []];
+    if (Path.isPath(at)) {
+      root = Editor.node(editor, at);
+    }
+
+    const nodeEntries: any = Node.nodes(root[0], {
+      reverse,
+      from,
+      to,
+      pass: ([n]) => (voids ? false : Editor.isVoid(editor, n)),
+    });
+
+    for (const [node, path] of nodeEntries) {
+      if (match(node, _match)) {
+        return [node as any, path];
+      }
+    }
+  } catch (error) {
+    return undefined;
+  }
+};
+
+export const match = <T>(obj: any, predicate: any): boolean => {
+  if (!predicate) return true;
+
+  if (typeof predicate === "object") {
+    return Object.entries(predicate).every(([key, value]) => {
+      const values = [value];
+
+      return values.includes(obj[key]);
+    });
+  }
+
+  return predicate(obj);
+};

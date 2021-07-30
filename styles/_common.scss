@@ -109,6 +109,11 @@
   outline: none;
   background-color: white;
   color: rgba(0, 0, 0, 0.6);
+
+  &.dark {
+    background-color: #222;
+    color: rgba(255, 255, 255, 0.6);
+  }
 }
 
 .image__caption--write {
@@ -128,14 +133,25 @@
 
 .render__table {
   position: relative;
+
   &,
   tr,
+  th,
   td {
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-collapse: collapse;
   }
-  td {
+  td,
+  th {
     padding: 5px 10px;
+  }
+
+  &.dark {
+    tr,
+    th,
+    td {
+      border: 1px solid rgba(255, 255, 255, 0.6);
+    }
   }
 
   &:hover {
@@ -157,6 +173,7 @@
   display: flex;
   // flex-wrap: wrap;
   justify-content: center;
+  grid-gap: 2rem;
   min-height: 200px;
   // grid-template-columns: repeat(auto-fit, 400px);
   // border: 1px solid black;
@@ -191,5 +208,48 @@
       background-color: #222;
       border: 1px solid #444;
     }
+  }
+}
+
+.elementPara {
+  div {
+    background-color: inherit;
+    position: absolute;
+    transform: rotate(-90deg);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #006cfa !important;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      display: block;
+      top: 1px;
+      left: 1px;
+
+      &:hover {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+      }
+    }
+  }
+
+  .elementPara--top {
+    top: -15px;
+    left: min(10%, 30px);
+  }
+
+  .elementPara--bottom {
+    bottom: -10px;
+    right: min(10%, 30px);
   }
 }

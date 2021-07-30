@@ -8,6 +8,8 @@ import { Unlink } from "@styled-icons/foundation/Unlink";
 import CustomEditor from "./Editor";
 import { EditorType } from "types";
 import { EmbedUrl } from "./EmbedUrl";
+import { useContext } from "react";
+import Context from "context/context";
 // import { useSlate } from "slate-react";
 
 export function LinkEditor({
@@ -106,6 +108,7 @@ export function LinkEditor({
           value={linkURL}
           type="text"
           onChange={onLinkURLChange}
+          // onClick={(e) => e.currentTarget.focus()}
         />
         <button
           className="link__btn link--blue"
@@ -195,6 +198,7 @@ export function VideoEditor({ editor, setVideoEditor }: any) {
 
 export function TableView({ editor, setTable }: any) {
   const [dimension, setDimension] = useState({ row: 0, column: 0 });
+  const lightCtx = useContext(Context);
   const tableBoxes: JSX.Element[] = [];
   let key = 0;
 
@@ -241,7 +245,7 @@ export function TableView({ editor, setTable }: any) {
     });
   }
   return (
-    <div className="tableView">
+    <div className={`tableView ${lightCtx.isLight ? "" : "dark"}`}>
       <div className="table__boxContainer" onPointerDown={clickHandler}>
         {tableBoxes.map((table) => table)}
       </div>

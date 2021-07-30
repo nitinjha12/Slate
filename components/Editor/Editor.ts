@@ -6,6 +6,7 @@ import { customEditorData } from "./data";
 import { isLinkNodeAtSelection } from "./helper";
 import { EmbedUrl } from "./EmbedUrl";
 import { ReactEditor } from "slate-react";
+import Table from "./Functions/Table";
 
 const LIST_TYPES = ["bulleted-list", "ordered-list", "toggle-list"];
 const ALIGN_TYPES = ["left-align", "right-align", "center-align"];
@@ -60,10 +61,6 @@ const CustomEditor = {
       this.toggleMark(editor, type);
       return;
     }
-
-    const [match] = Editor.nodes(editor, {
-      match: (n: any) => n.type === value,
-    }) as any;
 
     Transforms.unwrapNodes(editor, {
       match: (n: any) =>
@@ -120,26 +117,101 @@ const CustomEditor = {
       Transforms.wrapNodes(editor, block);
     }
   },
-  addGridLayout(editor: EditorType, num: number) {
+  addGridLayout(editor: EditorType, num: number, setValue: Function) {
     const children = [];
 
-    for (let i = 0; i < num; i++) {
-      children.push({
-        type: "grid-layout-child",
-        width: 100 / num,
-        children: [{ text: "" }],
+    const newEditor = JSON.parse(JSON.stringify(editor));
+
+    // for (let i = 0; i < num; i++) {
+    //   children.push({
+    //     type: "grid-layout-child",
+    //     width: 100 / num,
+    //     children: [{ text: "" }],
+    //   });
+    // }
+
+    // const block = { type: "grid-layout", children: children };
+
+    const removeNode = newEditor.children[newEditor.selection?.anchor.path[0]];
+    const dropNode = newEditor.children[num];
+
+    if (newEditor.children[num].type === "grid-layout") {
+      for (let data of newEditor.children[num].children) {
+        data.width = 100 / newEditor.children[num].children.length + 1;
+      }
+
+      Transforms.removeNodes(editor, {
+        match: (n: any) => n.type === "grid-layout",
       });
+
+      console.log(editor.selection);
+
+      const block = {
+        type: "grid-layout",
+        children: [
+          ...newEditor.children[num].children,
+          {
+            children: [removeNode],
+            type: "grid-layout-child",
+            width: 100 / newEditor.children[num].children.length + 1,
+          },
+        ],
+      };
+
+      console.log(block);
+
+      Transforms.insertNodes(editor, block);
+      return;
     }
 
-    const block = { type: "grid-layout", children: children };
+    console.log(
+      newEditor.children[num],
+      newEditor.children[newEditor.selection.anchor.path[0]],
+      num,
+      // newEditor.selection.anchor.path[0]
+      editor.selection?.anchor.path[0]
+    );
 
-    Transforms.insertNodes(editor, block);
+    Transforms.removeNodes(editor);
+    Transforms.removeNodes(editor, { at: [num] });
+
+    // console.log(removeNode, dropNode);
+
+    // setValue(newEditor.children);
+
+    const block = {
+      type: "grid-layout",
+      children: [
+        {
+          children: [dropNode],
+          width: 50,
+          type: "grid-layout-child",
+        },
+        {
+          children: [removeNode],
+          width: 50,
+          type: "grid-layout-child",
+        },
+      ],
+    };
+
+    console.log(block);
+
+    Transforms.insertNodes(editor, block, { at: newEditor.selection });
+
+    console.log("got it");
   },
 
   toggleLinkAtSelection(editor: EditorType) {
     const { selection } = editor;
 
-    // this.removeLink(editor);
+    const [match] = Editor.nodes(editor, {
+      match: (n: any) => n.type === "link",
+    }) as any;
+
+    if (match && match[0]) {
+      Transforms.unwrapNodes(editor, { match: (n: any) => n.type === "link" });
+    }
 
     if (!isLinkNodeAtSelection(editor, selection!)) {
       const isSelectionCollapsed = selection && Range.isCollapsed(selection);
@@ -225,197 +297,81 @@ const CustomEditor = {
     }
   },
   insertTable(editor: EditorType, dimension: any) {
-    const tableRow = [];
-
-    for (let i = 0; i < dimension.row; i++) {
-      tableRow.push({
-        type: "table-row",
-        children: [] as any,
-      });
-
-      this.columnLoop(tableRow, dimension.column, i);
-    }
-
-    const newProperties = {
-      type: "table",
-      children: [{ type: "table-body", children: tableRow }],
-    };
-
-    Transforms.insertNodes(editor, newProperties);
+    Table.insertTable(editor, dimension);
+  },
+  rowOperation(editor: EditorType, str: string) {
+    Table.rowOperations(editor, str);
+  },
+  columnOperation(editor: EditorType, str: string) {
+    Table.addColumn(editor, str);
   },
 
-  rowOperations(editor: EditorType, str: string) {
-    const [table] = Editor.nodes(editor, {
-      match: (n: any) => n.type === "table",
-    }) as any;
+  mergeTable(editor: EditorType, type: string) {
+    console.log(type);
+    const newEditor = JSON.parse(JSON.stringify(editor));
 
-    const [row] = Editor.nodes(editor, {
+    function nodeTraversal(
+      editor: any,
+      type: string,
+      path = editor.selection.anchor.path
+      // memo: any = {}
+    ): any {
+      console.log(editor, type, path);
+
+      if (editor?.type === type) return editor;
+
+      return nodeTraversal(editor.children[path[0]], type, path.slice(1));
+    }
+
+    const [cell]: any = nodeTraversal(newEditor, "table-cell");
+
+    console.log(cell);
+
+    const [row]: any = Editor.nodes(editor, {
       match: (n: any) => n.type === "table-row",
-    }) as any;
+    });
 
-    const data = JSON.parse(JSON.stringify(table));
+    const [tableBody]: any = Editor.nodes(editor, {
+      match: (n: any) => n.type === "table-body",
+    });
 
-    let selection = null;
+    if (type.includes("row")) {
+      if (type.includes("up")) {
+        const nextCellNum = cell[1][cell[1].length - 1] - 1;
+        if (!tableBody[0].children[nextCellNum]) {
+          return;
+        }
 
-    if (!selection) {
-      selection = JSON.parse(JSON.stringify(editor)) as any;
-    }
+        cell.rowSpan = Number(cell.rowSpan) + 1;
+      }
 
-    if (str.includes("above")) {
-      selection.selection.anchor.path[2]++;
-      selection.selection.focus.path[2]++;
-    }
+      if (type.includes("down")) {
+        const nextCellNum = cell[1][cell[1].length - 1] + 1;
+        if (!tableBody[0].children[nextCellNum]) {
+          return;
+        }
 
-    const rowLength = table[0].children[0].children.length;
+        let nextCell =
+          tableBody[0].children[nextCellNum].children[
+            cell[1][cell[1].length - 1]
+          ];
 
-    const beforeDeletedRow =
-      table[0].children[0].children[selection.selection.anchor.path[2] - 1];
+        cell[0] = { ...cell[0], rowSpan: Number(cell[0].rowSpan) + 1 };
 
-    if (str.includes("delete") && beforeDeletedRow) {
-      const offset =
-        beforeDeletedRow.children[selection.selection.anchor.path[3]]
-          .children[0].text.length - 1;
-
-      selection.selection.anchor.path[2]--;
-      selection.selection.focus.path[2]--;
-      selection.selection.anchor.offset = offset;
-      selection.selection.focus.offset = offset;
-    }
-
-    if (table) {
-      Transforms.removeNodes(editor, {
-        match: (n: any) =>
-          !Editor.isEditor(n) &&
-          (Element.isElement(n) as any) &&
-          n.type === "table",
-      });
-    }
-
-    this.rowOperationsHelper(
-      editor,
-      data,
-      str,
-      row[1][2],
-      row[0].children.length,
-      selection!,
-      rowLength
-    );
-  },
-  rowOperationsHelper(
-    editor: EditorType,
-    data: any,
-    str: string,
-    position: number,
-    column: number,
-    selection: EditorType,
-    rowLength: number
-  ) {
-    const row: any = [
-      {
-        type: "table-row",
-        children: [],
-      },
-    ];
-
-    this.columnLoop(row, column, 0);
-
-    if (str.includes("above")) {
-      data[0].children[0].children.splice(position, 0, row[0]);
-    }
-
-    if (str.includes("below")) {
-      data[0].children[0].children.splice(position + 1, 0, row[0]);
-    }
-
-    if (str.includes("delete")) {
-      data[0].children[0].children.splice(position, 1);
-    }
-    if (rowLength === 1 && str.includes("delete")) return;
-
-    Transforms.insertNodes(editor, data[0]);
-    editor.selection = selection.selection;
-
-    ReactEditor.focus(editor);
-  },
-  columnLoop(tableRow: any, column: number, i: number) {
-    for (let j = 0; j < column; j++) {
-      tableRow[i].children.push({
-        type: "table-cell",
-        children: [{ text: "" }],
-      } as any);
-    }
-  },
-  addColumn(editor: EditorType, str: string) {
-    const [table] = Editor.nodes(editor, {
-      match: (n: any) => n.type === "table",
-    }) as any;
-
-    const [cell] = Editor.nodes(editor, {
-      match: (n: any) => n.type === "table-cell",
-    }) as any;
-
-    const data = JSON.parse(JSON.stringify(table));
-
-    let selection = null;
-
-    if (!selection) {
-      selection = JSON.parse(JSON.stringify(editor)) as any;
-    }
-
-    if (str.includes("left")) {
-      selection.selection.anchor.path[3]++;
-      selection.selection.focus.path[3]++;
-    }
-
-    const rows = data[0].children[0].children;
-
-    if (table) {
-      Transforms.removeNodes(editor, {
-        match: (n: any) =>
-          !Editor.isEditor(n) &&
-          (Element.isElement(n) as any) &&
-          n.type === "table",
-      });
-    }
-
-    this.addColumnHelper(editor, data, str, rows, cell[1][3], selection!);
-  },
-  addColumnHelper(
-    editor: EditorType,
-    data: any,
-    str: string,
-    rows: any,
-    position: number,
-    selection: EditorType
-  ) {
-    const column: any = {
-      type: "table-cell",
-      children: [{ text: "" }],
-    };
-
-    if (str.includes("right")) {
-      for (let row of rows) {
-        row.children.splice(position + 1, 0, column);
+        // console.log(editor.selection, cell, nextCell, tableBody);
+        nextCell = { ...nextCell, display: false };
+        console.log(
+          editor.selection,
+          cell,
+          nextCell,
+          tableBody,
+          editor.children
+        );
       }
     }
-
-    if (str.includes("left")) {
-      for (let row of rows) {
-        row.children.splice(position, 0, column);
-      }
-    }
-
-    if (str.includes("delete")) {
-      for (let row of rows) {
-        row.children.splice(position, 1);
-      }
-    }
-
-    Transforms.insertNodes(editor, data[0]);
-    if (!str.includes("delete")) editor.selection = selection.selection;
-
-    // ReactEditor.blur(editor);
   },
+
+  mergeRow() {},
 };
 
 export default CustomEditor;

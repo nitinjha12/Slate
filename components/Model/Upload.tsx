@@ -1,5 +1,5 @@
 import React, { useContext, useState, useRef, useEffect } from "react";
-import { UploadStyle } from "styles/style";
+import { UploadStyle } from "styles/model";
 import { Check } from "@styled-icons/boxicons-regular/Check";
 import { ModelProps } from "types";
 

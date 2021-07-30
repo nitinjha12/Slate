@@ -2,7 +2,6 @@ import React, {
   useMemo,
   useEffect,
   useState,
-  useRef,
   useContext,
   useCallback,
 } from "react";
@@ -22,18 +21,22 @@ import Context from "context/context";
 import ModelWindow from "./ModelWindow";
 import { onDragover, onDrop } from "./Dragndrop";
 import EditorNav from "./EditorNav";
+import { CardImage } from "@styled-icons/bootstrap/CardImage";
 
 function Create() {
-  const [editor] = useState(
-    withImage(
-      withLink(withTable(withHistory(withReact(createEditor() as any))))
-    )
+  const editor = useMemo(
+    () =>
+      withImage(
+        withLink(withTable(withHistory(withReact(createEditor() as any))))
+      ),
+    []
   );
 
   const [value, setValue] = useState<any>(initialValue);
   const modelCtx = useContext(Context);
   const [dragEle, setDragEle] = useState<HTMLElement>();
   const [isWriting, setWriting] = useState(true);
+  const [height, setHeight] = useState(40);
 
   useEffect(() => {
     if (editor && editor.selection) {
@@ -41,40 +44,58 @@ function Create() {
     }
   }, [editor.selection]);
 
-  // const [id, setId] = useState(localStorage.getItem("contentID") || "");
+  const [id, setId] = useState(localStorage.getItem("contentID") || "");
 
-  // useEffect(() => {
-  //   if (id) {
-  //     localStorage.setItem("contentID", id);
-  //   }
-  //   setId(localStorage.getItem("contentID")!);
+  useEffect(() => {
+    if (id) {
+      localStorage.setItem("contentID", id);
+    }
+    setId(localStorage.getItem("contentID")!);
 
-  //   (async function () {
-  //     const res = await fetch(`/api/task?id=${id}`);
-  //     const data = await res.json();
+    (async function () {
+      const res = await fetch(`/api/task?id=${id}`);
+      const data = await res.json();
 
-  //     setValue(JSON.parse(data.data.data));
-  //   })();
-  // }, [id]);
+      setValue(JSON.parse(data.data.data));
+    })();
+  }, [id]);
 
   const { renderElement, renderLeaf } = useEditorConfig();
 
   function onChange(value: any) {
     setValue(value);
 
-    // const content = value;
+    const content = value;
 
-    // if (id) {
-    //   fetcher({ id, data: content });
-    // } else {
-    //   fetcher({ data: content }, setId);
-    // }
+    if (id) {
+      fetcher({ id, data: content });
+    } else {
+      fetcher({ data: content }, setId);
+    }
   }
 
   function getDragAfterElement(container: any, y: number) {
     const draggableEle = [
       ...container.querySelectorAll(".my-2:not(.draggable--dragging)"),
     ];
+
+    // console.log(
+    //   draggableEle.reduce(
+    //     (closest, child) => {
+    //       const ele = child.getBoundingClientRect();
+    //       const offset = y - ele.top - ele.height / 2;
+
+    //       if (offset > 0 && offset < closest.offset) {
+    //         return { offset: offset, element: child };
+    //       } else {
+    //         return closest;
+    //       }
+    //     },
+    //     {
+    //       offset: Number.POSITIVE_INFINITY,
+    //     }
+    //   )
+    // );
 
     return draggableEle.reduce(
       (closest, child) => {
@@ -122,22 +143,60 @@ function Create() {
   }
   removeGridLayout();
   // ReactEditor.findPath
-  // console.log(editor.selection);
+  // console.log(editor);
+
+  function clickHandler(e: React.MouseEvent) {}
 
   return (
     <>
-      {modelCtx.isModel && <ModelWindow />}
+      {(modelCtx.isModel || modelCtx.isCarousel) && <ModelWindow />}
       <section
         className="editor"
-        style={{ position: modelCtx.isModel ? "fixed" : "relative" }}
+        style={{
+          position:
+            modelCtx.isModel || modelCtx.isCarousel ? "fixed" : "relative",
+        }}
       >
         <Slate editor={editor} value={value} onChange={onChange}>
-          <div className="editor__container">
-            {/* <Editable
-              renderElement={renderElement}
-              renderLeaf={renderLeaf}
-              onKeyDown={(e) => onKeyDown(e, editor)}
-            /> */}
+          <div
+            className={`editor__container ${
+              modelCtx.isLight ? "light" : "dark"
+            }`}
+          >
+            <nav className="editor__titleNav">
+              <label
+                htmlFor="upload"
+                className="editor__navBtn"
+                onClick={clickHandler}
+              >
+                <span>
+                  <CardImage size="20" className="editor__navSvg" />
+                </span>
+                <span> Add cover photo</span>
+              </label>
+              <input type="file" id="upload" style={{ display: "none" }} />
+            </nav>
+
+            <section className="editor__title">
+              <div className="editor__titleImage"></div>
+              <textarea
+                readOnly={!isWriting}
+                className="editor__titleTextarea"
+                onChange={(e) => {
+                  function calcHeight(value: any) {
+                    const numberOfLineBreaks = (value.match(/\n/g) || [])
+                      .length;
+                    const newHeight = 30 + numberOfLineBreaks * 40 + 12 + 2;
+                    return newHeight;
+                  }
+
+                  setHeight(calcHeight(e.target.value));
+                }}
+                style={{ height: height + "px" }}
+                placeholder="Title..."
+              ></textarea>
+            </section>
+
             <Toolbar />
             <EditorNav isWriting={isWriting} setWriting={setWriting} />
 
@@ -151,13 +210,17 @@ function Create() {
               onKeyDown={(e) => onKeyDown(e, editor)}
               className="editor__editable"
               autoFocus={true}
+              onError={() => {
+                console.log("error");
+              }}
               onDragOver={(e) => {
                 onDragover(e, getDragAfterElement, dragEle, setDragEle, editor);
               }}
               onDrop={() => {
-                onDrop(editor, dragEle, value, onChange);
+                onDrop(editor, dragEle, value, onChange, modelCtx.colLayout);
               }}
               readOnly={!isWriting}
+              placeholder="Start writing from here..."
             />
           </div>
         </Slate>

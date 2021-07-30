@@ -19,7 +19,9 @@ function Toolbar() {
   const [isVideoEditor, setVideoEditor] = useState(false);
   const [isTable, setTable] = useState(false);
   const [layoutNum, setLayoutNum] = useState(false);
-  // const [toolbarBtn, setToolbarBtn] = useState(false);
+  const [toolbarBtn, setToolbarBtn] = useState(
+    !!toolbar?.classList.contains("toolbar__buttons--hide")
+  );
   const [draggableEle, setDraggableEle] = useState<HTMLElement | null>(null);
   const previousSelection = useRef<any>(null);
 
@@ -81,31 +83,41 @@ function Toolbar() {
   }, [editor.selection, isVideoEditor]);
 
   useEffect(() => {
-    !isTable && toolbar?.classList.add("toolbar__buttons--none");
+    !isTable && toolbar?.classList.add("toolbar__buttons--hide");
   }, [isTable]);
 
   useEffect(() => {
-    !layoutNum && toolbar?.classList.add("toolbar__buttons--none");
+    !layoutNum && toolbar?.classList.add("toolbar__buttons--hide");
   }, [layoutNum]);
 
+  useEffect(() => {
+    setToolbarBtn(!!toolbar?.classList.contains("toolbar__buttons--hide"));
+  }, [editor.selection]);
+
+  function elePosition(ref: HTMLElement) {
+    const box = ref.getBoundingClientRect();
+
+    console.log(box);
+  }
+  // toolbarRef.current && elePosition(toolbarRef.current);
+
   return (
-    <section className="toolbar" ref={toolbarRef}>
+    <section className={`toolbar `} ref={toolbarRef}>
       <button
         className="toolbar__addButton"
+        style={{
+          transform: !toolbarBtn ? "rotate(-90deg)" : "rotate(0deg)",
+          transition: "all 0.4s",
+          background: !toolbarBtn ? "#3884FF" : "white",
+          border: !toolbarBtn
+            ? "1px solid #3884FF "
+            : "1px solid rgb(180, 180, 180)",
+        }}
         onClick={() => {
-          // if (!toolbarBtn) {
-          //   setToolbarBtn(true);
-          // }
-          // if (
-          //   toolbar?.classList.contains("toolbar__buttons--none") &&
-          //   !layoutNum &&
-          //   !isTable
-          // ) {
-          //   toolbar?.classList.remove("toolbar__buttons--none");
-          //   return;
-          // }
-          toolbar?.classList.remove("toolbar__buttons--none");
           toolbar?.classList.toggle("toolbar__buttons--hide");
+          setToolbarBtn(
+            !!toolbar?.classList.contains("toolbar__buttons--hide")
+          );
         }}
         title="edit block"
       >
@@ -120,15 +132,28 @@ function Toolbar() {
         onMouseLeave={() => onMouseLeave(draggableEle!)}
       >
         <DragIndicator
-          className="dragIndicator__icon"
+          className={`dragIndicator__icon ${
+            modelCtx.isLight ? "mode--light" : "mode--dark"
+          }`}
           size="20"
           color="black"
         />
       </button>
       {
-        <div className="toolbar__buttons toolbar__buttons--hide">
+        <div
+          className={`toolbar__buttons ${
+            modelCtx.isLight ? "mode--light" : "mode--dark"
+          } toolbar__buttons--hide`}
+        >
+          <div
+            className={`toolbar__buttonsTooltip  ${
+              modelCtx.isLight ? " " : "dark"
+            }`}
+          ></div>
           <select
-            className="toolbar__dropdown toolbar__option"
+            className={`toolbar__dropdown toolbar__option ${
+              modelCtx.isLight ? "light" : "dark"
+            }`}
             onChange={(e) => {
               toolbarButtonData[Number(e.target.value)].onMouseDown(
                 e as any,
@@ -169,11 +194,18 @@ function Toolbar() {
                   setLayoutNum(true);
                   return;
                 }
+
+                if (data.name === "carousel") {
+                  modelCtx.setCarousel(true);
+                  return;
+                }
                 data.onMouseDown(e, editor);
                 toolbar?.classList.add("toolbar__buttons--hide");
                 ReactEditor.focus(editor);
               }}
-              className={`btn--toolbar toolbar__option ${
+              className={`btn--toolbar   ${
+                modelCtx.isLight ? "light" : "dark"
+              } toolbar__option ${
                 data.isActive(editor) ? "btn--toolbar__active" : ""
               }`}
               style={data.style}

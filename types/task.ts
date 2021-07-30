@@ -3,7 +3,14 @@ import { ReactEditor } from "slate-react";
 import { HistoryEditor } from "slate-history";
 import React from "react";
 
-export type EditorType = Editor & ReactEditor & HistoryEditor;
+interface AnyObjecct {
+  [key: string]: any;
+}
+
+export type EditorType<TEditor = AnyObjecct> = Editor &
+  ReactEditor &
+  HistoryEditor &
+  TEditor;
 
 export interface EditorInterface {
   editor: EditorType;

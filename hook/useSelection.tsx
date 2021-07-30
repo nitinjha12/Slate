@@ -1,28 +1,22 @@
-import { EditorType } from "types";
-import { useState, useRef, useCallback, useEffect } from "react";
-import areEqual from "deep-equal";
+import React, { useContext, useState, useRef, useEffect } from "react";
+import Context from "context/context";
+import { ReactEditor } from "slate-react";
+import { Transforms, Path, Editor } from "slate";
+import CustomEditor from "components/Editor/Editor";
 
-function useSelection(editor: EditorType) {
-  const [selection, setSelection] = useState(editor.selection);
+const useSelection = function () {
+  const dataCtx = useContext(Context);
 
+  const editor = dataCtx.data.editor;
   const previousSelection = useRef(null) as any;
 
   useEffect(() => {
-    setSelection(editor.selection);
-  }, [editor.selection]);
+    if (editor?.selection) {
+      previousSelection.current = editor.selection;
+    }
+  }, [editor?.selection]);
 
-  const setSelectionOptimized = useCallback(
-    (newSelection) => {
-      if (areEqual(selection, newSelection)) {
-        return;
-      }
-      previousSelection.current = selection;
-      setSelection(newSelection);
-    },
-    [setSelection, selection]
-  );
-
-  return [previousSelection.current, selection, setSelectionOptimized];
-}
+  return previousSelection.current;
+};
 
 export default useSelection;

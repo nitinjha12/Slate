@@ -1,5 +1,5 @@
 import React from "react";
-import { ModelNavStyle } from "styles/style";
+import { ModelNavStyle } from "styles/model";
 
 interface IProps {
   upload: boolean;

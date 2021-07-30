@@ -15,3 +15,10 @@ export interface ImageLoader {
 export interface ModelProps {
   imageClickHandler(e: React.MouseEvent, value: string): void;
 }
+
+export interface CarouselStateType {
+  count: number;
+  width: number;
+  shape: "square" | "rounded";
+  page: number;
+}

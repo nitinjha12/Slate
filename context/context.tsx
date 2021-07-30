@@ -6,6 +6,12 @@ const Context = createContext<ContextInterface>({
   changeSetModel(bool: boolean) {},
   data: { editor: null },
   getEditor(editor: EditorType) {},
+  isLight: true,
+  changeTheme(bool) {},
+  colLayout: false,
+  setColLayout(bool) {},
+  isCarousel: false,
+  setCarousel(bool) {},
 });
 
 interface ContextInterface {
@@ -13,6 +19,12 @@ interface ContextInterface {
   changeSetModel(bool: boolean): void;
   data: { editor: EditorType | null };
   getEditor(editor: EditorType): void;
+  isLight: boolean;
+  changeTheme(bool: boolean): void;
+  colLayout: boolean;
+  setColLayout(bool: boolean): void;
+  isCarousel: boolean;
+  setCarousel(bool: boolean): void;
 }
 
 interface DataInterface {
@@ -22,6 +34,9 @@ interface DataInterface {
 export const Provider = ({ children }: any) => {
   const [isModel, setIsModel] = useState(false);
   const [data, setData] = useState<DataInterface>({ editor: null });
+  const [isLight, setLight] = useState(true);
+  const [colLayout, setColLayout] = useState(false);
+  const [isCarousel, setCarousel] = useState(false);
 
   function changeSetModel(bool: boolean) {
     setIsModel(bool);
@@ -31,11 +46,21 @@ export const Provider = ({ children }: any) => {
     setData((data: DataInterface) => ({ ...data, editor }));
   }
 
+  function changeTheme(bool: boolean) {
+    setLight(bool);
+  }
+
   const value = {
     isModel,
     changeSetModel,
     data,
     getEditor,
+    isLight,
+    changeTheme,
+    colLayout,
+    setColLayout,
+    isCarousel,
+    setCarousel,
   };
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

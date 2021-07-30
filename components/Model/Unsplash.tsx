@@ -1,8 +1,7 @@
 import React, { useState, useContext } from "react";
-import { UnsplashStyle } from "styles/style";
+import { UnsplashStyle } from "styles/model";
 import useSWR from "swr";
 import ImageWithLoader from "components/ImageWithLoader";
-import { ModelProps } from "types";
 import Context from "context/context";
 
 const fetcher = async function (url: string) {
@@ -10,7 +9,11 @@ const fetcher = async function (url: string) {
   return await res.json();
 };
 
-function Unsplash({ imageClickHandler }: ModelProps) {
+function Unsplash({
+  clickHandler,
+}: {
+  clickHandler(e: React.MouseEvent<HTMLDivElement>, img: any): void;
+}) {
   const [value, setValue] = useState("");
   const [query, setQuery] = useState("nature");
   const dataCtx = useContext(Context);
@@ -28,11 +31,6 @@ function Unsplash({ imageClickHandler }: ModelProps) {
 
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     setValue(e.target.value);
-  }
-
-  function clickHandler(e: React.MouseEvent, img: string) {
-    imageClickHandler(e, img);
-    dataCtx.changeSetModel(false);
   }
 
   if (error) {
@@ -60,7 +58,7 @@ function Unsplash({ imageClickHandler }: ModelProps) {
                 img.width < img.height ? "rowGrid" : ""
               }`}
               key={img.id}
-              onClick={(e) => clickHandler(e, img.urls.regular)}
+              onClick={clickHandler}
             >
               <ImageWithLoader
                 src={img.urls.regular}

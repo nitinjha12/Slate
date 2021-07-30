@@ -1,11 +1,39 @@
 .editor {
   padding: 50px 10px;
   min-height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+.editor__container {
+  padding: 10px 50px;
+  // max-width: 1100px;
+
+  &.dark {
+    background-color: #111;
+    color: white;
+    caret-color: white;
+
+    .editor__titleTextarea {
+      background-color: #111;
+      color: white;
+    }
+
+    .editor__titleNav {
+      .editor__navBtn {
+        background-color: inherit;
+
+        &:hover {
+          background-color: #333;
+          color: white;
+        }
+      }
+    }
+  }
 }
 
 .editor__editable {
   margin: 10px;
-  padding: 10px 50px;
 
   ul,
   ol {
@@ -39,35 +67,100 @@ code {
   vertical-align: super;
 }
 
+.editor__titleNav {
+  margin-bottom: 20px;
+
+  .editor__navBtn {
+    padding: 8px;
+    padding-bottom: 10px;
+    border-radius: 6px;
+    display: flex;
+    width: 180px;
+    font-weight: 500;
+    font-family: inherit;
+    font-size: 18px;
+    align-items: center;
+    color: rgb(170, 170, 170);
+    border: none;
+    outline: none;
+    background-color: white;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgb(241, 241, 241);
+      color: #444;
+    }
+
+    .editor__navSvg {
+      margin-right: 5px;
+    }
+  }
+}
+
+.editor__title {
+  margin-bottom: 30px;
+
+  .editor__titleTextarea {
+    width: 100%;
+    resize: none;
+    font-family: inherit;
+    font-size: 30px;
+    border: none;
+    outline: none;
+    font-weight: bold;
+
+    &::placeholder {
+      font-weight: bold;
+    }
+  }
+}
+
 .editornav {
   display: flex;
   font-family: "Poppins", sans-serif;
-  margin: 0px 50px;
   padding: 10px 20px;
   position: sticky;
   top: 0;
   border-radius: 5px;
-  border: 1px solid rgba(235, 235, 235);
-  background-color: #f5f7fa;
-  z-index: 1000;
+  margin-bottom: 50px;
+
+  z-index: 100;
+
+  &.light {
+    background-color: #f5f7fa;
+    border: 1px solid rgba(235, 235, 235);
+
+    .editornav__list {
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+    }
+
+    .editornav--active {
+      color: #2962ff;
+    }
+  }
+
+  &.drak {
+    background-color: #333;
+    color: white;
+    border: 1px solid rgba(170, 170, 170);
+
+    .editornav--active {
+      color: #1c7eff;
+    }
+  }
 
   .editornav__ul {
     list-style: none;
     display: flex;
+    align-items: center;
     grid-gap: 2rem;
   }
 
   .editornav__list {
     padding: 5px;
     cursor: pointer;
-
-    &:hover {
-      background-color: rgba(255, 255, 255, 0.5);
-    }
-  }
-
-  .editornav--active {
-    color: #2962ff;
   }
 
   .editornav__icon {
@@ -75,7 +168,7 @@ code {
   }
 }
 
-.faqStyle {
+.toogleList__Style {
   margin: 20px 0px;
   display: flex;
   flex-direction: column;
@@ -83,17 +176,16 @@ code {
   padding: 0px 20px;
   background-color: white;
   transition: all 0.5s;
-  overflow: hidden;
   font-family: "Lato", sans-serif;
   position: relative;
 
-  .faq__title {
+  .toogleList____title {
     background-color: white;
     position: relative;
     display: flex;
     transition: all 0.5s;
 
-    .faq__downArrow {
+    .toogleList____downArrow {
       position: absolute;
       left: -15px;
       top: 5px;
@@ -110,7 +202,7 @@ code {
     }
   }
 
-  .faq__input {
+  .toogleList____input {
     position: relative;
     left: 25px;
     padding: 10px 5px;

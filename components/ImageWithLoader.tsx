@@ -25,7 +25,7 @@ function ImageWithLoader({
 
   return (
     <main
-      className={`${parentClassName} customParentLoader`}
+      className={`${parentClassName && parentClassName} customParentLoader`}
       style={loader ? styleLoader : { display: "block" }}
     >
       {loader && <mark className="customLoader"></mark>}

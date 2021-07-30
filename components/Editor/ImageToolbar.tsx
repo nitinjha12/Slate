@@ -1,14 +1,16 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { imageToolbarData } from "./data";
 import { useSlate } from "slate-react";
 import { LinkEditor } from "./SelectEditor";
 import { Editor } from "slate";
+import Context from "context/context";
 
 function ImageToolbar() {
   const [activeNum, setActiveNum] = useState(3);
   const [activeLink, setActiveLink] = useState(false);
   const previousSelection = useRef<any>(null);
   const editor = useSlate();
+  const lightCtx = useContext(Context);
 
   useEffect(() => {
     if (editor.selection) {
@@ -31,7 +33,7 @@ function ImageToolbar() {
   });
 
   return (
-    <section className="imageToolbar">
+    <section className={`imageToolbar ${lightCtx.isLight ? "light" : "dark"}`}>
       {activeLink && (
         <>
           <LinkEditor
@@ -45,7 +47,9 @@ function ImageToolbar() {
       {!activeLink && (
         <div className="imageToolbar__buttons">
           <select
-            className="toolbar__dropdown toolbar__option"
+            className={`toolbar__dropdown toolbar__option ${
+              lightCtx.isLight ? "light" : "dark"
+            }`}
             onChange={(e) => {
               imageToolbarData[Number(e.target.value)].onMouseDown(
                 e as any,
@@ -72,7 +76,9 @@ function ImageToolbar() {
                   setActiveLink(true);
                 }
               }}
-              className={`btn--toolbar toolbar__option hoveringToolbar__button ${
+              className={`btn--toolbar  ${
+                lightCtx.isLight ? "light" : "dark"
+              } toolbar__option hoveringToolbar__button ${
                 data.isActive(editor) ||
                 (match && match[0].url && data.name === "link")
                   ? "btn--toolbar__active"

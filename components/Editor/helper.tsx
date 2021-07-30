@@ -1,6 +1,6 @@
 import Element, { Leaf } from "./Element";
 import { DefaultElement } from "slate-react";
-import { Editor, Path, Point, Range } from "slate";
+import { Editor, Path, Point, Range, Transforms } from "slate";
 import { EditorType, EditorInterface } from "types";
 
 export const useEditorConfig = () => {
@@ -15,10 +15,16 @@ export function isLinkNodeAtSelection(
     return false;
   }
 
-  return !!Editor.above(editor, {
-    at: selection,
-    match: (n: any) => n.type === "link",
-  });
+  Transforms.setSelection(editor, selection as any);
+
+  try {
+    return !!Editor.above(editor, {
+      at: selection,
+      match: (n: any) => n.type === "link",
+    });
+  } catch (err) {
+    err;
+  }
 }
 
 const renderLeaf = (props: any) => <Leaf {...props} />;
@@ -104,6 +110,7 @@ export const initialValue = [
     type: "image",
     src: "/bigo.png",
     caption: "Big O",
+
     children: [{ text: "" }],
   },
   { type: "paragraph", children: [{ text: "" }] },

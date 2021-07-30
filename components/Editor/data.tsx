@@ -14,6 +14,7 @@ import { LineHorizontal1 } from "@styled-icons/fluentui-system-filled/LineHorizo
 import { PlaylistPlay } from "@styled-icons/material-outlined/PlaylistPlay";
 import { Table } from "@styled-icons/bootstrap/Table";
 import { Grid } from "@styled-icons/boxicons-regular/Grid";
+import { ViewCarousel } from "@styled-icons/material-sharp/ViewCarousel";
 import CustomEditor from "./Editor";
 import { EditorType, ToolbarButtonDataInterface } from "types";
 
@@ -187,12 +188,19 @@ export const customEditorData = {
     style: {},
     title: "Toggle List",
   },
-  gridLayout: {
-    editorData: { value: "grid-layout", type: undefined },
+  // gridLayout: {
+  //   editorData: { value: "grid-layout", type: undefined },
+  //   markBlock: false,
+  //   children: <Grid size="18" />,
+  //   style: {},
+  //   title: "Toggle List",
+  // },
+  carousel: {
+    editorData: { value: "carousel", type: undefined },
     markBlock: false,
-    children: <Grid size="18" />,
+    children: <ViewCarousel size="18" />,
     style: {},
-    title: "Toggle List",
+    title: "Carousel",
   },
 };
 
@@ -255,7 +263,7 @@ for (let data of customEditorDataArr) {
           data.editorData.value === "image" ||
           data.editorData.value === "video" ||
           data.editorData.value === "table" ||
-          data.editorData.value === "grid-layout"
+          data.editorData.value === "carousel"
         ) {
           return;
         }
