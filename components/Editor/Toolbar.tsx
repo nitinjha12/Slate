@@ -4,7 +4,7 @@ import { toolbarButtonData } from "./data";
 import { Plus } from "@styled-icons/bootstrap/Plus";
 import { ReactEditor, useSlate } from "slate-react";
 import Context from "context/context";
-import { VideoEditor, TableView, GridLayout } from "./SelectEditor";
+import { VideoEditor, TableView } from "./SelectEditor";
 import { DragIndicator } from "@styled-icons/material-sharp/DragIndicator";
 import { onMouseEnter, onMouseLeave } from "./Dragndrop";
 
@@ -218,7 +218,6 @@ function Toolbar() {
             <VideoEditor editor={editor} setVideoEditor={setVideoEditor} />
           )}
           {isTable && <TableView setTable={setTable} editor={editor} />}
-          {layoutNum && <GridLayout setLayout={setLayoutNum} editor={editor} />}
         </div>
       }
     </section>
