@@ -125,6 +125,32 @@ export const ImageShapeStyle = styled.div`
   }
 `;
 
+export const CaraouselLibraryStyle = styled.section`
+  .selected__img {
+    padding: 0px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+
+    main {
+      min-height: 100%;
+    }
+  }
+`;
+
+export const CarouselContainerStyle = styled.section`
+  padding: 60px 60px;
+  width: 100%;
+  height: 100%;
+  background-color: #f5f8fb;
+
+  @media (max-width: 450px) {
+    padding: 60px 20px;
+  }
+`;
+
 export const CaraouselStyle = styled.section`
   width: 100%;
   position: relative;

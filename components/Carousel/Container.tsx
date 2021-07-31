@@ -1,12 +1,18 @@
 import { useRef } from "react";
-import { CareerAboutSection, CaraouselStyle } from "styles/carousel";
+import { CarouselContainerStyle, CaraouselStyle } from "styles/carousel";
 import CaraouselItem from "./CaraouselItem";
+import { useReadOnly } from "slate-react";
 
-function CarouselContainer({ caraouselData }: any) {
-  const caraouselRef = useRef<HTMLElement>(null);
+function CarouselContainer({ attributes, element, children }: any) {
+  const caraouselRef = useRef<HTMLDivElement>(null);
   let currentSlide = 0;
+  const readOnly = useReadOnly();
 
-  const timer = setInterval(nextHandler, 3000);
+  if (readOnly) {
+    const timer = setInterval(nextHandler, 3000);
+  }
+
+  // console.log(children, element);
 
   function goToSlide(slide: number) {
     caraouselRef.current!.childNodes.forEach((item: any, i) => {
@@ -16,7 +22,7 @@ function CarouselContainer({ caraouselData }: any) {
   }
 
   function activateDot(slide: number) {
-    document.querySelectorAll(".caraousel__datadots").forEach((dot) => {
+    document.querySelectorAll(".caraousel__datadots").forEach((dot: any) => {
       dot.classList.remove("caraousel__datadots__active");
 
       if (dot.dataset.slide == slide) {
@@ -28,7 +34,7 @@ function CarouselContainer({ caraouselData }: any) {
   function prevHandler() {
     currentSlide--;
 
-    if (currentSlide < 0) currentSlide = caraouselData.length - 1;
+    if (currentSlide < 0) currentSlide = children.length - 1;
 
     goToSlide(currentSlide);
     activateDot(currentSlide);
@@ -37,13 +43,13 @@ function CarouselContainer({ caraouselData }: any) {
   function nextHandler() {
     currentSlide++;
 
-    if (currentSlide >= caraouselData.length) currentSlide = 0;
+    if (currentSlide >= children.length) currentSlide = 0;
 
     goToSlide(currentSlide);
     activateDot(currentSlide);
   }
 
-  function dothandler(e: React.MouseEvent<HTMLButtonElement>) {
+  function dothandler(e: any) {
     currentSlide = Number(e.target.dataset.slide);
 
     goToSlide(currentSlide);
@@ -51,42 +57,36 @@ function CarouselContainer({ caraouselData }: any) {
   }
 
   return (
-    // <CareerAboutSection>
-    <CaraouselStyle>
-      <div className="caraousel__container" ref={caraouselRef}>
-        {caraouselData.map((data, i) => (
-          <CaraouselItem
-            key={i}
-            index={i}
-            src={data.src}
-            // thought={data.thought}
-            // fieldOfWork={data.fieldOfWork}
-            // detail={data.detail}
-            wrap={i % 2 !== 0 ? true : false}
-          />
-        ))}
-      </div>
-      <button className="btn__caraousel btn-prev" onClick={prevHandler}>
-        ←
-      </button>
-      <button className="btn__caraousel btn-next" onClick={nextHandler}>
-        →
-      </button>
+    <CarouselContainerStyle>
+      <CaraouselStyle contentEditable={false}>
+        <div
+          className="caraousel__container"
+          {...attributes}
+          ref={caraouselRef}
+        >
+          {children}
+        </div>
+        <button className="btn__caraousel btn-prev" onClick={prevHandler}>
+          ←
+        </button>
+        <button className="btn__caraousel btn-next" onClick={nextHandler}>
+          →
+        </button>
 
-      <div className="caraousel__dots">
-        {caraouselData.map((_, i) => (
-          <button
-            key={i}
-            onClick={dothandler}
-            className={`caraousel__datadots ${
-              i === 0 ? "caraousel__datadots__active" : ""
-            }`}
-            data-slide={i}
-          ></button>
-        ))}
-      </div>
-    </CaraouselStyle>
-    // </CareerAboutSection>
+        <div className="caraousel__dots">
+          {children.map((_: any, i: any) => (
+            <button
+              key={i}
+              onClick={dothandler}
+              className={`caraousel__datadots ${
+                i === 0 ? "caraousel__datadots__active" : ""
+              }`}
+              data-slide={i}
+            ></button>
+          ))}
+        </div>
+      </CaraouselStyle>
+    </CarouselContainerStyle>
   );
 }
 

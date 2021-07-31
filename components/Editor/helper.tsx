@@ -78,6 +78,10 @@ const renderElement = (props: any) => {
       return <Element.GridLayout {...props} />;
     case "grid-layout-child":
       return <Element.GridLayoutChildren {...props} />;
+    case "carousel":
+      return <Element.Carousel {...props} />;
+    case "carousel-item":
+      return <Element.CarouselItem {...props} />;
     case "paragraph":
       return <Element.ParaGraph {...props} />;
     default:

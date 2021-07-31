@@ -12,6 +12,8 @@ import { useState, useEffect } from "react";
 import ToggleList from "./ToggleList";
 import Video from "./Elements/Video";
 import Table from "./Elements/Table";
+import CaraouselItem from "components/Carousel/CaraouselItem";
+import CarouselContainer from "components/Carousel/Container";
 
 const Element = {
   Anchor(props: any) {
@@ -223,6 +225,15 @@ const Element = {
         </div>
       </>
     );
+  },
+
+  Carousel(props: any) {
+    // console.log(props);
+    return <CarouselContainer {...props} />;
+  },
+  CarouselItem(props: any) {
+    console.log(props);
+    return <CaraouselItem {...props} />;
   },
 
   ParaGraph(props: any) {

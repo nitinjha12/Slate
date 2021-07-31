@@ -9,14 +9,12 @@ import Unsplash from "./Unsplash";
 function ModelUnsplash({ imageClickHandler }: ModelProps) {
   const dataCtx = useContext(Context);
 
-  function clickHandler(e: React.MouseEvent, img: string) {
+  function clickHandler(e: React.MouseEvent<HTMLDivElement>, img: string) {
     imageClickHandler(e, img);
     dataCtx.changeSetModel(false);
   }
 
-  return (
-    <Unsplash clickHandler={(e, img) => clickHandler(e, img.urls.regular)} />
-  );
+  return <Unsplash clickHandler={clickHandler} />;
 }
 
 export default ModelUnsplash;

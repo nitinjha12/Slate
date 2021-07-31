@@ -1,22 +1,16 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { UnsplashStyle } from "styles/model";
 import useSWR from "swr";
 import ImageWithLoader from "components/ImageWithLoader";
-import Context from "context/context";
 
 const fetcher = async function (url: string) {
   const res = await fetch(url);
   return await res.json();
 };
 
-function Unsplash({
-  clickHandler,
-}: {
-  clickHandler(e: React.MouseEvent<HTMLDivElement>, img: any): void;
-}) {
+function Unsplash({ clickHandler }: any) {
   const [value, setValue] = useState("");
   const [query, setQuery] = useState("nature");
-  const dataCtx = useContext(Context);
 
   const { data, error } = useSWR(
     `https://api.unsplash.com/search/photos/?client_id=${process.env.NEXT_APP_UNSPLASH_API}&query=${query}&page=1&per_page=20`,
@@ -58,10 +52,12 @@ function Unsplash({
                 img.width < img.height ? "rowGrid" : ""
               }`}
               key={img.id}
-              onClick={clickHandler}
+              onClick={(e) => {
+                clickHandler(e, img.urls.raw);
+              }}
             >
               <ImageWithLoader
-                src={img.urls.regular}
+                src={img.urls.small}
                 alt={img.alt_description}
                 width={50}
                 height={50}

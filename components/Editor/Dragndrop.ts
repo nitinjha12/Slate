@@ -81,6 +81,7 @@ export const onDragover = (
   editor: EditorType
 ) => {
   e.preventDefault();
+  e.stopPropagation();
 
   const editorParent =
     document.querySelector<HTMLDivElement>(".editor__editable")!;
@@ -95,13 +96,15 @@ export const onDragover = (
 };
 
 export const onDrop = (
+  e: React.MouseEvent,
   editor: EditorType,
   dragEle: HTMLElement | undefined,
   value: any,
   setValue: Function,
   layout: boolean
 ) => {
-  // e.preventDefault();
+  e.preventDefault();
+  e.stopPropagation();
   const dragBtn = document.querySelector<HTMLButtonElement>(
     ".toolbar__dragndrop"
   );
@@ -157,7 +160,7 @@ export const onDrop = (
 
   const newEditor = JSON.parse(JSON.stringify(editor));
 
-  Transforms.moveNodes(editor, {});
+  // Transforms.moveNodes(editor, {});
   console.log(editor);
   // Transforms.removeNodes(editor, { at: editor.selection?.anchor.path });
   // Transforms.collapse(editor);
