@@ -1,5 +1,6 @@
 import { Editor, Range, Point, Element, Transforms, Node, Text } from "slate";
 import { EditorType } from "types";
+import { ReactEditor } from "slate-react";
 
 function withTable(editor: EditorType) {
   const { deleteBackward, deleteForward, insertBreak, insertText } = editor;
@@ -8,33 +9,73 @@ function withTable(editor: EditorType) {
   // editor.
 
   editor.insertText = (text) => {
-    // console.log("text");
-
     const { selection } = editor;
-    const [start] = Editor.nodes(editor, {
-      match: (n: any) => n.type === "table-cell",
-      at: selection?.anchor.path,
-    }) as any;
-    const [end]: any = Editor.nodes(editor, {
-      match: (n: any) => n.type === "table-cell",
-      at: selection?.focus.path,
-    });
-    // Collapse selection if multiple table-cells are selected to avoid breaking the table
-    if (
-      selection &&
-      !Range.isCollapsed(selection) &&
-      (start || end) &&
-      start?.[0] !== end?.[0]
-    ) {
-      const [cell]: any = Editor.nodes(editor, {
-        match: (n: any) => n.type === "table-cell",
+
+    if (selection) {
+      const [table]: any = Editor.nodes(editor, {
+        match: (n: any) => {
+          return (
+            !Editor.isEditor(n) &&
+            (Element.isElement(n) as any) &&
+            n.type === "table"
+          );
+        },
+        mode: "all",
       });
-      if (cell) {
-        Transforms.collapse(editor, { edge: "end" });
-        insertText(text);
-        return;
+
+      if (table) {
+        const nodeDomTraversal = (
+          editor: EditorType,
+          ele: HTMLElement,
+          type: string,
+          path = editor.selection!.anchor.path
+        ): any => {
+          console.log(editor, ele, type, path);
+
+          if (ele?.classList.contains("toolbar__dragndrop")) {
+            ele.remove();
+            return;
+          }
+
+          // if (editor?.type === type) return ele;
+
+          return nodeDomTraversal(
+            editor.children[path[0]] as any,
+            ele.childNodes[path[0]] as any,
+            type,
+            path.slice(1)
+          );
+        };
+
+        const [cell]: any = Editor.nodes(editor, {
+          match: (n: any) => {
+            // console.log(n);
+
+            // const path = n.type && ReactEditor.findPath(editor, n);
+            // const editableEle =
+            //   document.querySelector<HTMLElement>(".editor__editable");
+
+            // console.log(path);
+            // if (n.type === "paragraph") {
+            //   const dom = nodeDomTraversal(editor, editableEle!, n.type, path);
+            // }
+
+            return (
+              !Editor.isEditor(n) &&
+              (Element.isElement(n) as any) &&
+              n.type.includes("list")
+            );
+          },
+          mode: "all",
+        });
+        const dragBtn = document.querySelector<HTMLElement>(
+          ".dragIndicator__icon"
+        );
+
+        dragBtn!.style.display = "none";
       }
     }
+
     insertText(text);
   };
 
@@ -92,8 +133,6 @@ function withTable(editor: EditorType) {
     if (selection) {
       const [table]: any = Editor.nodes(editor, {
         match: (n: any) => {
-          // console.log(n);
-          // console.log(Transforms);
           return (
             !Editor.isEditor(n) &&
             (Element.isElement(n) as any) &&
@@ -102,39 +141,39 @@ function withTable(editor: EditorType) {
         },
         mode: "all",
       });
-      const [cell]: any = Editor.nodes(editor, {
-        match: (n: any) => {
-          const block = { type: "paragraph", children: [{ text: "" }] };
-          const listBlock = { type: "list-item", children: [{ text: "" }] };
-          let list = false;
-
-          n.type === "table-cell" &&
-            n.children.map((child: any) => {
-              if (child.type.includes("list")) {
-                list = true;
-              }
-            });
-
-          n.type === "table-cell" &&
-            !list &&
-            Transforms.insertNodes(editor, block);
-
-          n.type &&
-            n.type.includes("list") &&
-            Transforms.insertNodes(editor, listBlock);
-
-          // console.log(JSON.parse(JSON.stringify(editor.operations)));
-          return (
-            !Editor.isEditor(n) &&
-            (Element.isElement(n) as any) &&
-            n.type &&
-            n.type.includes("list")
-          );
-        },
-        mode: "all",
-      });
 
       if (table) {
+        const [cell]: any = Editor.nodes(editor, {
+          match: (n: any) => {
+            const block = { type: "paragraph", children: [{ text: "" }] };
+            const listBlock = { type: "list-item", children: [{ text: "" }] };
+            let list = false;
+
+            n.type === "table-cell" &&
+              n.children.map((child: any) => {
+                if (child.type.includes("list")) {
+                  list = true;
+                }
+              });
+
+            n.type === "table-cell" &&
+              !list &&
+              Transforms.insertNodes(editor, block);
+
+            n.type &&
+              n.type.includes("list") &&
+              Transforms.insertNodes(editor, listBlock);
+
+            // console.log(JSON.parse(JSON.stringify(editor.operations)));
+            return (
+              !Editor.isEditor(n) &&
+              (Element.isElement(n) as any) &&
+              n.type &&
+              n.type.includes("list")
+            );
+          },
+          mode: "all",
+        });
         return;
       }
     }

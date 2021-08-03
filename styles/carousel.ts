@@ -145,6 +145,7 @@ export const CarouselContainerStyle = styled.section`
   width: 100%;
   height: 100%;
   background-color: #f5f8fb;
+  overflow: hidden;
 
   @media (max-width: 450px) {
     padding: 60px 20px;
@@ -224,13 +225,23 @@ export const CarouselItemStyle = styled.div`
   position: absolute;
   justify-content: center;
   grid-gap: 2rem;
-  padding: 0 40px;
+  padding: 40px;
   width: 100%;
   height: 100%;
-  margin: 50px 0;
+
+  .parentCarousel__ImageItem {
+    height: 100%;
+    width: 100%;
+
+    div {
+      height: 100%;
+      width: 100%;
+    }
+  }
 
   @media (max-width: 900px) {
     flex-direction: column;
+    grid-gap: 1rem;
   }
 
   .caraousel__dataImg {

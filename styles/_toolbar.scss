@@ -75,18 +75,25 @@
   margin-right: 7px;
 }
 
-.toolbar__dragndrop {
-  position: relative !important;
+.toolbar__dragndrop,
+.toolbar__dragndropIndicator {
+  position: absolute;
   background-color: transparent;
   outline: none;
   border: none;
   cursor: grab;
+  left: 30px;
 
   .dragIndicator__icon {
     cursor: grab;
     z-index: 1000;
+    background-color: inherit;
   }
 }
+
+// .toolbar__dragndrop {
+//   top: 12px;
+// }
 
 .toolbar__option {
   border-radius: 3px;
@@ -274,8 +281,8 @@
 
 .videoEditor {
   position: absolute;
-  top: 40px;
-  // right: -30px;
+  top: 50px;
+  left: 150px;
   color: white;
   background-color: #111;
   border-radius: 5px;

@@ -7,6 +7,7 @@ import { isLinkNodeAtSelection } from "./helper";
 import { EmbedUrl } from "./EmbedUrl";
 import { ReactEditor } from "slate-react";
 import Table from "./Functions/Table";
+import findDomNode from "./findDomNode";
 
 const LIST_TYPES = ["bulleted-list", "ordered-list", "toggle-list"];
 const ALIGN_TYPES = ["left-align", "right-align", "center-align"];
@@ -104,6 +105,15 @@ const CustomEditor = {
   },
 
   toggleAlignBlock(editor: EditorType, isActive: boolean, format: string) {
+    // const align = format.split("-");
+
+    // const domNode = findDomNode(
+    //   editor,
+    //   editor.selection?.anchor.path[0]!
+    // ) as HTMLElement;
+
+    // domNode.style.textAlign = align[0];
+
     Transforms.unwrapNodes(editor, {
       match: (n: any) =>
         ALIGN_TYPES.includes(
@@ -113,11 +123,15 @@ const CustomEditor = {
     });
 
     if (!isActive) {
-      const block = { type: format, children: [] };
-      Transforms.wrapNodes(editor, block);
+      Transforms.wrapNodes(editor, { type: format, children: [] } as any);
     }
   },
-  addGridLayout(editor: EditorType, num: number, setValue: Function) {
+  addGridLayout(
+    editor: EditorType,
+    num: number,
+    setValue: Function,
+    path: number[]
+  ) {
     const children = [];
 
     const newEditor = JSON.parse(JSON.stringify(editor));
@@ -132,19 +146,30 @@ const CustomEditor = {
 
     // const block = { type: "grid-layout", children: children };
 
-    const removeNode = newEditor.children[newEditor.selection?.anchor.path[0]];
+    const removeNode = newEditor.children[path[0]];
     const dropNode = newEditor.children[num];
 
+    console.log(
+      num,
+      dropNode,
+      path,
+      JSON.parse(JSON.stringify(editor.children[num]))
+    );
+    const position = ReactEditor.findPath(editor, editor.children[num]);
+
     if (newEditor.children[num].type === "grid-layout") {
+      const totalLength = newEditor.children[num].children.length + 1;
+
       for (let data of newEditor.children[num].children) {
-        data.width = 100 / newEditor.children[num].children.length + 1;
+        data.width = 100 / totalLength;
+        data.line = true;
       }
 
-      Transforms.removeNodes(editor, {
-        match: (n: any) => n.type === "grid-layout",
-      });
+      console.log(100 / totalLength, totalLength);
 
-      console.log(editor.selection);
+      Transforms.removeNodes(editor, { at: path });
+
+      // console.log(position, newEditor.children[num].children);
 
       const block = {
         type: "grid-layout",
@@ -153,31 +178,30 @@ const CustomEditor = {
           {
             children: [removeNode],
             type: "grid-layout-child",
-            width: 100 / newEditor.children[num].children.length + 1,
+            width: 100 / totalLength,
+            line: true,
           },
         ],
       };
 
+      block.children[block.children.length - 1].line = false;
+
       console.log(block);
 
-      Transforms.insertNodes(editor, block);
+      Transforms.removeNodes(editor, {
+        // match: (n: any) => n.type === "grid-layout",
+        at: [num],
+      });
+
+      Transforms.insertNodes(editor, block, { at: [num] });
       return;
     }
 
-    console.log(
-      newEditor.children[num],
-      newEditor.children[newEditor.selection.anchor.path[0]],
-      num,
-      // newEditor.selection.anchor.path[0]
-      editor.selection?.anchor.path[0]
-    );
+    console.log(newEditor.children[num], newEditor.children[path[0]], num);
 
-    Transforms.removeNodes(editor);
-    Transforms.removeNodes(editor, { at: [num] });
+    Transforms.removeNodes(editor, { at: path });
 
-    // console.log(removeNode, dropNode);
-
-    // setValue(newEditor.children);
+    // console.log(position);
 
     const block = {
       type: "grid-layout",
@@ -186,20 +210,21 @@ const CustomEditor = {
           children: [dropNode],
           width: 50,
           type: "grid-layout-child",
+          line: true,
         },
         {
           children: [removeNode],
           width: 50,
           type: "grid-layout-child",
+          line: false,
         },
       ],
     };
 
-    console.log(block);
+    // console.log(block);
 
-    Transforms.insertNodes(editor, block, { at: newEditor.selection });
-
-    console.log("got it");
+    Transforms.removeNodes(editor, { at: [num] });
+    Transforms.insertNodes(editor, block, { at: position });
   },
 
   toggleLinkAtSelection(editor: EditorType) {

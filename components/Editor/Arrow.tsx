@@ -7,6 +7,8 @@ import { useSlateStatic } from "slate-react";
 function Arrow({ isSelected, isHover }: any) {
   const editor = useSlateStatic();
 
+  // console.log(isSelected);
+
   function clickHandler(e: React.MouseEvent, prev = false) {
     const block = { type: "paragraph", children: [{ text: "" }] };
 

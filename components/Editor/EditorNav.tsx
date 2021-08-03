@@ -3,7 +3,6 @@ import { Pencil } from "@styled-icons/bootstrap/Pencil";
 import { Eye } from "@styled-icons/evil/Eye";
 import { SunFill } from "@styled-icons/bootstrap/SunFill";
 import { MoonFill } from "@styled-icons/bootstrap/MoonFill";
-import { GridView } from "@styled-icons/material-outlined/GridView";
 import Context from "context/context";
 
 function EditorNav({ isWriting, setWriting }: any) {
@@ -40,14 +39,6 @@ function EditorNav({ isWriting, setWriting }: any) {
               onClick={() => lightCtx.changeTheme(true)}
             />
           )}
-        </li>
-        <li
-          className={`editornav__list ${
-            lightCtx.colLayout && "editornav--active"
-          }`}
-          onClick={() => lightCtx.setColLayout(!lightCtx.colLayout)}
-        >
-          <GridView size="30" />
         </li>
       </ul>
     </nav>

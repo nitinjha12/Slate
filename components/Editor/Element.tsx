@@ -8,12 +8,67 @@ import {
   useReadOnly,
 } from "slate-react";
 import { Editor, Transforms } from "slate";
-import { useState, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import ToggleList from "./ToggleList";
 import Video from "./Elements/Video";
 import Table from "./Elements/Table";
 import CaraouselItem from "components/Carousel/CaraouselItem";
 import CarouselContainer from "components/Carousel/Container";
+import { DragIndicator } from "@styled-icons/material-sharp/DragIndicator";
+import { onMouseEnter } from "./Dragndrop";
+import Context from "context/context";
+
+function DragIndicatorIcon() {
+  const modelCtx = useContext(Context);
+  const editor = useSlate();
+  const readOnly = useReadOnly();
+
+  return !readOnly ? (
+    <button
+      className="toolbar__dragndrop"
+      onMouseEnter={(e) => onMouseEnter(e, editor as any, modelCtx.setDragPath)}
+      style={{ display: "none" }}
+      contentEditable={false}
+    >
+      <DragIndicator
+        className={`dragIndicator__icon ${
+          modelCtx.isLight ? "mode--light" : "mode--dark"
+        }`}
+        size="20"
+        color="black"
+      />
+    </button>
+  ) : (
+    <span style={{ display: "none" }} className="toolbar__dragndrop"></span>
+  );
+}
+
+const hoverHandler = {
+  onMouseEnter(e: React.MouseEvent) {
+    e.currentTarget.setAttribute("draggable", "true");
+
+    // function
+
+    // console.log(node);
+
+    e.currentTarget!.addEventListener("dragstart", () => {
+      e.currentTarget?.classList.add("draggable--dragging");
+    });
+
+    e.currentTarget!.addEventListener("dragend", () => {
+      e.currentTarget?.classList.remove("draggable--dragging");
+    });
+
+    const dragBtn: any = e.currentTarget.childNodes[0];
+    dragBtn.style.display = "inline-block";
+  },
+  onMouseLeave(e: React.MouseEvent) {
+    e.currentTarget.setAttribute("draggable", "false");
+
+    const dragBtn: any = e.currentTarget.childNodes[0];
+    dragBtn.style.display = "none";
+  },
+};
 
 const Element = {
   Anchor(props: any) {
@@ -25,52 +80,82 @@ const Element = {
   },
   Code(props: any) {
     return (
-      <div className="code__container my-2" {...props.attributes}>
-        <code>{props.children}</code>
+      <div className="draggableItems my-2" {...hoverHandler}>
+        <DragIndicatorIcon />
+
+        <div className="code__container " {...props.attributes}>
+          <code>{props.children}</code>
+        </div>
       </div>
     );
   },
   Heading1(props: any) {
     return (
-      <h1
-        {...props.attributes}
-        className="my-2"
-        style={{ fontSize: "2em", fontWeight: "bold" }}
-      >
-        {props.children}
-      </h1>
+      <div className="draggableItems my-2" {...hoverHandler}>
+        <DragIndicatorIcon />
+
+        <h1
+          {...props.attributes}
+          className=""
+          style={{ fontSize: "2em", fontWeight: "bold" }}
+        >
+          {props.children}
+        </h1>
+      </div>
     );
   },
   Heading2(props: any) {
     return (
-      <h2 {...props.attributes} className="my-2">
-        {props.children}
-      </h2>
+      <div className="draggableItems my-2" {...hoverHandler}>
+        <DragIndicatorIcon />
+
+        <h2 {...props.attributes} className="">
+          {props.children}
+        </h2>
+      </div>
     );
   },
   Heading3(props: any) {
     return (
-      <h3 {...props.attributes} className="my-2">
-        {props.children}
-      </h3>
+      <div className="draggableItems my-2" {...hoverHandler}>
+        <DragIndicatorIcon />
+
+        <h3 {...props.attributes} className="">
+          {props.children}
+        </h3>
+      </div>
     );
   },
   BulletedList(props: any) {
     return (
-      <ul {...props.attributes} className="my-2">
-        {props.children}
-      </ul>
+      <div className="draggableItems my-2" {...hoverHandler}>
+        <DragIndicatorIcon />
+
+        <ul {...props.attributes} className="">
+          {props.children}
+        </ul>
+      </div>
     );
   },
   OrderedList(props: any) {
     return (
-      <ol {...props.attributes} className="my-2">
-        {props.children}
-      </ol>
+      <div className="draggableItems my-2" {...hoverHandler}>
+        <DragIndicatorIcon />
+
+        <ol {...props.attributes} className="">
+          {props.children}
+        </ol>
+      </div>
     );
   },
   ToggleList(props: any) {
-    return <ToggleList {...props} />;
+    return (
+      <div className="draggableItems my-2" {...hoverHandler}>
+        <DragIndicatorIcon />
+
+        <ToggleList {...props} />
+      </div>
+    );
   },
   BoldText(props: any) {
     return <strong {...props.attributes}>{props.children}</strong>;
@@ -78,7 +163,7 @@ const Element = {
 
   ListItem(props: any) {
     return (
-      <li {...props.attributes} className="my-2">
+      <li {...props.attributes} className="">
         {props.children}
       </li>
     );
@@ -86,52 +171,60 @@ const Element = {
 
   Line(props: any) {
     return (
-      <div
-        {...props.attributes}
-        style={{ display: "flow-root" }}
-        contentEditable={false}
-        className="my-2 hr--line"
-      >
-        <hr
-          style={{
-            display: "flow-root",
-            height: "3px",
-            backgroundColor: "#E6E9EF",
-            margin: "1rem 0",
-            border: "0px",
-            borderRadius: "3px",
-          }}
-        />
-        <span style={{ display: "none" }}>{props.children}</span>
+      <div className="draggableItems my-2" {...hoverHandler}>
+        <DragIndicatorIcon />
+
+        <div
+          {...props.attributes}
+          style={{ display: "flow-root" }}
+          contentEditable={false}
+          className=" hr--line"
+        >
+          <hr
+            style={{
+              display: "flow-root",
+              height: "3px",
+              backgroundColor: "#E6E9EF",
+              margin: "1rem 0",
+              border: "0px",
+              borderRadius: "3px",
+            }}
+          />
+          <span style={{ display: "none" }}>{props.children}</span>
+        </div>
       </div>
     );
   },
   LeftAlign(props: any) {
     return (
-      <div style={{ textAlign: "left" }} className="my-2" {...props.attributes}>
-        {props.children}
+      <div className="draggableItems my-2" {...hoverHandler}>
+        <DragIndicatorIcon />
+
+        <div style={{ textAlign: "left" }} className="" {...props.attributes}>
+          {props.children}
+        </div>
       </div>
     );
   },
   CenterAlign(props: any) {
     return (
-      <div
-        style={{ textAlign: "center" }}
-        className="my-2"
-        {...props.attributes}
-      >
-        {props.children}
+      <div className="draggableItems my-2" {...hoverHandler}>
+        <DragIndicatorIcon />
+
+        <div style={{ textAlign: "center" }} className="" {...props.attributes}>
+          {props.children}
+        </div>
       </div>
     );
   },
   RightAlign(props: any) {
     return (
-      <div
-        style={{ textAlign: "right" }}
-        className="my-2"
-        {...props.attributes}
-      >
-        {props.children}
+      <div className="draggableItems my-2" {...hoverHandler}>
+        <DragIndicatorIcon />
+
+        <div style={{ textAlign: "right" }} className="" {...props.attributes}>
+          {props.children}
+        </div>
       </div>
     );
   },
@@ -147,15 +240,30 @@ const Element = {
   Image(props: any) {
     return (
       <>
-        <ImageElement {...props} />
+        <div className="draggableItems my-2" {...hoverHandler}>
+          <DragIndicatorIcon />
+
+          <ImageElement {...props} />
+        </div>
       </>
     );
   },
   Video(props: any) {
-    return <Video {...props} />;
+    return (
+      <div className="draggableItems my-2" {...hoverHandler}>
+        <DragIndicatorIcon />
+
+        <Video {...props} />
+      </div>
+    );
   },
   Table(props: any) {
-    return <Table {...props} />;
+    return (
+      <div className="draggableItems my-2" {...hoverHandler}>
+        <DragIndicatorIcon />
+        <Table {...props} />
+      </div>
+    );
   },
   TableHead(props: any) {
     return <thead {...props.attributes}>{props.children}</thead>;
@@ -173,6 +281,7 @@ const Element = {
         colSpan={props.element.colSpan}
         rowSpan={props.element.rowSpan}
         style={props.element.display ? {} : { display: "none" }}
+        className="element__tableCell"
       >
         {props.children}
       </td>
@@ -181,71 +290,66 @@ const Element = {
 
   GridLayout(props: any) {
     return (
-      <section {...props.attributes} className="my-2 gridLayout">
+      <section {...props.attributes} className="gridLayout">
         {props.children}
       </section>
     );
   },
   GridLayoutChildren(props: any) {
     // console.log(props);
-
-    const editor = useSlate();
     const readonly = useReadOnly();
-    const selected = useSelected();
-
-    // console.log(editor.selection);
-
-    const path = editor.selection?.anchor.path;
-    if (path) {
-      const children: any = editor.children;
-      const child = children[path[0]]?.children[path[1]];
-    }
 
     return (
       <>
         <div
-          className="gridLayout__children"
-          {...props.attributes}
+          className="draggableItems my-2 gridLayout--dragItem"
+          {...hoverHandler}
           style={{
             width: props.element.width + "%",
-            border: readonly ? "none" : "1px solid black",
-            position: "relative",
+            // paddingLeft: "40px",
           }}
         >
-          {/* {selected && (
-            <button
-              style={{ position: "absolute", bottom: "0px" }}
-              onClick={() => Transforms.removeNodes(editor)}
-              contentEditable={false}
-            >
-              Delete
-            </button>
-          )} */}
-          {props.children}
+          <DragIndicatorIcon />
+
+          <div
+            className="gridLayout__children"
+            {...props.attributes}
+            style={{
+              border: readonly ? "none" : "1px solid black",
+              position: "relative",
+            }}
+          >
+            {props.children}
+          </div>
         </div>
+        {props.element.line && <div className=""></div>}
       </>
     );
   },
 
   Carousel(props: any) {
     // console.log(props);
-    return <CarouselContainer {...props} />;
+    return (
+      <div className="draggableItems my-2" {...hoverHandler}>
+        <DragIndicatorIcon />
+        <CarouselContainer {...props} />
+      </div>
+    );
   },
   CarouselItem(props: any) {
-    console.log(props);
     return <CaraouselItem {...props} />;
   },
 
   ParaGraph(props: any) {
     return (
-      <p {...props.attributes} className="my-2">
-        {props.children}
-      </p>
-    );
-  },
+      <div className="draggableItems my-2" {...hoverHandler}>
+        <DragIndicatorIcon />
 
-  Default(props: any) {
-    return <span {...props.attributes}>{props.children}</span>;
+        <p {...props.attributes} className="">
+          {props.children}
+        </p>
+      </div>
+    );
   },
 };
 
@@ -277,19 +381,19 @@ export const Leaf = function (props: any) {
     </span>
   );
 
-  if (props.leaf.placeholder) {
-    return (
-      <>
-        <DefaultLeaf {...props} />
-        <span
-          style={{ opacity: 0.8, position: "absolute", top: 0, color: "black" }}
-          contentEditable={false}
-        >
-          Type / to open menu
-        </span>
-      </>
-    );
-  }
+  // if (props.leaf.placeholder) {
+  //   return (
+  //     <>
+  //       <DefaultLeaf {...props} />
+  //       <span
+  //         style={{ opacity: 0.8, position: "absolute", top: 0, color: "black" }}
+  //         contentEditable={false}
+  //       >
+  //         Type / to open menu
+  //       </span>
+  //     </>
+  //   );
+  // }
 
   return <DefaultLeaf {...props} />;
 

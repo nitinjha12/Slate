@@ -6,7 +6,7 @@ import { ReactEditor, useSlate } from "slate-react";
 import Context from "context/context";
 import { VideoEditor, TableView } from "./SelectEditor";
 import { DragIndicator } from "@styled-icons/material-sharp/DragIndicator";
-import { onMouseEnter, onMouseLeave } from "./Dragndrop";
+// import { toolbarOnMouseEnter, toolbarOnMouseLeave } from "./Dragndrop";
 
 function Toolbar() {
   const toolbar = document.querySelector<HTMLDivElement>(".toolbar__buttons");
@@ -67,6 +67,8 @@ function Toolbar() {
       eleHeight = 5;
     }
 
+    console.log(rect);
+
     if (
       (setSelection.current.rect !== rect.top ||
         selected.type.includes("list") ||
@@ -78,15 +80,23 @@ function Toolbar() {
         rect.top + window.pageYOffset + eleHeight - el.offsetHeight + 22;
     }
 
-    el.style.top = `${setSelection.current.top}px`;
+    el.style.top = `${setSelection.current.top - 50}px`;
     el.style.left = `${10}px`;
   }, [editor.selection, isVideoEditor]);
 
   useEffect(() => {
+    if (isTable) {
+      setLayoutNum(false);
+      setVideoEditor(false);
+    }
     !isTable && toolbar?.classList.add("toolbar__buttons--hide");
   }, [isTable]);
 
   useEffect(() => {
+    if (layoutNum) {
+      setTable(false);
+      setVideoEditor(false);
+    }
     !layoutNum && toolbar?.classList.add("toolbar__buttons--hide");
   }, [layoutNum]);
 
@@ -100,6 +110,11 @@ function Toolbar() {
     console.log(box);
   }
   // toolbarRef.current && elePosition(toolbarRef.current);
+
+  useEffect(() => {
+    setTable(false);
+    setVideoEditor(false);
+  }, [toolbarBtn]);
 
   return (
     <section className={`toolbar `} ref={toolbarRef}>
@@ -124,21 +139,6 @@ function Toolbar() {
         <Plus size="24" />
       </button>
 
-      {/* drag and dropp   */}
-
-      <button
-        className="toolbar__dragndrop"
-        onMouseEnter={() => onMouseEnter(editor, setDraggableEle)}
-        onMouseLeave={() => onMouseLeave(draggableEle!)}
-      >
-        <DragIndicator
-          className={`dragIndicator__icon ${
-            modelCtx.isLight ? "mode--light" : "mode--dark"
-          }`}
-          size="20"
-          color="black"
-        />
-      </button>
       {
         <div
           className={`toolbar__buttons ${

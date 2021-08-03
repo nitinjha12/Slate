@@ -22,6 +22,7 @@ import ModelWindow from "./ModelWindow";
 import { onDragover, onDrop } from "./Dragndrop";
 import EditorNav from "./EditorNav";
 import { CardImage } from "@styled-icons/bootstrap/CardImage";
+import shouldMerge from "./shouldMerge";
 
 function Create() {
   const editor = useMemo(
@@ -32,6 +33,8 @@ function Create() {
     []
   );
 
+  const [dropLine, setDropLine] = useState<"" | "top" | "bottom">("");
+  const [gridLayout, setGridLayout] = useState(false);
   const [value, setValue] = useState<any>(initialValue);
   const modelCtx = useContext(Context);
   const [dragEle, setDragEle] = useState<HTMLElement>();
@@ -44,58 +47,42 @@ function Create() {
     }
   }, [editor.selection]);
 
-  // const [id, setId] = useState(localStorage.getItem("contentID") || "");
+  const [id, setId] = useState(localStorage.getItem("contentID") || "");
 
-  // useEffect(() => {
-  //   if (id) {
-  //     localStorage.setItem("contentID", id);
-  //   }
-  //   setId(localStorage.getItem("contentID")!);
+  useEffect(() => {
+    if (id) {
+      localStorage.setItem("contentID", id);
+    }
+    setId(localStorage.getItem("contentID")!);
 
-  //   (async function () {
-  //     const res = await fetch(`/api/task?id=${id}`);
-  //     const data = await res.json();
+    (async function () {
+      const res = await fetch(`/api/task?id=${id}`);
+      const data = await res.json();
 
-  //     setValue(JSON.parse(data.data.data));
-  //   })();
-  // }, [id]);
+      setValue(JSON.parse(data.data.data));
+    })();
+  }, [id]);
 
   const { renderElement, renderLeaf } = useEditorConfig();
 
   function onChange(value: any) {
     setValue(value);
 
-    // const content = value;
+    const content = value;
 
-    // if (id) {
-    //   fetcher({ id, data: content });
-    // } else {
-    //   fetcher({ data: content }, setId);
-    // }
+    if (id) {
+      fetcher({ id, data: content });
+    } else {
+      fetcher({ data: content }, setId);
+    }
   }
 
   function getDragAfterElement(container: any, y: number) {
     const draggableEle = [
-      ...container.querySelectorAll(".my-2:not(.draggable--dragging)"),
+      ...container.querySelectorAll(
+        ".draggableItems:not(.draggable--dragging)"
+      ),
     ];
-
-    // console.log(
-    //   draggableEle.reduce(
-    //     (closest, child) => {
-    //       const ele = child.getBoundingClientRect();
-    //       const offset = y - ele.top - ele.height / 2;
-
-    //       if (offset > 0 && offset < closest.offset) {
-    //         return { offset: offset, element: child };
-    //       } else {
-    //         return closest;
-    //       }
-    //     },
-    //     {
-    //       offset: Number.POSITIVE_INFINITY,
-    //     }
-    //   )
-    // );
 
     return draggableEle.reduce(
       (closest, child) => {
@@ -163,52 +150,74 @@ function Create() {
               modelCtx.isLight ? "light" : "dark"
             }`}
             onDragOver={(e) => {
-              onDragover(e, getDragAfterElement, dragEle, setDragEle, editor);
+              onDragover(
+                e,
+                getDragAfterElement,
+                dragEle,
+                setDragEle,
+                setGridLayout,
+                editor
+              );
             }}
             onDrop={(e) => {
-              onDrop(e, editor, dragEle, value, onChange, modelCtx.colLayout);
+              onDrop(
+                e,
+                editor,
+                dragEle,
+                value,
+                onChange,
+                gridLayout,
+                modelCtx.dragPath
+              );
             }}
           >
-            <nav className="editor__titleNav">
-              <label
-                htmlFor="upload"
-                className="editor__navBtn"
-                onClick={clickHandler}
-              >
-                <span>
-                  <CardImage size="20" className="editor__navSvg" />
-                </span>
-                <span> Add cover photo</span>
-              </label>
-              <input type="file" id="upload" style={{ display: "none" }} />
-            </nav>
+            <section className="header__container">
+              <nav className="editor__titleNav">
+                <label
+                  htmlFor="upload"
+                  className="editor__navBtn"
+                  onClick={clickHandler}
+                >
+                  <span>
+                    <CardImage size="20" className="editor__navSvg" />
+                  </span>
+                  <span> Add cover photo</span>
+                </label>
+                <input type="file" id="upload" style={{ display: "none" }} />
+              </nav>
 
-            <section className="editor__title">
-              <div className="editor__titleImage"></div>
-              <textarea
-                readOnly={!isWriting}
-                className="editor__titleTextarea"
-                onChange={(e) => {
-                  function calcHeight(value: any) {
-                    const numberOfLineBreaks = (value.match(/\n/g) || [])
-                      .length;
-                    const newHeight = 30 + numberOfLineBreaks * 40 + 12 + 2;
-                    return newHeight;
-                  }
+              <section className="editor__title">
+                <div className="editor__titleImage"></div>
+                <textarea
+                  readOnly={!isWriting}
+                  className="editor__titleTextarea"
+                  onChange={(e) => {
+                    function calcHeight(value: any) {
+                      const numberOfLineBreaks = (value.match(/\n/g) || [])
+                        .length;
+                      const newHeight = 30 + numberOfLineBreaks * 40 + 12 + 2;
+                      return newHeight;
+                    }
 
-                  setHeight(calcHeight(e.target.value));
-                }}
-                style={{ height: height + "px" }}
-                placeholder="Title..."
-              ></textarea>
+                    setHeight(calcHeight(e.target.value));
+                  }}
+                  style={{ height: height + "px" }}
+                  placeholder="Title..."
+                ></textarea>
+              </section>
+              <EditorNav isWriting={isWriting} setWriting={setWriting} />
             </section>
 
             <Toolbar />
-            <EditorNav isWriting={isWriting} setWriting={setWriting} />
-
+            <div
+              className="element--dropLine"
+              style={{ display: "none" }}
+            ></div>
+            <div
+              className="element--dropLineVertical"
+              style={{ display: "none" }}
+            ></div>
             <HoveringToolbar />
-            {/* <h1 contentEditable={true} placeholder="Title..."></h1>
-            <hr /> */}
 
             <Editable
               renderElement={useCallback(renderElement, [])}
@@ -218,6 +227,11 @@ function Create() {
               autoFocus={true}
               onError={() => {
                 console.log("error");
+              }}
+              onMouseEnter={(e) => {
+                // console.log(e.target);
+                // const parent = nodeTraversal(e.target);
+                // console.log(parent);
               }}
               readOnly={!isWriting}
               placeholder="Start writing from here..."
