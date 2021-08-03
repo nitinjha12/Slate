@@ -4,6 +4,7 @@ import React, {
   useState,
   useContext,
   useCallback,
+  useRef,
 } from "react";
 import { createEditor, Editor, Range } from "slate";
 import { Slate, Editable, withReact, useSlate, ReactEditor } from "slate-react";
@@ -160,15 +161,7 @@ function Create() {
               );
             }}
             onDrop={(e) => {
-              onDrop(
-                e,
-                editor,
-                dragEle,
-                value,
-                onChange,
-                gridLayout,
-                modelCtx.dragPath
-              );
+              onDrop(e, editor, dragEle, value, gridLayout, modelCtx.dragPath);
             }}
           >
             <section className="header__container">

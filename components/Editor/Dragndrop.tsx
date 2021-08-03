@@ -46,7 +46,7 @@ export const onMouseEnter = (
   }
 
   // console.log(table);
-  console.log(position);
+  // console.log(position);
 
   // console.log(position, e.currentTarget);
   if (position > editor.children.length - 1) return;
@@ -94,7 +94,16 @@ export const onDragover = (
     setLayout(false);
   }
 
+  if (afterEle.parentElement?.classList.contains("gridLayout__children")) {
+    verticalLine.style.display = "none";
+    dropLine.style.display = "none";
+    setLayout(false);
+  }
+
   child && child.insertAdjacentElement("afterbegin", dropLine);
+
+  // if () {
+  // }
 
   if (afterEle !== dragEle) {
     setDragEle(afterEle);
@@ -106,7 +115,6 @@ export const onDrop = (
   editor: EditorType,
   dragEle: HTMLElement | undefined,
   value: any,
-  setValue: Function,
   layout: boolean,
   index: number[]
 ) => {
@@ -152,7 +160,7 @@ export const onDrop = (
   }
 
   if (layout) {
-    CustomEditor.addGridLayout(editor, position, setValue, index);
+    CustomEditor.addGridLayout(editor, position, index);
     return;
   }
 

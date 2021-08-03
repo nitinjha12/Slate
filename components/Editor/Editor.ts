@@ -126,36 +126,18 @@ const CustomEditor = {
       Transforms.wrapNodes(editor, { type: format, children: [] } as any);
     }
   },
-  addGridLayout(
-    editor: EditorType,
-    num: number,
-    setValue: Function,
-    path: number[]
-  ) {
-    const children = [];
-
+  addGridLayout(editor: EditorType, num: number, path: number[]) {
     const newEditor = JSON.parse(JSON.stringify(editor));
-
-    // for (let i = 0; i < num; i++) {
-    //   children.push({
-    //     type: "grid-layout-child",
-    //     width: 100 / num,
-    //     children: [{ text: "" }],
-    //   });
-    // }
-
-    // const block = { type: "grid-layout", children: children };
 
     const removeNode = newEditor.children[path[0]];
     const dropNode = newEditor.children[num];
 
     console.log(
       num,
-      dropNode,
-      path,
-      JSON.parse(JSON.stringify(editor.children[num]))
+      // dropNode,
+      path
+      // JSON.parse(JSON.stringify(editor.children[num]))
     );
-    const position = ReactEditor.findPath(editor, editor.children[num]);
 
     if (newEditor.children[num].type === "grid-layout") {
       const totalLength = newEditor.children[num].children.length + 1;
@@ -164,12 +146,6 @@ const CustomEditor = {
         data.width = 100 / totalLength;
         data.line = true;
       }
-
-      console.log(100 / totalLength, totalLength);
-
-      Transforms.removeNodes(editor, { at: path });
-
-      // console.log(position, newEditor.children[num].children);
 
       const block = {
         type: "grid-layout",
@@ -183,13 +159,11 @@ const CustomEditor = {
           },
         ],
       };
-
+      Transforms.removeNodes(editor, { at: path });
       block.children[block.children.length - 1].line = false;
 
-      console.log(block);
-
       Transforms.removeNodes(editor, {
-        // match: (n: any) => n.type === "grid-layout",
+        match: (n: any) => n.type === "grid-layout",
         at: [num],
       });
 
@@ -197,11 +171,7 @@ const CustomEditor = {
       return;
     }
 
-    console.log(newEditor.children[num], newEditor.children[path[0]], num);
-
-    Transforms.removeNodes(editor, { at: path });
-
-    // console.log(position);
+    const position = ReactEditor.findPath(editor, editor.children[num]);
 
     const block = {
       type: "grid-layout",
@@ -221,8 +191,7 @@ const CustomEditor = {
       ],
     };
 
-    // console.log(block);
-
+    Transforms.removeNodes(editor, { at: path });
     Transforms.removeNodes(editor, { at: [num] });
     Transforms.insertNodes(editor, block, { at: position });
   },

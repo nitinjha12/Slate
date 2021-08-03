@@ -67,8 +67,6 @@ function Toolbar() {
       eleHeight = 5;
     }
 
-    console.log(rect);
-
     if (
       (setSelection.current.rect !== rect.top ||
         selected.type.includes("list") ||
