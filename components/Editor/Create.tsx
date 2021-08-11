@@ -139,8 +139,6 @@ function Create() {
   }
   removeGridLayout();
 
-  console.log(editor);
-
   function clickHandler(e: React.MouseEvent) {}
 
   return (

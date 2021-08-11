@@ -78,13 +78,10 @@ const hoverHandler = function (id: string) {
       dragBtn.style.display = "inline-block";
       const addBtn: any = e.currentTarget.childNodes[0].childNodes[0];
 
-      console.log(hoverNodePath);
-
       if (
         hoverNodePath &&
         editor.selection?.anchor.path[0] === hoverNodePath[0]
       ) {
-        console.log("got it");
         dragBtn.classList.add("toolbar__parent--drag");
         addBtn.style.display = "none";
       }
