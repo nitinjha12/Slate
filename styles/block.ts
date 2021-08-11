@@ -87,7 +87,7 @@ export const ToggleListStyle = styled.section`
   .toggleList__remove {
     position: absolute;
     top: 10px;
-    right: 5px;
+    right: -5px;
     cursor: pointer;
 
     &:hover {

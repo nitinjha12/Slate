@@ -6,7 +6,7 @@ import React, {
   useCallback,
   useRef,
 } from "react";
-import { createEditor, Editor, Range } from "slate";
+import { createEditor, Editor, Range, Transforms } from "slate";
 import { Slate, Editable, withReact, useSlate, ReactEditor } from "slate-react";
 import { withHistory } from "slate-history";
 import { onKeyDown } from "./Editor";
@@ -14,6 +14,7 @@ import { fetcher } from "helper/taskClient";
 import withLink from "./withLink";
 import withImage from "./withImage";
 import withTable from "./withTable";
+import withList from "./withList";
 import { useEditorConfig } from "./helper";
 import Toolbar from "./Toolbar";
 import { initialValue } from "./helper";
@@ -24,12 +25,16 @@ import { onDragover, onDrop } from "./Dragndrop";
 import EditorNav from "./EditorNav";
 import { CardImage } from "@styled-icons/bootstrap/CardImage";
 import shouldMerge from "./shouldMerge";
+import { v4 as uuidv4 } from "uuid";
+import { setNewSelection } from "./findNode";
 
 function Create() {
   const editor = useMemo(
     () =>
       withImage(
-        withLink(withTable(withHistory(withReact(createEditor() as any))))
+        withList(
+          withLink(withTable(withHistory(withReact(createEditor() as any))))
+        )
       ),
     []
   );
@@ -38,7 +43,7 @@ function Create() {
   const [gridLayout, setGridLayout] = useState(false);
   const [value, setValue] = useState<any>(initialValue);
   const modelCtx = useContext(Context);
-  const [dragEle, setDragEle] = useState<HTMLElement>();
+  const [dropId, setDropId] = useState<string>();
   const [isWriting, setWriting] = useState(true);
   const [height, setHeight] = useState(40);
 
@@ -48,21 +53,21 @@ function Create() {
     }
   }, [editor.selection]);
 
-  const [id, setId] = useState(localStorage.getItem("contentID") || "");
+  // const [id, setId] = useState(localStorage.getItem("contentID") || "");
 
-  useEffect(() => {
-    if (id) {
-      localStorage.setItem("contentID", id);
-    }
-    setId(localStorage.getItem("contentID")!);
+  // useEffect(() => {
+  //   if (id) {
+  //     localStorage.setItem("contentID", id);
+  //   }
+  //   setId(localStorage.getItem("contentID")!);
 
-    (async function () {
-      const res = await fetch(`/api/task?id=${id}`);
-      const data = await res.json();
+  //   (async function () {
+  //     const res = await fetch(`/api/task?id=${id}`);
+  //     const data = await res.json();
 
-      setValue(JSON.parse(data.data.data));
-    })();
-  }, [id]);
+  //     setValue(JSON.parse(data.data.data));
+  //   })();
+  // }, [id]);
 
   const { renderElement, renderLeaf } = useEditorConfig();
 
@@ -71,11 +76,11 @@ function Create() {
 
     const content = value;
 
-    if (id) {
-      fetcher({ id, data: content });
-    } else {
-      fetcher({ data: content }, setId);
-    }
+    // if (id) {
+    //   fetcher({ id, data: content });
+    // } else {
+    //   fetcher({ data: content }, setId);
+    // }
   }
 
   function getDragAfterElement(container: any, y: number) {
@@ -130,8 +135,23 @@ function Create() {
     }
   }
   removeGridLayout();
-  // ReactEditor.findPath
-  // console.log(editor);
+
+  function checkCommonKey() {
+    let nodeKey;
+
+    for (let node of value) {
+      if (node.key === nodeKey) {
+        Transforms.setNodes(editor, { key: uuidv4() } as any, {
+          match: (n) => n === node,
+        });
+        break;
+      }
+      if (node.type === "paragraph") {
+        nodeKey = node.key;
+      }
+    }
+  }
+  checkCommonKey();
 
   function clickHandler(e: React.MouseEvent) {}
 
@@ -154,14 +174,21 @@ function Create() {
               onDragover(
                 e,
                 getDragAfterElement,
-                dragEle,
-                setDragEle,
+                dropId,
+                setDropId,
                 setGridLayout,
-                editor
+                editor,
+                modelCtx.dragPath
               );
             }}
             onDrop={(e) => {
-              onDrop(e, editor, dragEle, value, gridLayout, modelCtx.dragPath);
+              onDrop(e, editor, dropId, gridLayout, modelCtx.dragPath);
+            }}
+            onDragEnter={(e) => {
+              if (dropId) {
+                console.log("hey");
+                setNewSelection(editor, dropId);
+              }
             }}
           >
             <section className="header__container">

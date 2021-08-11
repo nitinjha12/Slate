@@ -5,8 +5,6 @@ import { Plus } from "@styled-icons/bootstrap/Plus";
 import { ReactEditor, useSlate } from "slate-react";
 import Context from "context/context";
 import { VideoEditor, TableView } from "./SelectEditor";
-import { DragIndicator } from "@styled-icons/material-sharp/DragIndicator";
-// import { toolbarOnMouseEnter, toolbarOnMouseLeave } from "./Dragndrop";
 
 function Toolbar() {
   const toolbar = document.querySelector<HTMLDivElement>(".toolbar__buttons");
@@ -18,18 +16,16 @@ function Toolbar() {
   const [activeNum, setActiveNum] = useState(0);
   const [isVideoEditor, setVideoEditor] = useState(false);
   const [isTable, setTable] = useState(false);
-  const [layoutNum, setLayoutNum] = useState(false);
   const [toolbarBtn, setToolbarBtn] = useState(
     !!toolbar?.classList.contains("toolbar__buttons--hide")
   );
-  const [draggableEle, setDraggableEle] = useState<HTMLElement | null>(null);
   const previousSelection = useRef<any>(null);
 
   useEffect(() => {
     if (editor && editor.selection) {
       previousSelection.current = editor.selection;
     }
-    if (!editor.selection && previousSelection.current && isVideoEditor) {
+    if (!editor.selection && previousSelection.current) {
       editor.selection = previousSelection.current;
     }
   }, [editor.selection, editor]);
@@ -42,9 +38,10 @@ function Toolbar() {
       return;
     }
 
-    if (!selection || (!ReactEditor.isFocused(editor) && !isVideoEditor)) {
+    if ((!selection || !ReactEditor.isFocused(editor)) && !isVideoEditor) {
       el.style.display = "none";
       toolbar?.classList.add("toolbar__buttons--hide");
+
       return;
     } else {
       el.style.display = "inline-block";
@@ -68,10 +65,9 @@ function Toolbar() {
     }
 
     if (
-      (setSelection.current.rect !== rect.top ||
-        selected.type.includes("list") ||
-        !setSelection.current.top) &&
-      !isVideoEditor
+      setSelection.current.rect !== rect.top ||
+      selected.type.includes("list") ||
+      !setSelection.current.top
     ) {
       setSelection.current.rect = rect.top;
       setSelection.current.top =
@@ -80,34 +76,23 @@ function Toolbar() {
 
     el.style.top = `${setSelection.current.top - 50}px`;
     el.style.left = `${10}px`;
-  }, [editor.selection, isVideoEditor]);
+
+    setToolbarBtn(!!toolbar?.classList.contains("toolbar__buttons--hide"));
+  }, [editor.selection]);
 
   useEffect(() => {
     if (isTable) {
-      setLayoutNum(false);
       setVideoEditor(false);
     }
     !isTable && toolbar?.classList.add("toolbar__buttons--hide");
   }, [isTable]);
 
   useEffect(() => {
-    if (layoutNum) {
+    if (isVideoEditor) {
       setTable(false);
-      setVideoEditor(false);
     }
-    !layoutNum && toolbar?.classList.add("toolbar__buttons--hide");
-  }, [layoutNum]);
-
-  useEffect(() => {
-    setToolbarBtn(!!toolbar?.classList.contains("toolbar__buttons--hide"));
-  }, [editor.selection]);
-
-  function elePosition(ref: HTMLElement) {
-    const box = ref.getBoundingClientRect();
-
-    console.log(box);
-  }
-  // toolbarRef.current && elePosition(toolbarRef.current);
+    !isVideoEditor && toolbar?.classList.add("toolbar__buttons--hide");
+  }, [isVideoEditor]);
 
   useEffect(() => {
     setTable(false);
@@ -186,10 +171,6 @@ function Toolbar() {
                 }
                 if (data.name === "table") {
                   setTable(true);
-                  return;
-                }
-                if (data.name === "grid-layout") {
-                  setLayoutNum(true);
                   return;
                 }
 

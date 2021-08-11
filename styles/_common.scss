@@ -307,3 +307,10 @@
     left: 10px;
   }
 }
+
+.transparent__layer {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: transparent;
+}

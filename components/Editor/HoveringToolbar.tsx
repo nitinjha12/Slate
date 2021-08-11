@@ -13,7 +13,7 @@ function HoveringToolbar() {
 
   if (
     (editor.selection && !Range.isCollapsed(editor.selection)) ||
-    (previousSelection && !focused) ||
+    (previousSelection && !focused && !editor.selection) ||
     isLinkNodeAtSelection(editor as any, editor.selection as any)
     // ||
     // isLinkNodeAtSelection(editor as any, previousSelection.current as any)

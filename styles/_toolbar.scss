@@ -1,7 +1,7 @@
 .toolbar {
   position: absolute;
   display: inline-block;
-  z-index: 10;
+  z-index: 600;
 }
 
 .toolbar__buttonsTooltip {
@@ -47,7 +47,7 @@
   grid-gap: 0.5rem;
   align-items: center;
   left: 5px;
-  top: 40px;
+  top: 45px;
   opacity: 1;
   transition: all 0.4s ease-in-out;
   visibility: visible;
@@ -67,26 +67,41 @@
 .toolbar__addButton {
   // background-color: white;
   // color: black;
+  position: relative;
   border-radius: 50%;
   height: 30px;
   width: 30px;
   cursor: pointer;
-  top: 4px;
+  top: 10px;
   margin-right: 7px;
 }
 
-.toolbar__dragndrop,
-.toolbar__dragndropIndicator {
+.toolbar__addButton--hover {
+  background: white;
+  border: 1px solid rgb(180, 180, 180);
+  top: 0px;
+  margin-right: 3px;
+}
+
+.toolbar__parent {
   position: absolute;
+  left: -5px;
+  z-index: 500;
+  top: 4px;
+}
+
+.toolbar__parent--drag {
+  left: 30px;
+}
+
+.toolbar__dragndrop {
   background-color: transparent;
   outline: none;
   border: none;
   cursor: grab;
-  left: 30px;
 
   .dragIndicator__icon {
     cursor: grab;
-    z-index: 1000;
     background-color: inherit;
   }
 }

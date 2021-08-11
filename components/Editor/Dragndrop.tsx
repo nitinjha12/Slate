@@ -3,66 +3,32 @@ import { ReactEditor, useSlateStatic } from "slate-react";
 import { Transforms, Location, Range, Editor, Path, Node, Span } from "slate";
 import CustomEditor from "./Editor";
 import Context from "context/context";
+import { findSlateNode } from "./findNode";
 
 export const onMouseEnter = (
-  e: React.MouseEvent,
+  e: React.MouseEvent<HTMLElement>,
   editor: EditorType,
   setDragPath: Function
 ) => {
-  const editorParent =
-    document.querySelector<HTMLDivElement>(".editor__editable")!;
-  let position = 0;
+  const { id } = e.currentTarget.dataset;
+  const node = id && findSlateNode(editor.children, id);
+  const nodePath = node && ReactEditor.findPath(editor, node);
 
-  const table = Editor.above(editor, {
-    match: (n: any) => n.type === "table",
-  });
+  console.log(node, nodePath);
 
-  let grid = false;
-
-  if (
-    e.currentTarget.parentElement?.parentElement?.classList.contains(
-      "gridLayout"
-    )
-  ) {
-    grid = true;
-  }
-
-  if (!table && !grid) {
-    for (let node of editorParent.childNodes as any) {
-      if (node === e.currentTarget.parentElement!) {
-        break;
-      }
-      position++;
-    }
-  }
-
-  if (grid) {
-    for (let node of editorParent.childNodes as any) {
-      if (node === e.currentTarget.parentElement?.parentElement) {
-        break;
-      }
-      position++;
-    }
-  }
-
-  // console.log(table);
-  // console.log(position);
-
-  // console.log(position, e.currentTarget);
-  if (position > editor.children.length - 1) return;
-
-  const path = ReactEditor.findPath(editor as any, editor.children[position]);
-  console.log(path);
-  setDragPath(path);
+  setDragPath(nodePath);
 };
+
+let count = 0;
 
 export const onDragover = (
   e: React.DragEvent,
   getDragAfterElement: Function,
-  dragEle: HTMLElement | undefined,
-  setDragEle: Function,
+  dropId: string | undefined,
+  setDropId: Function,
   setLayout: Function,
-  editor: EditorType
+  editor: EditorType,
+  dragPath: Path
 ) => {
   e.preventDefault();
   e.stopPropagation();
@@ -71,10 +37,21 @@ export const onDragover = (
     document.querySelector<HTMLDivElement>(".editor__editable")!;
 
   const afterEle: HTMLElement = getDragAfterElement(editorParent, e.clientY);
-
-  // const elementMouseIsOver = document.elementFromPoint(e.clientX, e.clientY);
-
   const child = afterEle && (afterEle.childNodes[1] as HTMLElement);
+
+  if (count === 0) {
+    const range: Range = {
+      anchor: { path: dragPath, offset: 0 },
+      focus: { path: dragPath, offset: 0 },
+    };
+
+    try {
+      Transforms.setSelection(editor, range);
+    } catch (err) {
+      console.log(err);
+    }
+    count++;
+  }
 
   const dropLine: HTMLElement = document.querySelector(".element--dropLine")!;
   const verticalLine: HTMLElement = document.querySelector(
@@ -100,32 +77,35 @@ export const onDragover = (
     setLayout(false);
   }
 
+  // console.log(ReactEditor.findEventRange(editor, e));
+
   child && child.insertAdjacentElement("afterbegin", dropLine);
 
-  // if () {
-  // }
-
-  if (afterEle !== dragEle) {
-    setDragEle(afterEle);
+  if (afterEle.dataset.id !== dropId) {
+    setDropId(afterEle.dataset.id);
   }
 };
 
 export const onDrop = (
   e: React.MouseEvent,
   editor: EditorType,
-  dragEle: HTMLElement | undefined,
-  value: any,
+  dropId: string | undefined,
   layout: boolean,
   index: number[]
 ) => {
   e.preventDefault();
   e.stopPropagation();
 
-  const editorParent =
-    document.querySelector<HTMLDivElement>(".editor__editable")!;
+  count = 0;
+
+  const range: Range = {
+    anchor: { path: [index[0] - 1], offset: 0 },
+    focus: { path: [index[0] - 1], offset: 0 },
+  };
+
+  Transforms.setSelection(editor, range);
 
   const editorContainer = document.querySelector(".editor__container")!;
-
   const dropLine: HTMLElement = document.querySelector(".element--dropLine")!;
   const verticalLine: HTMLElement = document.querySelector(
     ".element--dropLineVertical"
@@ -136,45 +116,36 @@ export const onDrop = (
   editorContainer.appendChild(dropLine);
   editorContainer.appendChild(verticalLine);
 
-  let position = 0;
-  let node;
-
-  for (node of dragEle?.parentElement?.childNodes as any) {
-    if (node === dragEle) {
-      break;
-    }
-    position++;
-  }
-
-  if (dragEle?.parentElement!.classList.contains("gridLayout")) {
-    // console.log(dragEle?.parentElement);
-
-    dragEle = dragEle?.parentElement!;
-
-    for (node of editorParent.childNodes as any) {
-      if (node === dragEle) {
-        break;
-      }
-      position++;
-    }
-  }
+  const node = dropId && findSlateNode(editor.children, dropId);
+  const dropPath = node && ReactEditor.findPath(editor, node);
+  if (!node) return;
 
   if (layout) {
-    CustomEditor.addGridLayout(editor, position, index);
+    CustomEditor.addGridLayout(editor, dropPath, index);
     return;
   }
 
   try {
-    const to = ReactEditor.findPath(editor, value[position]);
+    console.log(index, dropPath);
+    if (index[0] === dropPath[0]) return;
 
-    console.log(to, index);
+    // Transforms.moveNodes(editor, {
+    //   at: index,
+    //   to: dropPath,
+    // });
 
-    if (index[0] === to[0]) return;
+    const nodeData = JSON.parse(JSON.stringify(editor.children));
+    const range: Range = {
+      anchor: { path: dropPath, offset: 0 },
+      focus: { path: dropPath, offset: 0 },
+    };
 
-    Transforms.moveNodes(editor, {
-      at: index,
-      to,
-    });
+    console.log(nodeData[index[0]]);
+
+    Transforms.removeNodes(editor, { at: index });
+    Transforms.insertNodes(editor, nodeData[index[0]], { at: dropPath });
+    Transforms.setSelection(editor, range);
+    ReactEditor.focus(editor);
   } catch (err) {
     console.log(err);
   }

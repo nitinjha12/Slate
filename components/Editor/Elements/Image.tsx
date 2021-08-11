@@ -21,7 +21,7 @@ function ImageCompo(props: any) {
   useEffect(() => {
     if (editor && editor.selection) {
       const img: any = editor.children[editor.selection?.anchor.path[0]];
-      if (img.type !== "image") {
+      if (img && img.type !== "image") {
         setSelected(false);
       }
     }
@@ -134,8 +134,9 @@ function ImageCompo(props: any) {
         )}
 
         <Arrow
-          isSelected={selected && focused && !readOnly}
+          isSelected={focused && !readOnly}
           isHover={isHover}
+          id={props.element.key}
         />
 
         {(isImgCaption || !!caption) &&

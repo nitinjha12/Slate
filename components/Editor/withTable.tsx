@@ -1,6 +1,7 @@
 import { Editor, Range, Point, Element, Transforms, Node, Text } from "slate";
 import { EditorType } from "types";
 import { ReactEditor } from "slate-react";
+import { v4 as uuidv4 } from "uuid";
 
 function withTable(editor: EditorType) {
   const { deleteBackward, deleteForward, insertBreak, insertText } = editor;
@@ -23,43 +24,20 @@ function withTable(editor: EditorType) {
         mode: "all",
       });
 
-      if (table) {
-        const nodeDomTraversal = (
-          editor: EditorType,
-          ele: HTMLElement,
-          type: string,
-          path = editor.selection!.anchor.path
-        ): any => {
-          console.log(editor, ele, type, path);
-
-          if (ele?.classList.contains("toolbar__dragndrop")) {
-            ele.remove();
-            return;
-          }
-
-          // if (editor?.type === type) return ele;
-
-          return nodeDomTraversal(
-            editor.children[path[0]] as any,
-            ele.childNodes[path[0]] as any,
-            type,
-            path.slice(1)
+      const [tableCell]: any = Editor.nodes(editor, {
+        match: (n: any) => {
+          return (
+            !Editor.isEditor(n) &&
+            (Element.isElement(n) as any) &&
+            n.type === "table-cell"
           );
-        };
+        },
+        mode: "all",
+      });
 
+      if (table && tableCell) {
         const [cell]: any = Editor.nodes(editor, {
           match: (n: any) => {
-            // console.log(n);
-
-            // const path = n.type && ReactEditor.findPath(editor, n);
-            // const editableEle =
-            //   document.querySelector<HTMLElement>(".editor__editable");
-
-            // console.log(path);
-            // if (n.type === "paragraph") {
-            //   const dom = nodeDomTraversal(editor, editableEle!, n.type, path);
-            // }
-
             return (
               !Editor.isEditor(n) &&
               (Element.isElement(n) as any) &&
@@ -68,11 +46,6 @@ function withTable(editor: EditorType) {
           },
           mode: "all",
         });
-        const dragBtn = document.querySelector<HTMLElement>(
-          ".dragIndicator__icon"
-        );
-
-        dragBtn!.style.display = "none";
       }
     }
 
@@ -142,10 +115,25 @@ function withTable(editor: EditorType) {
         mode: "all",
       });
 
-      if (table) {
+      const [tableCell]: any = Editor.nodes(editor, {
+        match: (n: any) => {
+          return (
+            !Editor.isEditor(n) &&
+            (Element.isElement(n) as any) &&
+            n.type === "table-cell"
+          );
+        },
+        mode: "all",
+      });
+
+      if (table && tableCell) {
         const [cell]: any = Editor.nodes(editor, {
           match: (n: any) => {
-            const block = { type: "paragraph", children: [{ text: "" }] };
+            const block = {
+              type: "paragraph",
+              children: [{ text: "" }],
+              key: uuidv4(),
+            };
             const listBlock = { type: "list-item", children: [{ text: "" }] };
             let list = false;
 
@@ -164,7 +152,6 @@ function withTable(editor: EditorType) {
               n.type.includes("list") &&
               Transforms.insertNodes(editor, listBlock);
 
-            // console.log(JSON.parse(JSON.stringify(editor.operations)));
             return (
               !Editor.isEditor(n) &&
               (Element.isElement(n) as any) &&

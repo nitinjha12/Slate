@@ -5,6 +5,7 @@ import { useSlate, useReadOnly, ReactEditor } from "slate-react";
 import { Play } from "@styled-icons/boxicons-regular/Play";
 import { Cross } from "@styled-icons/entypo/Cross";
 import Context from "context/context";
+import { v4 as uuidv4 } from "uuid";
 
 // interface ToggleListInterface {
 //   title: string;
@@ -14,20 +15,20 @@ import Context from "context/context";
 function ToggleList({ element, attributes, children }: any) {
   const [toggle, setToggle] = useState(false);
   const [title, setTitle] = useState<string>(element.title || "");
-  const [height, setHeight] = useState(element.height || "40");
+  // const [height, setHeight] = useState(element.height || "40");
   const [path, setPath] = useState([0]);
   const editor = useSlate();
   const readonly = useReadOnly();
   const lightCtx = useContext(Context);
 
-  const titleChangeHandler = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const titleChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
 
     Transforms.setNodes(
       editor,
       {
         title: e.target.value,
-        height: height,
+        key: uuidv4(),
       } as any,
       {
         at: path,
@@ -79,33 +80,15 @@ function ToggleList({ element, attributes, children }: any) {
         />
         {!readonly ? (
           <>
-            <textarea
+            <input
               value={title}
               onChange={titleChangeHandler}
               onFocus={pathHandler}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  setHeight(
-                    Number.parseFloat(e.currentTarget.style.height) + 19
-                  );
-                }
-                if (e.key === "Backspace") {
-                  setHeight(
-                    Number.parseFloat(e.currentTarget.style.height) - 19
-                  );
-                }
-              }}
               className="toggleList__input"
-              style={{ height: height + "px" }}
             />
           </>
         ) : (
-          <textarea
-            value={title}
-            readOnly
-            style={{ height: height + "px" }}
-            className="toggleList__input"
-          />
+          <p className="toggleList__input">{title}</p>
         )}
 
         <Cross

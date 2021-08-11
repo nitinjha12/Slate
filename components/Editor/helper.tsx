@@ -2,6 +2,7 @@ import Element, { Leaf } from "./Element";
 import { DefaultElement } from "slate-react";
 import { Editor, Path, Point, Range, Transforms } from "slate";
 import { EditorType, EditorInterface } from "types";
+import { v4 as uuidv4 } from "uuid";
 
 export const useEditorConfig = () => {
   return { renderElement, renderLeaf };
@@ -101,6 +102,7 @@ export const initialValue = [
       { text: "italic", italic: true },
       { text: ", or anything else you might want to do!" },
     ],
+    key: uuidv4(),
   },
   {
     type: "paragraph",
@@ -109,21 +111,23 @@ export const initialValue = [
       { text: "select any piece of text and the menu will appear", bold: true },
       { text: "." },
     ],
+    key: uuidv4(),
   },
   {
     type: "image",
     src: "/bigo.png",
     caption: "Big O",
-
+    key: uuidv4(),
     children: [{ text: "" }],
   },
-  { type: "paragraph", children: [{ text: "" }] },
+  { type: "paragraph", key: uuidv4(), children: [{ text: "" }] },
 
   {
     type: "video",
     src: "https://player.vimeo.com/video/336812686",
     url: "",
+    key: uuidv4(),
     children: [{ text: "" }],
   },
-  { type: "paragraph", children: [{ text: "" }] },
+  // { type: "paragraph", key: uuidv4(), children: [{ text: "" }] },
 ];

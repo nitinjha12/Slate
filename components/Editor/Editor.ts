@@ -1,5 +1,5 @@
 import React, { Children, useRef } from "react";
-import { Editor, Transforms, Text, Element, Range, Point } from "slate";
+import { Editor, Transforms, Text, Element, Range, Path } from "slate";
 // import { useSlateStatic } from "slate-react";
 import { EditorType, EditorInterface } from "types";
 import { customEditorData } from "./data";
@@ -7,7 +7,8 @@ import { isLinkNodeAtSelection } from "./helper";
 import { EmbedUrl } from "./EmbedUrl";
 import { ReactEditor } from "slate-react";
 import Table from "./Functions/Table";
-import findDomNode from "./findDomNode";
+import findDomNode from "./findNode";
+import { v4 as uuidv4 } from "uuid";
 
 const LIST_TYPES = ["bulleted-list", "ordered-list", "toggle-list"];
 const ALIGN_TYPES = ["left-align", "right-align", "center-align"];
@@ -72,11 +73,12 @@ const CustomEditor = {
     });
     const newProperties: Partial<any> = {
       type: isActive ? "paragraph" : isList ? "list-item" : value,
+      key: uuidv4(),
     };
     Transforms.setNodes(editor, newProperties);
 
     if (!isActive && isList) {
-      const block = { type: value, children: [] };
+      const block = { type: value, children: [], key: uuidv4() };
       Transforms.wrapNodes(
         editor,
         ["toggle-list"].includes(value!)
@@ -97,10 +99,15 @@ const CustomEditor = {
 
     Transforms.setNodes(editor, {
       type: isActive ? "paragraph" : "span",
+      key: uuidv4(),
     } as any);
 
     if (!isActive) {
-      Transforms.wrapNodes(editor, { type: format, children: [] } as any);
+      Transforms.wrapNodes(editor, {
+        type: format,
+        children: [],
+        key: uuidv4(),
+      } as any);
     }
   },
 
@@ -123,14 +130,18 @@ const CustomEditor = {
     });
 
     if (!isActive) {
-      Transforms.wrapNodes(editor, { type: format, children: [] } as any);
+      Transforms.wrapNodes(editor, {
+        type: format,
+        children: [],
+        key: uuidv4(),
+      } as any);
     }
   },
-  addGridLayout(editor: EditorType, num: number, path: number[]) {
+  addGridLayout(editor: EditorType, num: Path, path: Path) {
     const newEditor = JSON.parse(JSON.stringify(editor));
 
     const removeNode = newEditor.children[path[0]];
-    const dropNode = newEditor.children[num];
+    const dropNode = newEditor.children[num[0]];
 
     console.log(
       num,
@@ -139,23 +150,25 @@ const CustomEditor = {
       // JSON.parse(JSON.stringify(editor.children[num]))
     );
 
-    if (newEditor.children[num].type === "grid-layout") {
-      const totalLength = newEditor.children[num].children.length + 1;
+    if (newEditor.children[num[0]].type === "grid-layout") {
+      const totalLength = newEditor.children[num[0]].children.length + 1;
 
-      for (let data of newEditor.children[num].children) {
+      for (let data of newEditor.children[num[0]].children) {
         data.width = 100 / totalLength;
         data.line = true;
       }
 
       const block = {
         type: "grid-layout",
+        key: uuidv4(),
         children: [
-          ...newEditor.children[num].children,
+          ...newEditor.children[num[0]].children,
           {
             children: [removeNode],
             type: "grid-layout-child",
             width: 100 / totalLength,
             line: true,
+            key: uuidv4(),
           },
         ],
       };
@@ -164,35 +177,38 @@ const CustomEditor = {
 
       Transforms.removeNodes(editor, {
         match: (n: any) => n.type === "grid-layout",
-        at: [num],
+        at: num,
       });
 
-      Transforms.insertNodes(editor, block, { at: [num] });
+      Transforms.insertNodes(editor, block, { at: num });
       return;
     }
 
-    const position = ReactEditor.findPath(editor, editor.children[num]);
+    const position = ReactEditor.findPath(editor, editor.children[num[0]]);
 
     const block = {
       type: "grid-layout",
+      key: uuidv4(),
       children: [
         {
           children: [dropNode],
           width: 50,
           type: "grid-layout-child",
           line: true,
+          key: uuidv4(),
         },
         {
           children: [removeNode],
           width: 50,
           type: "grid-layout-child",
           line: false,
+          key: uuidv4(),
         },
       ],
     };
 
     Transforms.removeNodes(editor, { at: path });
-    Transforms.removeNodes(editor, { at: [num] });
+    Transforms.removeNodes(editor, { at: num });
     Transforms.insertNodes(editor, block, { at: position });
   },
 
@@ -278,14 +294,13 @@ const CustomEditor = {
     if (selection) {
       Transforms.insertNodes(
         editor,
-        [
-          {
-            type: "video",
-            src: embedUrl,
-            children: [{ text: "" }],
-          },
-          { type: "paragraph", children: [{ text: "" }] },
-        ] as any,
+
+        {
+          type: "video",
+          src: embedUrl,
+          children: [{ text: "" }],
+          key: uuidv4(),
+        } as any,
         { at: selection }
       );
     }

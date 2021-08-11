@@ -1,4 +1,5 @@
 import ImageElement from "./Elements/Image";
+import { useEffect } from "react";
 import {
   useSelected,
   useFocused,
@@ -15,59 +16,102 @@ import Table from "./Elements/Table";
 import CaraouselItem from "components/Carousel/CaraouselItem";
 import CarouselContainer from "components/Carousel/Container";
 import { DragIndicator } from "@styled-icons/material-sharp/DragIndicator";
+import { Plus } from "@styled-icons/bootstrap/Plus";
 import { onMouseEnter } from "./Dragndrop";
 import Context from "context/context";
+import { findSlateNodePath, setNewSelection } from "./findNode";
 
-function DragIndicatorIcon() {
+function DragIndicatorIcon({ id }: { id: string }) {
   const modelCtx = useContext(Context);
   const editor = useSlate();
   const readOnly = useReadOnly();
 
   return !readOnly ? (
-    <button
-      className="toolbar__dragndrop"
-      onMouseEnter={(e) => onMouseEnter(e, editor as any, modelCtx.setDragPath)}
-      style={{ display: "none" }}
-      contentEditable={false}
-    >
-      <DragIndicator
-        className={`dragIndicator__icon ${
-          modelCtx.isLight ? "mode--light" : "mode--dark"
-        }`}
-        size="20"
-        color="black"
-      />
-    </button>
+    <>
+      <div
+        className="toolbar__parent "
+        style={{ display: "none" }}
+        contentEditable={false}
+      >
+        <button
+          className="toolbar__addButton toolbar__addButton--hover"
+          onClick={(e) => {
+            setNewSelection(editor as any, id);
+            e.currentTarget.style.display = "none";
+            e.currentTarget.parentElement?.classList.add(
+              "toolbar__parent--drag"
+            );
+          }}
+        >
+          <Plus size="24" />
+        </button>
+        <button
+          onMouseEnter={(e) =>
+            onMouseEnter(e, editor as any, modelCtx.setDragPath)
+          }
+          className="toolbar__dragndrop"
+          data-id={id}
+        >
+          <DragIndicator
+            className={`dragIndicator__icon ${
+              modelCtx.isLight ? "mode--light" : "mode--dark"
+            }`}
+            size="20"
+            color="black"
+          />
+        </button>
+      </div>
+    </>
   ) : (
-    <span style={{ display: "none" }} className="toolbar__dragndrop"></span>
+    <span style={{ display: "none" }}></span>
   );
 }
 
-const hoverHandler = {
-  onMouseEnter(e: React.MouseEvent) {
-    e.currentTarget.setAttribute("draggable", "true");
+const hoverHandler = function (id: string) {
+  const editor = useSlate();
+  const hoverNodePath = findSlateNodePath(editor as any, id);
 
-    // function
+  return {
+    onMouseEnter(e: React.MouseEvent<HTMLElement>) {
+      e.currentTarget.setAttribute("draggable", "true");
+      const dragBtn: any = e.currentTarget.childNodes[0];
+      dragBtn.style.display = "inline-block";
+      const addBtn: any = e.currentTarget.childNodes[0].childNodes[0];
 
-    // console.log(node);
+      if (
+        hoverNodePath &&
+        editor.selection?.anchor.path[0] === hoverNodePath[0]
+      ) {
+        dragBtn.classList.add("toolbar__parent--drag");
+        addBtn.style.display = "none";
+      }
 
-    e.currentTarget!.addEventListener("dragstart", () => {
-      e.currentTarget?.classList.add("draggable--dragging");
-    });
+      e.currentTarget!.addEventListener("dragstart", () => {
+        e.currentTarget?.classList.add("draggable--dragging");
+      });
 
-    e.currentTarget!.addEventListener("dragend", () => {
-      e.currentTarget?.classList.remove("draggable--dragging");
-    });
+      e.currentTarget!.addEventListener("dragend", () => {
+        e.currentTarget?.classList.remove("draggable--dragging");
+      });
+    },
+    onMouseLeave(e: React.MouseEvent) {
+      e.currentTarget.setAttribute("draggable", "false");
 
-    const dragBtn: any = e.currentTarget.childNodes[0];
-    dragBtn.style.display = "inline-block";
-  },
-  onMouseLeave(e: React.MouseEvent) {
-    e.currentTarget.setAttribute("draggable", "false");
+      const dragBtn: any = e.currentTarget.childNodes[0];
+      const addBtn: any = e.currentTarget.childNodes[0].childNodes[0];
+      dragBtn.style.display = "none";
+      dragBtn.classList.remove("toolbar__parent--drag");
+      addBtn.style.display = "inline-block";
+    },
+    onPointerDown(e: React.MouseEvent) {
+      const dragBtn: any = e.currentTarget.childNodes[0];
+      dragBtn.style.display = "inline-block";
+      const addBtn: any = e.currentTarget.childNodes[0].childNodes[0];
 
-    const dragBtn: any = e.currentTarget.childNodes[0];
-    dragBtn.style.display = "none";
-  },
+      dragBtn.classList.add("toolbar__parent--drag");
+      addBtn.style.display = "none";
+    },
+  };
 };
 
 const Element = {
@@ -80,10 +124,18 @@ const Element = {
   },
   Code(props: any) {
     return (
-      <div className="draggableItems my-2" {...hoverHandler}>
-        <DragIndicatorIcon />
+      <div
+        className="draggableItems my-2"
+        {...hoverHandler(props.element.key)}
+        data-id={props.element.key}
+      >
+        <DragIndicatorIcon id={props.element.key} />
 
-        <div className="code__container " {...props.attributes}>
+        <div
+          className="code__container "
+          {...props.attributes}
+          data-id={props.element.key}
+        >
           <code>{props.children}</code>
         </div>
       </div>
@@ -91,8 +143,12 @@ const Element = {
   },
   Heading1(props: any) {
     return (
-      <div className="draggableItems my-2" {...hoverHandler}>
-        <DragIndicatorIcon />
+      <div
+        className="draggableItems my-2"
+        {...hoverHandler(props.element.key)}
+        data-id={props.element.key}
+      >
+        <DragIndicatorIcon id={props.element.key} />
 
         <h1
           {...props.attributes}
@@ -106,8 +162,12 @@ const Element = {
   },
   Heading2(props: any) {
     return (
-      <div className="draggableItems my-2" {...hoverHandler}>
-        <DragIndicatorIcon />
+      <div
+        className="draggableItems my-2"
+        {...hoverHandler(props.element.key)}
+        data-id={props.element.key}
+      >
+        <DragIndicatorIcon id={props.element.key} />
 
         <h2 {...props.attributes} className="">
           {props.children}
@@ -117,8 +177,12 @@ const Element = {
   },
   Heading3(props: any) {
     return (
-      <div className="draggableItems my-2" {...hoverHandler}>
-        <DragIndicatorIcon />
+      <div
+        className="draggableItems my-2"
+        {...hoverHandler(props.element.key)}
+        data-id={props.element.key}
+      >
+        <DragIndicatorIcon id={props.element.key} />
 
         <h3 {...props.attributes} className="">
           {props.children}
@@ -128,8 +192,12 @@ const Element = {
   },
   BulletedList(props: any) {
     return (
-      <div className="draggableItems my-2" {...hoverHandler}>
-        <DragIndicatorIcon />
+      <div
+        className="draggableItems my-2"
+        {...hoverHandler(props.element.key)}
+        data-id={props.element.key}
+      >
+        <DragIndicatorIcon id={props.element.key} />
 
         <ul {...props.attributes} className="">
           {props.children}
@@ -139,8 +207,12 @@ const Element = {
   },
   OrderedList(props: any) {
     return (
-      <div className="draggableItems my-2" {...hoverHandler}>
-        <DragIndicatorIcon />
+      <div
+        className="draggableItems my-2"
+        {...hoverHandler(props.element.key)}
+        data-id={props.element.key}
+      >
+        <DragIndicatorIcon id={props.element.key} />
 
         <ol {...props.attributes} className="">
           {props.children}
@@ -150,8 +222,12 @@ const Element = {
   },
   ToggleList(props: any) {
     return (
-      <div className="draggableItems my-2" {...hoverHandler}>
-        <DragIndicatorIcon />
+      <div
+        className="draggableItems my-2"
+        {...hoverHandler(props.element.key)}
+        data-id={props.element.key}
+      >
+        <DragIndicatorIcon id={props.element.key} />
 
         <ToggleList {...props} />
       </div>
@@ -171,8 +247,12 @@ const Element = {
 
   Line(props: any) {
     return (
-      <div className="draggableItems my-2" {...hoverHandler}>
-        <DragIndicatorIcon />
+      <div
+        className="draggableItems my-2"
+        {...hoverHandler(props.element.key)}
+        data-id={props.element.key}
+      >
+        <DragIndicatorIcon id={props.element.key} />
 
         <div
           {...props.attributes}
@@ -197,8 +277,12 @@ const Element = {
   },
   LeftAlign(props: any) {
     return (
-      <div className="draggableItems my-2" {...hoverHandler}>
-        <DragIndicatorIcon />
+      <div
+        className="draggableItems my-2"
+        {...hoverHandler(props.element.key)}
+        data-id={props.element.key}
+      >
+        <DragIndicatorIcon id={props.element.key} />
 
         <div style={{ textAlign: "left" }} className="" {...props.attributes}>
           {props.children}
@@ -208,8 +292,12 @@ const Element = {
   },
   CenterAlign(props: any) {
     return (
-      <div className="draggableItems my-2" {...hoverHandler}>
-        <DragIndicatorIcon />
+      <div
+        className="draggableItems my-2"
+        {...hoverHandler(props.element.key)}
+        data-id={props.element.key}
+      >
+        <DragIndicatorIcon id={props.element.key} />
 
         <div style={{ textAlign: "center" }} className="" {...props.attributes}>
           {props.children}
@@ -219,8 +307,12 @@ const Element = {
   },
   RightAlign(props: any) {
     return (
-      <div className="draggableItems my-2" {...hoverHandler}>
-        <DragIndicatorIcon />
+      <div
+        className="draggableItems my-2"
+        {...hoverHandler(props.element.key)}
+        data-id={props.element.key}
+      >
+        <DragIndicatorIcon id={props.element.key} />
 
         <div style={{ textAlign: "right" }} className="" {...props.attributes}>
           {props.children}
@@ -240,8 +332,12 @@ const Element = {
   Image(props: any) {
     return (
       <>
-        <div className="draggableItems my-2" {...hoverHandler}>
-          <DragIndicatorIcon />
+        <div
+          className="draggableItems my-2"
+          {...hoverHandler(props.element.key)}
+          data-id={props.element.key}
+        >
+          <DragIndicatorIcon id={props.element.key} />
 
           <ImageElement {...props} />
         </div>
@@ -250,8 +346,12 @@ const Element = {
   },
   Video(props: any) {
     return (
-      <div className="draggableItems my-2" {...hoverHandler}>
-        <DragIndicatorIcon />
+      <div
+        className="draggableItems my-2"
+        {...hoverHandler(props.element.key)}
+        data-id={props.element.key}
+      >
+        <DragIndicatorIcon id={props.element.key} />
 
         <Video {...props} />
       </div>
@@ -259,8 +359,12 @@ const Element = {
   },
   Table(props: any) {
     return (
-      <div className="draggableItems my-2" {...hoverHandler}>
-        <DragIndicatorIcon />
+      <div
+        className="draggableItems my-2"
+        {...hoverHandler(props.element.key)}
+        data-id={props.element.key}
+      >
+        <DragIndicatorIcon id={props.element.key} />
         <Table {...props} />
       </div>
     );
@@ -290,7 +394,11 @@ const Element = {
 
   GridLayout(props: any) {
     return (
-      <section {...props.attributes} className="gridLayout">
+      <section
+        {...props.attributes}
+        className="gridLayout"
+        data-id={props.element.key}
+      >
         {props.children}
       </section>
     );
@@ -303,13 +411,14 @@ const Element = {
       <>
         <div
           className="draggableItems my-2 gridLayout--dragItem"
-          {...hoverHandler}
+          {...hoverHandler(props.element.key)}
+          data-id={props.element.key}
           style={{
             width: props.element.width + "%",
             // paddingLeft: "40px",
           }}
         >
-          <DragIndicatorIcon />
+          <DragIndicatorIcon id={props.element.key} />
 
           <div
             className="gridLayout__children"
@@ -330,8 +439,12 @@ const Element = {
   Carousel(props: any) {
     // console.log(props);
     return (
-      <div className="draggableItems my-2" {...hoverHandler}>
-        <DragIndicatorIcon />
+      <div
+        className="draggableItems my-2"
+        {...hoverHandler(props.element.key)}
+        data-id={props.element.key}
+      >
+        <DragIndicatorIcon id={props.element.key} />
         <CarouselContainer {...props} />
       </div>
     );
@@ -342,8 +455,12 @@ const Element = {
 
   ParaGraph(props: any) {
     return (
-      <div className="draggableItems my-2" {...hoverHandler}>
-        <DragIndicatorIcon />
+      <div
+        className="draggableItems my-2"
+        {...hoverHandler(props.element.key)}
+        data-id={props.element.key}
+      >
+        <DragIndicatorIcon id={props.element.key} />
 
         <p {...props.attributes} className="">
           {props.children}

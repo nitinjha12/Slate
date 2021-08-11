@@ -1,6 +1,7 @@
 import { Transforms, Editor, Element } from "slate";
 import { ReactEditor } from "slate-react";
 import { EditorType } from "types";
+import { v4 as uuidv4 } from "uuid";
 
 const Table = {
   insertTable(editor: EditorType, dimension: any) {
@@ -17,6 +18,7 @@ const Table = {
 
     const newProperties = {
       type: "table",
+      key: uuidv4(),
       children: [{ type: "table-body", children: tableRow }],
     };
 
@@ -60,14 +62,14 @@ const Table = {
       selection.selection.focus.offset = offset;
     }
 
-    // if (table) {
-    //   Transforms.removeNodes(editor, {
-    //     match: (n: any) =>
-    //       !Editor.isEditor(n) &&
-    //       (Element.isElement(n) as any) &&
-    //       n.type === "table",
-    //   });
-    // }
+    if (table) {
+      Transforms.removeNodes(editor, {
+        match: (n: any) =>
+          !Editor.isEditor(n) &&
+          (Element.isElement(n) as any) &&
+          n.type === "table",
+      });
+    }
 
     this.rowOperationsHelper(
       editor,
@@ -110,7 +112,7 @@ const Table = {
     }
     if (rowLength === 1 && str.includes("delete")) return;
 
-    Transforms.setNodes(editor, data[0]);
+    Transforms.insertNodes(editor, data[0]);
     editor.selection = selection.selection;
 
     ReactEditor.focus(editor);
@@ -186,7 +188,9 @@ const Table = {
       for (let row of rows) {
         const column: any = {
           type: "table-cell",
-          children: [{ type: "paragraph", children: [{ text: "" }] }],
+          children: [
+            { type: "paragraph", children: [{ text: "" }], key: uuidv4() },
+          ],
           colSpan: 1,
           rowSpan: 1,
           display: true,

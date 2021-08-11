@@ -3,6 +3,7 @@ import Context from "context/context";
 import { ReactEditor } from "slate-react";
 import { Transforms, Path, Editor } from "slate";
 import CustomEditor from "components/Editor/Editor";
+import { v4 as uuidv4 } from "uuid";
 
 const useImageHandler = function () {
   const dataCtx = useContext(Context);
@@ -33,17 +34,16 @@ const useImageHandler = function () {
 
       Transforms.insertNodes(
         editor!,
-        [
-          {
-            type: "image",
-            caption: "",
-            // url: value,
-            src: value,
-            children: [{ text: "" }],
-            style: { width: "100%" },
-          },
-          { type: "paragraph", children: [{ text: "" }] },
-        ] as any,
+
+        {
+          type: "image",
+          caption: "",
+          // url: value,
+          key: uuidv4(),
+          src: value,
+          children: [{ text: "" }],
+          style: { width: "100%" },
+        } as any,
         { at: previousSelection.current, select: true }
       );
     }

@@ -38,7 +38,11 @@ function Video(props: any) {
           title="Video Player"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         />
-        <Arrow isSelected={!readOnly} isHover={isHover} />
+        <Arrow
+          isSelected={!readOnly && focused}
+          isHover={isHover}
+          id={props.element.key}
+        />
         {props.children}
       </div>
     </div>
