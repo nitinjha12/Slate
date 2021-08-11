@@ -15,6 +15,7 @@ import withLink from "./withLink";
 import withImage from "./withImage";
 import withTable from "./withTable";
 import withList from "./withList";
+import withKey from "./withKey";
 import { useEditorConfig } from "./helper";
 import Toolbar from "./Toolbar";
 import { initialValue } from "./helper";
@@ -33,7 +34,9 @@ function Create() {
     () =>
       withImage(
         withList(
-          withLink(withTable(withHistory(withReact(createEditor() as any))))
+          withKey(
+            withLink(withTable(withHistory(withReact(createEditor() as any))))
+          )
         )
       ),
     []
@@ -53,21 +56,21 @@ function Create() {
     }
   }, [editor.selection]);
 
-  // const [id, setId] = useState(localStorage.getItem("contentID") || "");
+  const [id, setId] = useState(localStorage.getItem("contentID") || "");
 
-  // useEffect(() => {
-  //   if (id) {
-  //     localStorage.setItem("contentID", id);
-  //   }
-  //   setId(localStorage.getItem("contentID")!);
+  useEffect(() => {
+    if (id) {
+      localStorage.setItem("contentID", id);
+    }
+    setId(localStorage.getItem("contentID")!);
 
-  //   (async function () {
-  //     const res = await fetch(`/api/task?id=${id}`);
-  //     const data = await res.json();
+    (async function () {
+      const res = await fetch(`/api/task?id=${id}`);
+      const data = await res.json();
 
-  //     setValue(JSON.parse(data.data.data));
-  //   })();
-  // }, [id]);
+      setValue(JSON.parse(data.data.data));
+    })();
+  }, [id]);
 
   const { renderElement, renderLeaf } = useEditorConfig();
 
@@ -76,11 +79,11 @@ function Create() {
 
     const content = value;
 
-    // if (id) {
-    //   fetcher({ id, data: content });
-    // } else {
-    //   fetcher({ data: content }, setId);
-    // }
+    if (id) {
+      fetcher({ id, data: content });
+    } else {
+      fetcher({ data: content }, setId);
+    }
   }
 
   function getDragAfterElement(container: any, y: number) {
@@ -136,22 +139,7 @@ function Create() {
   }
   removeGridLayout();
 
-  function checkCommonKey() {
-    let nodeKey;
-
-    for (let node of value) {
-      if (node.key === nodeKey) {
-        Transforms.setNodes(editor, { key: uuidv4() } as any, {
-          match: (n) => n === node,
-        });
-        break;
-      }
-      if (node.type === "paragraph") {
-        nodeKey = node.key;
-      }
-    }
-  }
-  checkCommonKey();
+  console.log(editor);
 
   function clickHandler(e: React.MouseEvent) {}
 

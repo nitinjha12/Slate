@@ -78,10 +78,13 @@ const hoverHandler = function (id: string) {
       dragBtn.style.display = "inline-block";
       const addBtn: any = e.currentTarget.childNodes[0].childNodes[0];
 
+      console.log(hoverNodePath);
+
       if (
         hoverNodePath &&
         editor.selection?.anchor.path[0] === hoverNodePath[0]
       ) {
+        console.log("got it");
         dragBtn.classList.add("toolbar__parent--drag");
         addBtn.style.display = "none";
       }
@@ -142,11 +145,18 @@ const Element = {
     );
   },
   Heading1(props: any) {
+    const heading = document.getElementById("heading-1");
+
+    if (heading?.innerHTML === "") {
+      heading.innerHTML = "Heading 1";
+    }
+
     return (
       <div
-        className="draggableItems my-2"
+        className="draggableItems my-2 heading-1"
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
+        placeholder="Heading 1"
       >
         <DragIndicatorIcon id={props.element.key} />
 
@@ -169,7 +179,11 @@ const Element = {
       >
         <DragIndicatorIcon id={props.element.key} />
 
-        <h2 {...props.attributes} className="">
+        <h2
+          {...props.attributes}
+          className="heading-2"
+          data-placeholder="Heading 2"
+        >
           {props.children}
         </h2>
       </div>
@@ -184,7 +198,11 @@ const Element = {
       >
         <DragIndicatorIcon id={props.element.key} />
 
-        <h3 {...props.attributes} className="">
+        <h3
+          {...props.attributes}
+          className="heading-3"
+          data-placeholder="Heading 3"
+        >
           {props.children}
         </h3>
       </div>
