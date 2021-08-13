@@ -51,34 +51,34 @@ function Create() {
   const [isWriting, setWriting] = useState(true);
   const [height, setHeight] = useState(40);
 
-  const [id, setId] = useState(localStorage.getItem("contentID") || "");
+  // const [id, setId] = useState(localStorage.getItem("contentID") || "");
 
-  useEffect(() => {
-    if (id) {
-      localStorage.setItem("contentID", id);
-    }
-    setId(localStorage.getItem("contentID")!);
+  // useEffect(() => {
+  //   if (id) {
+  //     localStorage.setItem("contentID", id);
+  //   }
+  //   setId(localStorage.getItem("contentID")!);
 
-    (async function () {
-      const res = await fetch(`/api/task?id=${id}`);
-      const data = await res.json();
+  //   (async function () {
+  //     const res = await fetch(`/api/task?id=${id}`);
+  //     const data = await res.json();
 
-      setValue(JSON.parse(data.data.data));
-    })();
-  }, [id]);
+  //     setValue(JSON.parse(data.data.data));
+  //   })();
+  // }, [id]);
 
   const { renderElement, renderLeaf } = useEditorConfig();
 
   function onChange(value: any) {
     setValue(value);
 
-    const content = value;
+    // const content = value;
 
-    if (id) {
-      fetcher({ id, data: content });
-    } else {
-      fetcher({ data: content }, setId);
-    }
+    // if (id) {
+    //   fetcher({ id, data: content });
+    // } else {
+    //   fetcher({ data: content }, setId);
+    // }
   }
 
   function getDragAfterElement(container: any, y: number) {
