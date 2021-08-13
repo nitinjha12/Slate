@@ -3,10 +3,13 @@
 }
 
 .activeToolbar {
-  position: absolute;
+  position: fixed;
+  overflow: hidden;
   width: 100%;
   height: 100%;
-  z-index: 300;
+  z-index: 800;
+  inset: 0px;
+  top: 0px;
 }
 
 // .toolbar__buttonsTooltip {

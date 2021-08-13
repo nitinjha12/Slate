@@ -65,13 +65,11 @@ export const onDragover = (
       focus: { path: dragPath, offset: 0 },
     };
 
-    Transforms.select(editor, range);
-    Editor.normalize(editor);
-
+    // Transforms.select(editor, range);
     ReactEditor.blur(editor);
+    window.getSelection()!.removeAllRanges();
 
     count++;
-    window.getSelection()!.removeAllRanges();
   }
 
   if (e.clientX - box.x < 45) {

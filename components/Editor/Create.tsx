@@ -168,10 +168,8 @@ function Create() {
         className="editor"
         style={{
           position:
-            modelCtx.isModel || modelCtx.isCarousel || modelCtx.isToolbar
-              ? "fixed"
-              : "relative",
-          top: modelCtx.isToolbar ? -modelCtx.isToolbar + 200 : 0,
+            modelCtx.isModel || modelCtx.isCarousel ? "fixed" : "relative",
+          // top: modelCtx.isToolbar ? -modelCtx.isToolbar + 200 : 0,
         }}
       >
         <Slate editor={editor} value={value} onChange={onChange}>
@@ -196,7 +194,10 @@ function Create() {
             }}
             onDragEnter={(e) => {
               if (dropId) {
-                // setNewSelection(editor, dropId);
+                setNewSelection(editor, dropId);
+                Editor.normalize(editor);
+                ReactEditor.blur(editor);
+                window.getSelection()!.removeAllRanges();
               }
             }}
             // onDragLeave={(e) => {

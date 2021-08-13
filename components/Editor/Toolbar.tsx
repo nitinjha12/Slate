@@ -34,8 +34,8 @@ function Toolbar({ id }: { id: string }) {
         className="toolbar__addButton"
         onClick={(e: React.MouseEvent<HTMLElement>) => {
           const rect = e.currentTarget.getBoundingClientRect();
-          const top =
-            rect.top + window.pageYOffset - e.currentTarget.offsetHeight;
+          const top = rect.top;
+          // + window.pageYOffset - e.currentTarget.offsetHeight;
 
           if (
             !Editor.isEmpty(editor, node as any) ||

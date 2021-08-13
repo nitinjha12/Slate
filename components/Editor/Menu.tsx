@@ -22,6 +22,15 @@ function Menu() {
       editor.selection = previousSelection.current!;
     }
   }, [editor.selection]);
+  const { body } = document;
+
+  useEffect(() => {
+    if (modelCtx.isToolbar) {
+      body.style.overflow = "hidden";
+    } else {
+      body.style.overflow = "visible";
+    }
+  }, [modelCtx.isToolbar]);
 
   function removeToolbar() {
     modelCtx.setToolbar(0);
@@ -33,6 +42,7 @@ function Menu() {
     }
     editor.selection = previousSelection.current!;
     Transforms.select(editor, editor.selection);
+    body.style.overflow = "visible";
     ReactEditor.focus(editor);
   }
 
@@ -47,77 +57,86 @@ function Menu() {
       ></div> */}
 
       <div
-        className="toolbar__options "
-        onClick={(e) => e.stopPropagation()}
-        style={{ top: modelCtx.isToolbar }}
+        className="activeToolbar__child"
+        style={{
+          position: modelCtx.isToolbar ? "fixed" : "relative",
+          width: "100vw",
+          height: "100vh",
+        }}
       >
-        <div className="toolbar__basicBlock">
-          <p>Basic Blocks</p>
+        <div
+          className="toolbar__options "
+          onClick={(e) => e.stopPropagation()}
+          style={{ top: modelCtx.isToolbar }}
+        >
+          <div className="toolbar__basicBlock">
+            <p>Basic Blocks</p>
 
-          {toolbarButtonData.slice(0, 13).map((data, i) => (
-            <div
-              className={`toolbar__blockBtn ${
-                editor && data.isActive(editor) ? "btn--toolbar__active" : ""
-              }`}
-              key={i}
-              onPointerDown={(e) => {
-                data.onMouseDown(e, editor!);
-                ReactEditor.focus(editor!);
-                removeToolbar();
-              }}
-              style={data.style}
-              title={data.title}
-            >
-              <button className={`toolbar__blockBtn--icon  `}>
-                {data.children.icon}
-              </button>
-              <div className="toolbar__blockBtn--name">
-                {data.children.name}
+            {toolbarButtonData.slice(0, 13).map((data, i) => (
+              <div
+                className={`toolbar__blockBtn ${
+                  editor && data.isActive(editor) ? "btn--toolbar__active" : ""
+                }`}
+                key={i}
+                onPointerDown={(e) => {
+                  data.onMouseDown(e, editor!);
+                  ReactEditor.focus(editor!);
+                  removeToolbar();
+                }}
+                style={data.style}
+                title={data.title}
+              >
+                <button className={`toolbar__blockBtn--icon  `}>
+                  {data.children.icon}
+                </button>
+                <div className="toolbar__blockBtn--name">
+                  {data.children.name}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-        <div className="toolbar__basicBlock">
-          <p>Media</p>
+            ))}
+          </div>
+          <div className="toolbar__basicBlock">
+            <p>Media</p>
 
-          {toolbarButtonData.slice(13).map((data, i) => (
-            <div
-              className={`toolbar__blockBtn ${
-                editor && data.isActive(editor) ? "btn--toolbar__active" : ""
-              }`}
-              key={i}
-              onPointerDown={(e) => {
-                if (data.name === "video") {
-                  setVideoEditor(true);
-                }
+            {toolbarButtonData.slice(13).map((data, i) => (
+              <div
+                className={`toolbar__blockBtn ${
+                  editor && data.isActive(editor) ? "btn--toolbar__active" : ""
+                }`}
+                key={i}
+                onPointerDown={(e) => {
+                  if (data.name === "video") {
+                    setVideoEditor(true);
+                  }
 
-                if (data.name === "image") {
-                  modelCtx.changeSetModel(true);
-                }
+                  if (data.name === "image") {
+                    modelCtx.changeSetModel(true);
+                  }
 
-                if (data.name === "table") {
-                  setTable(true);
-                }
+                  if (data.name === "table") {
+                    setTable(true);
+                  }
 
-                removeToolbar();
-              }}
-              style={data.style}
-              title={data.title}
-            >
-              <button className={`toolbar__blockBtn--icon  `}>
-                {data.children.icon}
-              </button>
-              <div className="toolbar__blockBtn--name">
-                {data.children.name}
+                  // removeToolbar();
+                }}
+                style={data.style}
+                title={data.title}
+              >
+                <button className={`toolbar__blockBtn--icon  `}>
+                  {data.children.icon}
+                </button>
+                <div className="toolbar__blockBtn--name">
+                  {data.children.name}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+        {isVideoEditor && (
+          <VideoEditor editor={editor} setVideoEditor={setVideoEditor} />
+        )}
+        {isTable && <TableView setTable={setTable} editor={editor} />}
       </div>
-      {isVideoEditor && (
-        <VideoEditor editor={editor} setVideoEditor={setVideoEditor} />
-      )}
-      {isTable && <TableView setTable={setTable} editor={editor} />}
     </section>
   );
 }
