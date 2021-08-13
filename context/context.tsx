@@ -14,6 +14,10 @@ const Context = createContext<ContextInterface>({
   setCarousel(bool) {},
   dragPath: [0],
   setDragPath(path) {},
+  isToolbar: 0,
+  setToolbar(bool) {},
+  getKey: "",
+  setKey(key) {},
 });
 
 interface ContextInterface {
@@ -29,6 +33,10 @@ interface ContextInterface {
   setCarousel(bool: boolean): void;
   dragPath: number[];
   setDragPath(path: number[]): void;
+  isToolbar: number;
+  setToolbar(bool: number): void;
+  getKey: string;
+  setKey(key: string): void;
 }
 
 interface DataInterface {
@@ -42,6 +50,8 @@ export const Provider = ({ children }: any) => {
   const [colLayout, setColLayout] = useState(false);
   const [isCarousel, setCarousel] = useState(false);
   const [dragPath, setDragPath] = useState([0]);
+  const [isToolbar, setToolbar] = useState(0);
+  const [getKey, setKey] = useState("");
 
   function changeSetModel(bool: boolean) {
     setIsModel(bool);
@@ -68,6 +78,10 @@ export const Provider = ({ children }: any) => {
     setCarousel,
     dragPath,
     setDragPath,
+    isToolbar,
+    setToolbar,
+    getKey,
+    setKey,
   };
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

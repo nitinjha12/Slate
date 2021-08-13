@@ -28,6 +28,7 @@ import { CardImage } from "@styled-icons/bootstrap/CardImage";
 import shouldMerge from "./shouldMerge";
 import { v4 as uuidv4 } from "uuid";
 import { setNewSelection } from "./findNode";
+import Menu from "./Menu";
 
 function Create() {
   const editor = useMemo(
@@ -50,46 +51,40 @@ function Create() {
   const [isWriting, setWriting] = useState(true);
   const [height, setHeight] = useState(40);
 
+  const [id, setId] = useState(localStorage.getItem("contentID") || "");
+
   useEffect(() => {
-    if (editor && editor.selection) {
-      modelCtx.getEditor(editor);
+    if (id) {
+      localStorage.setItem("contentID", id);
     }
-  }, [editor.selection]);
+    setId(localStorage.getItem("contentID")!);
 
-  // const [id, setId] = useState(localStorage.getItem("contentID") || "");
+    (async function () {
+      const res = await fetch(`/api/task?id=${id}`);
+      const data = await res.json();
 
-  // useEffect(() => {
-  //   if (id) {
-  //     localStorage.setItem("contentID", id);
-  //   }
-  //   setId(localStorage.getItem("contentID")!);
-
-  //   (async function () {
-  //     const res = await fetch(`/api/task?id=${id}`);
-  //     const data = await res.json();
-
-  //     setValue(JSON.parse(data.data.data));
-  //   })();
-  // }, [id]);
+      setValue(JSON.parse(data.data.data));
+    })();
+  }, [id]);
 
   const { renderElement, renderLeaf } = useEditorConfig();
 
   function onChange(value: any) {
     setValue(value);
 
-    // const content = value;
+    const content = value;
 
-    // if (id) {
-    //   fetcher({ id, data: content });
-    // } else {
-    //   fetcher({ data: content }, setId);
-    // }
+    if (id) {
+      fetcher({ id, data: content });
+    } else {
+      fetcher({ data: content }, setId);
+    }
   }
 
   function getDragAfterElement(container: any, y: number) {
     const draggableEle = [
       ...container.querySelectorAll(
-        ".draggableItems:not(.draggable--dragging)"
+        ".editor__element--parent:not(.draggable--dragging)"
       ),
     ];
 
@@ -109,6 +104,28 @@ function Create() {
       }
     ).element;
   }
+
+  useEffect(() => {
+    const newValue = JSON.parse(JSON.stringify(value));
+
+    for (let val of newValue) {
+      val.class = "editor__element--parent";
+    }
+    setValue(newValue);
+
+    // for (let i = 0; i < newValue.length; i++) {
+    //   if (newValue[i].type === "grid-layout") {
+    //     for (let child of newValue[i].children) {
+    //       child.width = 100 / newValue[i].children.length;
+    //     }
+    //   }
+
+    //   if (newValue[i].type === "grid-layout-child") {
+    //     newValue[i] = { ...newValue[i].children[0] };
+    //   }
+    // }
+    // setValue(newValue);
+  }, [value.length]);
 
   function replaceListItem() {
     const newValue = JSON.parse(JSON.stringify(value));
@@ -139,19 +156,26 @@ function Create() {
   }
   removeGridLayout();
 
+  // console.log(editor);
+
   function clickHandler(e: React.MouseEvent) {}
 
   return (
     <>
       {(modelCtx.isModel || modelCtx.isCarousel) && <ModelWindow />}
+
       <section
         className="editor"
         style={{
           position:
-            modelCtx.isModel || modelCtx.isCarousel ? "fixed" : "relative",
+            modelCtx.isModel || modelCtx.isCarousel || modelCtx.isToolbar
+              ? "fixed"
+              : "relative",
+          top: modelCtx.isToolbar ? -modelCtx.isToolbar + 200 : 0,
         }}
       >
         <Slate editor={editor} value={value} onChange={onChange}>
+          {modelCtx.isToolbar ? <Menu /> : null}
           <div
             className={`editor__container ${
               modelCtx.isLight ? "light" : "dark"
@@ -172,10 +196,15 @@ function Create() {
             }}
             onDragEnter={(e) => {
               if (dropId) {
-                console.log("hey");
-                setNewSelection(editor, dropId);
+                // setNewSelection(editor, dropId);
               }
             }}
+            // onDragLeave={(e) => {
+            //   console.log("leave");
+            //   if (dropId) {
+            //     setNewSelection(editor, dropId);
+            //   }
+            // }}
           >
             <section className="header__container">
               <nav className="editor__titleNav">
@@ -214,7 +243,6 @@ function Create() {
               <EditorNav isWriting={isWriting} setWriting={setWriting} />
             </section>
 
-            <Toolbar />
             <div
               className="element--dropLine"
               style={{ display: "none" }}

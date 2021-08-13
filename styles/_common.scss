@@ -160,6 +160,8 @@
 }
 
 .hr--line {
+  position: relative;
+
   &:hover {
     outline: 3px solid #a1c8fd;
   }
@@ -171,11 +173,27 @@
 
 .gridLayout {
   display: flex;
-  // flex-wrap: wrap;
+  padding: 10px 80px;
   justify-content: center;
   min-height: 200px;
-  // grid-template-columns: repeat(auto-fit, 400px);
-  // border: 1px solid black;
+  grid-gap: 1rem;
+
+  .gridLayout--dragItem {
+    padding: 0px;
+  }
+
+  @media (max-width: 450px) {
+    padding: 0 10px;
+  }
+
+  @media (max-width: 560px) {
+    flex-wrap: wrap;
+    grid-gap: 5px;
+
+    .gridLayout--dragItem {
+      width: 100% !important;
+    }
+  }
 
   .gridLayout__children {
     padding: 10px;
@@ -264,11 +282,20 @@
 
 .draggableItems {
   position: relative;
-  padding: 0px 50px;
+  padding: 0px 80px;
+  width: 100%;
+
+  @media (max-width: 450px) {
+    padding: 0 10px;
+  }
 }
 
 .header__container {
-  padding: 0px 50px;
+  padding: 0px 80px;
+
+  @media (max-width: 450px) {
+    padding: 0 10px;
+  }
 }
 
 .element--dropLine {
@@ -284,7 +311,7 @@
   height: 100%;
   width: 4px;
   position: absolute;
-  left: 30px;
+  left: 60px;
   background-color: rgb(93, 151, 228);
   z-index: 120;
 }
@@ -299,9 +326,27 @@
   }
 }
 
+.element__container {
+  .draggableItems {
+    padding: 0px !important;
+
+    button {
+      display: none !important;
+    }
+  }
+}
+
 .gridLayout--dragItem {
   padding: 0;
   padding-left: 30px;
+
+  .toolbar__parent {
+    left: -20px !important;
+
+    .toolbar__addButton--hover {
+      display: none !important;
+    }
+  }
 
   button {
     left: 10px;

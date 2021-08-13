@@ -1,4 +1,4 @@
-import { Transforms, Editor, Element } from "slate";
+import { Transforms, Editor, Element, Range, Node } from "slate";
 import { EditorType } from "types";
 import { v4 as uuidv4 } from "uuid";
 
@@ -7,6 +7,10 @@ const withKey = (editor: EditorType) => {
 
   editor.normalizeNode = (entry) => {
     const [node, path]: any = entry;
+
+    // if (!Node.leaf(node, path)) return;
+
+    if (!node.text) return;
 
     if (!node.key) {
       Transforms.setNodes(editor, { key: uuidv4() } as any, { at: path });
@@ -20,25 +24,23 @@ const withKey = (editor: EditorType) => {
       case "split_node":
         (op.properties as any).key = uuidv4();
         break;
+      case "remove_node":
+        // console.log(op);
+        break;
+      case "set_selection":
+        // window.getSelection()!.removeAllRanges();
+        // Range.isForward(op.newProperties);
+        // if (!) {
+        //   console.log("gotcha");
+        //   Range.start(op.properties!);
+        // }
+        break;
+
+      case "insert_node":
+      // console.log(op);
     }
 
     apply(op);
-  };
-
-  editor.insertBreak = () => {
-    const { selection } = editor;
-
-    if (selection) {
-      const [para]: any = Editor.nodes(editor, {
-        match: (n: any) => {
-          Transforms.setNodes(editor, { key: uuidv4() } as any);
-
-          return !Editor.isEditor(n) && (Element.isElement(n) as any) && n.text;
-        },
-      });
-    }
-
-    insertBreak();
   };
 
   return editor;

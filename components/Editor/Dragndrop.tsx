@@ -8,10 +8,21 @@ import { findSlateNode } from "./findNode";
 export const onMouseEnter = (
   e: React.MouseEvent<HTMLElement>,
   editor: EditorType,
-  setDragPath: Function
+  setDragPath: Function,
+  parentId: string | undefined
 ) => {
   const { id } = e.currentTarget.dataset;
-  const node = id && findSlateNode(editor.children, id);
+
+  if (parentId) {
+    const [node]: any = id && findSlateNode(editor.children, id, parentId);
+    const nodePath = node && ReactEditor.findPath(editor, node);
+
+    setDragPath(nodePath);
+
+    return;
+  }
+
+  const [node]: any = id && findSlateNode(editor.children, id);
   const nodePath = node && ReactEditor.findPath(editor, node);
 
   console.log(node, nodePath);
@@ -39,47 +50,41 @@ export const onDragover = (
   const afterEle: HTMLElement = getDragAfterElement(editorParent, e.clientY);
   const child = afterEle && (afterEle.childNodes[1] as HTMLElement);
 
+  const dropLine: HTMLElement = document.querySelector(".element--dropLine")!;
+  const verticalLine: HTMLElement = document.querySelector(
+    ".element--dropLineVertical"
+  )!;
+
+  if (dropLine) dropLine.style.display = "block";
+
+  const box = afterEle.getBoundingClientRect();
+
   if (count === 0) {
     const range: Range = {
       anchor: { path: dragPath, offset: 0 },
       focus: { path: dragPath, offset: 0 },
     };
 
-    try {
-      Transforms.setSelection(editor, range);
-    } catch (err) {
-      console.log(err);
-    }
+    Transforms.select(editor, range);
+    Editor.normalize(editor);
+
+    ReactEditor.blur(editor);
+
     count++;
+    window.getSelection()!.removeAllRanges();
   }
 
-  const dropLine: HTMLElement = document.querySelector(".element--dropLine")!;
-  const verticalLine: HTMLElement = document.querySelector(
-    ".element--dropLineVertical"
-  )!;
-  dropLine.style.display = "block";
-
-  const box = afterEle.getBoundingClientRect();
-
-  if (child && e.clientX - box.x < 45) {
+  if (e.clientX - box.x < 45) {
     dropLine.style.display = "none";
     verticalLine.style.display = "block";
-    child.insertAdjacentElement("beforebegin", verticalLine);
+    afterEle.insertAdjacentElement("afterbegin", verticalLine);
     setLayout(true);
   } else {
     verticalLine.style.display = "none";
     setLayout(false);
   }
 
-  if (afterEle.parentElement?.classList.contains("gridLayout__children")) {
-    verticalLine.style.display = "none";
-    dropLine.style.display = "none";
-    setLayout(false);
-  }
-
-  // console.log(ReactEditor.findEventRange(editor, e));
-
-  child && child.insertAdjacentElement("afterbegin", dropLine);
+  afterEle && afterEle.insertAdjacentElement("afterbegin", dropLine);
 
   if (afterEle.dataset.id !== dropId) {
     setDropId(afterEle.dataset.id);
@@ -95,15 +100,24 @@ export const onDrop = (
 ) => {
   e.preventDefault();
   e.stopPropagation();
-
   count = 0;
 
-  const range: Range = {
-    anchor: { path: [index[0] - 1], offset: 0 },
-    focus: { path: [index[0] - 1], offset: 0 },
-  };
+  const [node]: any = dropId && findSlateNode(editor.children, dropId);
+  const dropPath = node && ReactEditor.findPath(editor, node);
 
-  Transforms.setSelection(editor, range);
+  // const range: Range = {
+  //   anchor: {
+  //     path: dropPath,
+  //     offset: 0,
+  //   },
+  //   focus: {
+  //     path: dropPath,
+  //     offset: 0,
+  //   },
+  // };
+
+  // Transforms.select(editor, range);
+  // ReactEditor.focus(editor);
 
   const editorContainer = document.querySelector(".editor__container")!;
   const dropLine: HTMLElement = document.querySelector(".element--dropLine")!;
@@ -116,8 +130,6 @@ export const onDrop = (
   editorContainer.appendChild(dropLine);
   editorContainer.appendChild(verticalLine);
 
-  const node = dropId && findSlateNode(editor.children, dropId);
-  const dropPath = node && ReactEditor.findPath(editor, node);
   if (!node) return;
 
   if (layout) {
@@ -126,13 +138,8 @@ export const onDrop = (
   }
 
   try {
-    console.log(index, dropPath);
-    if (index[0] === dropPath[0]) return;
-
-    // Transforms.moveNodes(editor, {
-    //   at: index,
-    //   to: dropPath,
-    // });
+    // console.log(index, dropPath);
+    if (Path.equals(index, dropPath)) return;
 
     const nodeData = JSON.parse(JSON.stringify(editor.children));
     const range: Range = {
@@ -140,11 +147,9 @@ export const onDrop = (
       focus: { path: dropPath, offset: 0 },
     };
 
-    console.log(nodeData[index[0]]);
-
     Transforms.removeNodes(editor, { at: index });
     Transforms.insertNodes(editor, nodeData[index[0]], { at: dropPath });
-    Transforms.setSelection(editor, range);
+    Transforms.select(editor, range);
     ReactEditor.focus(editor);
   } catch (err) {
     console.log(err);

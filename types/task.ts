@@ -22,11 +22,11 @@ export interface EditorInterface {
 export interface ToolbarButtonDataInterface {
   onMouseDown(
     e:
-      | React.MouseEvent<HTMLButtonElement, MouseEvent>
+      | React.MouseEvent<HTMLElement, MouseEvent>
       | React.PointerEvent<HTMLSelectElement>,
     editor: EditorType
   ): void;
-  children: JSX.Element | string;
+  children: any;
   style?: any;
   name: string | undefined;
   title: string | undefined;

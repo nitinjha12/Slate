@@ -15,20 +15,18 @@ import { PlaylistPlay } from "@styled-icons/material-outlined/PlaylistPlay";
 import { Table } from "@styled-icons/bootstrap/Table";
 import { Grid } from "@styled-icons/boxicons-regular/Grid";
 import { ViewCarousel } from "@styled-icons/material-sharp/ViewCarousel";
+import { Paragraph } from "@styled-icons/bootstrap/Paragraph";
+import { Heading } from "@styled-icons/fa-solid/Heading";
+import { Heading as Heading2 } from "@styled-icons/boxicons-regular/Heading";
+import { Heading as Heading3 } from "@styled-icons/remix-editor/Heading";
 import CustomEditor from "./Editor";
 import { EditorType, ToolbarButtonDataInterface } from "types";
 
 export const customEditorData = {
-  // choose: {
-  //   editorData: { type: undefined, value: "" },
-  //   markBlock: false,
-  //   children: "Choose Heading",
-  //   style: {},
-  // },
   p: {
     editorData: { type: undefined, value: "paragraph" },
     markBlock: false,
-    children: "Paragraph",
+    children: { icon: <Paragraph size="20" />, name: "Paragraph" },
     style: {},
     title: "heading",
   },
@@ -36,21 +34,21 @@ export const customEditorData = {
   h1: {
     editorData: { type: undefined, value: "heading-1" },
     markBlock: false,
-    children: "Heading 1",
+    children: { icon: <Heading size="20" />, name: "Heading 1" },
     style: {},
     title: "heading",
   },
   h2: {
     editorData: { type: undefined, value: "heading-2" },
     markBlock: false,
-    children: "Heading 2",
+    children: { icon: <Heading2 size="20" />, name: "Heading 2" },
     style: {},
     title: "heading",
   },
   h3: {
     editorData: { type: undefined, value: "heading-3" },
     markBlock: false,
-    children: "Heading 3",
+    children: { icon: <Heading3 size="20" />, name: "Heading 3" },
     style: {},
     title: "heading",
   },
@@ -106,7 +104,7 @@ export const customEditorData = {
   code: {
     editorData: { value: "code", type: undefined },
     markBlock: false,
-    children: <CodeAlt />,
+    children: { icon: <CodeAlt size="20" />, name: "Code Block" },
     style: {},
     title: "Code Block",
   },
@@ -114,44 +112,58 @@ export const customEditorData = {
   ulList: {
     editorData: { value: "bulleted-list", type: undefined },
     markBlock: false,
-    children: <ListUl size="24" />,
+    children: { icon: <ListUl size="24" />, name: "Bullet List" },
     style: {},
     title: "unordered-list",
   },
   olList: {
     editorData: { value: "ordered-list", type: undefined },
     markBlock: false,
-    children: <ListOrdered size="20" />,
+    children: { icon: <ListOrdered size="20" />, name: "Number List" },
     style: {},
     title: "ordered-list",
   },
   horizontalLine: {
     editorData: { value: "line", type: undefined },
     markBlock: false,
-    children: <LineHorizontal1 size="20" />,
+    children: { icon: <LineHorizontal1 size="20" />, name: "Divider" },
     style: {},
     title: "Code Block",
+  },
+  toggleList: {
+    editorData: { value: "toggle-list", type: undefined },
+    markBlock: false,
+    children: { icon: <PlaylistPlay size="18" />, name: "ToggleList" },
+    style: {},
+    title: "Toggle List",
   },
   leftAlign: {
     editorData: { value: "left-align", type: undefined },
     markBlock: false,
-    children: <AlignLeft size="20" />,
+    children: { icon: <AlignLeft size="20" />, name: "Text Align Left" },
     style: {},
     title: "Left-Align",
   },
   centerAlign: {
     editorData: { value: "center-align", type: undefined },
     markBlock: false,
-    children: <AlignMiddle size="20" />,
+    children: { icon: <AlignMiddle size="20" />, name: "Text Align Center" },
     style: {},
     title: "Center-Align",
   },
   rightAlign: {
     editorData: { value: "right-align", type: undefined },
     markBlock: false,
-    children: <AlignRight size="20" />,
+    children: { icon: <AlignRight size="20" />, name: "Text Align Right" },
     style: {},
     title: "Right-Align",
+  },
+  table: {
+    editorData: { value: "table", type: undefined },
+    markBlock: false,
+    children: { icon: <Table size="18" />, name: "Table" },
+    style: {},
+    title: "Table",
   },
   link: {
     editorData: { value: "link", type: undefined },
@@ -163,31 +175,18 @@ export const customEditorData = {
   image: {
     editorData: { value: "image", type: undefined },
     markBlock: false,
-    children: <Image size="20" />,
+    children: { icon: <Image size="20" />, name: "Image" },
     style: {},
     title: "Image",
   },
   video: {
     editorData: { value: "video", type: undefined },
     markBlock: false,
-    children: <Video size="20" />,
+    children: { icon: <Video size="20" />, name: "Video" },
     style: {},
     title: "Video",
   },
-  table: {
-    editorData: { value: "table", type: undefined },
-    markBlock: false,
-    children: <Table size="18" />,
-    style: {},
-    title: "Table",
-  },
-  toggleList: {
-    editorData: { value: "toggle-list", type: undefined },
-    markBlock: false,
-    children: <PlaylistPlay size="18" />,
-    style: {},
-    title: "Toggle List",
-  },
+
   // gridLayout: {
   //   editorData: { value: "grid-layout", type: undefined },
   //   markBlock: false,
@@ -198,7 +197,7 @@ export const customEditorData = {
   carousel: {
     editorData: { value: "carousel", type: undefined },
     markBlock: false,
-    children: <ViewCarousel size="18" />,
+    children: { icon: <ViewCarousel size="18" />, name: "Carousel" },
     style: {},
     title: "Carousel",
   },

@@ -7,7 +7,7 @@ const withImage = (editor: EditorType) => {
   const { insertData, isVoid, isInline } = editor;
 
   editor.isVoid = (element: any) => {
-    return element.type === "image" ? true : isVoid(element);
+    return ["image", "video"].includes(element.type) || isVoid(element);
   };
 
   editor.insertData = (data) => {

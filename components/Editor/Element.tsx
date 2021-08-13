@@ -1,18 +1,12 @@
 import ImageElement from "./Elements/Image";
-import { useEffect } from "react";
-import {
-  useSelected,
-  useFocused,
-  ReactEditor,
-  useSlate,
-  useSlateStatic,
-  useReadOnly,
-} from "slate-react";
-import { Editor, Transforms } from "slate";
+import { useEffect, useRef, useMemo } from "react";
+import { useSlate, useReadOnly } from "slate-react";
+import { Editor, Transforms, Path } from "slate";
 import React, { useState, useContext } from "react";
 import ToggleList from "./ToggleList";
 import Video from "./Elements/Video";
 import Table from "./Elements/Table";
+import HorizontalLine from "./Elements/Line";
 import CaraouselItem from "components/Carousel/CaraouselItem";
 import CarouselContainer from "components/Carousel/Container";
 import { DragIndicator } from "@styled-icons/material-sharp/DragIndicator";
@@ -20,8 +14,15 @@ import { Plus } from "@styled-icons/bootstrap/Plus";
 import { onMouseEnter } from "./Dragndrop";
 import Context from "context/context";
 import { findSlateNodePath, setNewSelection } from "./findNode";
+import Toolbar from "./Toolbar";
 
-function DragIndicatorIcon({ id }: { id: string }) {
+function DragIndicatorIcon({
+  id,
+  parentId,
+}: {
+  id: string;
+  parentId?: string;
+}) {
   const modelCtx = useContext(Context);
   const editor = useSlate();
   const readOnly = useReadOnly();
@@ -33,21 +34,10 @@ function DragIndicatorIcon({ id }: { id: string }) {
         style={{ display: "none" }}
         contentEditable={false}
       >
-        <button
-          className="toolbar__addButton toolbar__addButton--hover"
-          onClick={(e) => {
-            setNewSelection(editor as any, id);
-            e.currentTarget.style.display = "none";
-            e.currentTarget.parentElement?.classList.add(
-              "toolbar__parent--drag"
-            );
-          }}
-        >
-          <Plus size="24" />
-        </button>
+        <Toolbar id={id} />
         <button
           onMouseEnter={(e) =>
-            onMouseEnter(e, editor as any, modelCtx.setDragPath)
+            onMouseEnter(e, editor as any, modelCtx.setDragPath, parentId)
           }
           className="toolbar__dragndrop"
           data-id={id}
@@ -57,7 +47,6 @@ function DragIndicatorIcon({ id }: { id: string }) {
               modelCtx.isLight ? "mode--light" : "mode--dark"
             }`}
             size="20"
-            color="black"
           />
         </button>
       </div>
@@ -68,23 +57,14 @@ function DragIndicatorIcon({ id }: { id: string }) {
 }
 
 const hoverHandler = function (id: string) {
-  const editor = useSlate();
-  const hoverNodePath = findSlateNodePath(editor as any, id);
+  const modelCtx = useContext(Context);
 
   return {
     onMouseEnter(e: React.MouseEvent<HTMLElement>) {
       e.currentTarget.setAttribute("draggable", "true");
       const dragBtn: any = e.currentTarget.childNodes[0];
       dragBtn.style.display = "inline-block";
-      const addBtn: any = e.currentTarget.childNodes[0].childNodes[0];
-
-      if (
-        hoverNodePath &&
-        editor.selection?.anchor.path[0] === hoverNodePath[0]
-      ) {
-        dragBtn.classList.add("toolbar__parent--drag");
-        addBtn.style.display = "none";
-      }
+      modelCtx.setKey(id);
 
       e.currentTarget!.addEventListener("dragstart", () => {
         e.currentTarget?.classList.add("draggable--dragging");
@@ -106,10 +86,6 @@ const hoverHandler = function (id: string) {
     onPointerDown(e: React.MouseEvent) {
       const dragBtn: any = e.currentTarget.childNodes[0];
       dragBtn.style.display = "inline-block";
-      const addBtn: any = e.currentTarget.childNodes[0].childNodes[0];
-
-      dragBtn.classList.add("toolbar__parent--drag");
-      addBtn.style.display = "none";
     },
   };
 };
@@ -125,7 +101,7 @@ const Element = {
   Code(props: any) {
     return (
       <div
-        className="draggableItems my-2"
+        className={`draggableItems my-2 ${props.element.class}`}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -153,13 +129,13 @@ const Element = {
         className="draggableItems my-2 heading-1"
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
-        placeholder="Heading 1"
       >
         <DragIndicatorIcon id={props.element.key} />
 
         <h1
           {...props.attributes}
           className=""
+          data-placeholder="Heading 1"
           style={{ fontSize: "2em", fontWeight: "bold" }}
         >
           {props.children}
@@ -170,7 +146,7 @@ const Element = {
   Heading2(props: any) {
     return (
       <div
-        className="draggableItems my-2"
+        className={`draggableItems my-2 ${props.element.class}`}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -189,7 +165,7 @@ const Element = {
   Heading3(props: any) {
     return (
       <div
-        className="draggableItems my-2"
+        className={`draggableItems my-2 ${props.element.class}`}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -208,7 +184,7 @@ const Element = {
   BulletedList(props: any) {
     return (
       <div
-        className="draggableItems my-2"
+        className={`draggableItems my-2 ${props.element.class}`}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -223,7 +199,7 @@ const Element = {
   OrderedList(props: any) {
     return (
       <div
-        className="draggableItems my-2"
+        className={`draggableItems my-2 ${props.element.class}`}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -238,7 +214,7 @@ const Element = {
   ToggleList(props: any) {
     return (
       <div
-        className="draggableItems my-2"
+        className={`draggableItems my-2 ${props.element.class}`}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -263,37 +239,20 @@ const Element = {
   Line(props: any) {
     return (
       <div
-        className="draggableItems my-2"
+        className={`draggableItems my-2 ${props.element.class}`}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
         <DragIndicatorIcon id={props.element.key} />
 
-        <div
-          {...props.attributes}
-          style={{ display: "flow-root" }}
-          contentEditable={false}
-          className=" hr--line"
-        >
-          <hr
-            style={{
-              display: "flow-root",
-              height: "3px",
-              backgroundColor: "#E6E9EF",
-              margin: "1rem 0",
-              border: "0px",
-              borderRadius: "3px",
-            }}
-          />
-          <span style={{ display: "none" }}>{props.children}</span>
-        </div>
+        <HorizontalLine {...props} />
       </div>
     );
   },
   LeftAlign(props: any) {
     return (
       <div
-        className="draggableItems my-2"
+        className={`draggableItems my-2 ${props.element.class}`}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -308,7 +267,7 @@ const Element = {
   CenterAlign(props: any) {
     return (
       <div
-        className="draggableItems my-2"
+        className={`draggableItems my-2 ${props.element.class}`}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -323,7 +282,7 @@ const Element = {
   RightAlign(props: any) {
     return (
       <div
-        className="draggableItems my-2"
+        className={`draggableItems my-2 ${props.element.class}`}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -348,7 +307,7 @@ const Element = {
     return (
       <>
         <div
-          className="draggableItems my-2"
+          className={`draggableItems my-2 ${props.element.class}`}
           {...hoverHandler(props.element.key)}
           data-id={props.element.key}
         >
@@ -362,7 +321,7 @@ const Element = {
   Video(props: any) {
     return (
       <div
-        className="draggableItems my-2"
+        className={`draggableItems   ${props.element.class}`}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -375,7 +334,7 @@ const Element = {
   Table(props: any) {
     return (
       <div
-        className="draggableItems my-2"
+        className={`draggableItems my-2 ${props.element.class}`}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -406,12 +365,11 @@ const Element = {
       </td>
     );
   },
-
   GridLayout(props: any) {
     return (
       <section
         {...props.attributes}
-        className="gridLayout"
+        className={`gridLayout ${props.element.class}`}
         data-id={props.element.key}
       >
         {props.children}
@@ -419,21 +377,22 @@ const Element = {
     );
   },
   GridLayoutChildren(props: any) {
-    // console.log(props);
     const readonly = useReadOnly();
 
     return (
       <>
         <div
-          className="draggableItems my-2 gridLayout--dragItem"
-          {...hoverHandler(props.element.key)}
+          className=" gridLayout--dragItem"
+          // {...hoverHandler(props.element.key)}
           data-id={props.element.key}
           style={{
             width: props.element.width + "%",
-            // paddingLeft: "40px",
           }}
         >
-          <DragIndicatorIcon id={props.element.key} />
+          {/* <DragIndicatorIcon
+            id={props.element.key}
+            parentId={props.element.parentKey}
+          /> */}
 
           <div
             className="gridLayout__children"
@@ -455,7 +414,7 @@ const Element = {
     // console.log(props);
     return (
       <div
-        className="draggableItems my-2"
+        className={`draggableItems my-2 ${props.element.class}`}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -471,7 +430,7 @@ const Element = {
   ParaGraph(props: any) {
     return (
       <div
-        className="draggableItems my-2"
+        className={`draggableItems my-2 ${props.element.class}`}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -480,6 +439,20 @@ const Element = {
         <p {...props.attributes} className="">
           {props.children}
         </p>
+      </div>
+    );
+  },
+
+  Container(props: any) {
+    return (
+      <div
+        className={`draggableItems my-2 ${props.element.class}`}
+        {...hoverHandler(props.element.key)}
+        data-id={props.element.key}
+      >
+        <DragIndicatorIcon id={props.element.key} />
+
+        <div className="element__container">{props.children}</div>
       </div>
     );
   },

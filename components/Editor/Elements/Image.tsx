@@ -3,7 +3,6 @@ import { Transforms, Editor } from "slate";
 import { useSlate, useReadOnly, useSelected, useFocused } from "slate-react";
 import ImageToolbar from "../ImageToolbar";
 import ImageWithLoader from "components/ImageWithLoader";
-import Arrow from "../Arrow";
 import Context from "context/context";
 
 function ImageCompo(props: any) {
@@ -11,11 +10,9 @@ function ImageCompo(props: any) {
   const [caption, setCaption] = useState(props.element.caption);
   const [isSelected, setSelected] = useState(false);
   const [isImgCaption, setImgCaption] = useState(false);
-  const [isHover, setHover] = useState(false);
   const editor = useSlate();
   const readOnly = useReadOnly();
   const selected = useSelected();
-  const focused = useFocused();
   const lightCtx = useContext(Context);
 
   useEffect(() => {
@@ -82,8 +79,6 @@ function ImageCompo(props: any) {
       className="slate__imgContainer my-2"
     >
       <div
-        onMouseOver={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
         className={`slate__image ${
           isSelected && selected && !readOnly ? "slate__image--outline" : ""
         }`}
@@ -132,12 +127,6 @@ function ImageCompo(props: any) {
             Enter Image Caption
           </div>
         )}
-
-        <Arrow
-          isSelected={focused && !readOnly}
-          isHover={isHover}
-          id={props.element.key}
-        />
 
         {(isImgCaption || !!caption) &&
           (isEditingCaption ? (

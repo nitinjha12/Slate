@@ -219,22 +219,3 @@ code {
     list-style: none;
   }
 }
-
-[contenteditable]:empty:before {
-  content: attr(placeholder);
-  color: lightgray;
-  display: block;
-  position: absolute;
-}
-.heading-2:empty:before {
-  content: attr(data-placeholder);
-  color: lightgray;
-  display: block;
-  position: absolute;
-}
-.heading-3:empty:before {
-  content: attr(data-placeholder);
-  color: lightgray;
-  display: block;
-  position: absolute;
-}

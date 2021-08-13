@@ -75,6 +75,7 @@ const CustomEditor = {
       type: isActive ? "paragraph" : isList ? "list-item" : value,
       key: uuidv4(),
     };
+
     Transforms.setNodes(editor, newProperties);
 
     if (!isActive && isList) {
@@ -143,24 +144,28 @@ const CustomEditor = {
     const removeNode = newEditor.children[path[0]];
     const dropNode = newEditor.children[num[0]];
 
-    console.log(
-      num,
+    console
+      .log
+      // num,
       // dropNode,
-      path
-      // JSON.parse(JSON.stringify(editor.children[num]))
-    );
+      // path,
+      // newEditor.children[num[0]],
+      // JSON.parse(JSON.stringify(editor.children[num[0]]))
+      ();
 
     if (newEditor.children[num[0]].type === "grid-layout") {
       const totalLength = newEditor.children[num[0]].children.length + 1;
+      const parentKey = uuidv4();
 
       for (let data of newEditor.children[num[0]].children) {
         data.width = 100 / totalLength;
         data.line = true;
+        data.parentKey = parentKey;
       }
 
       const block = {
         type: "grid-layout",
-        key: uuidv4(),
+        key: parentKey,
         children: [
           ...newEditor.children[num[0]].children,
           {
@@ -169,9 +174,13 @@ const CustomEditor = {
             width: 100 / totalLength,
             line: true,
             key: uuidv4(),
+            parentKey: parentKey,
           },
         ],
       };
+
+      console.log(block);
+
       Transforms.removeNodes(editor, { at: path });
       block.children[block.children.length - 1].line = false;
 
@@ -185,10 +194,11 @@ const CustomEditor = {
     }
 
     const position = ReactEditor.findPath(editor, editor.children[num[0]]);
+    const parentKey = uuidv4();
 
     const block = {
       type: "grid-layout",
-      key: uuidv4(),
+      key: parentKey,
       children: [
         {
           children: [dropNode],
@@ -196,6 +206,7 @@ const CustomEditor = {
           type: "grid-layout-child",
           line: true,
           key: uuidv4(),
+          parentKey: parentKey,
         },
         {
           children: [removeNode],
@@ -203,6 +214,7 @@ const CustomEditor = {
           type: "grid-layout-child",
           line: false,
           key: uuidv4(),
+          parentKey: parentKey,
         },
       ],
     };

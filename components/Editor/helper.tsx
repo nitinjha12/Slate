@@ -85,6 +85,8 @@ const renderElement = (props: any) => {
       return <Element.CarouselItem {...props} />;
     case "paragraph":
       return <Element.ParaGraph {...props} />;
+    case "container":
+      return <Element.Container {...props} />;
     default:
       return <DefaultElement {...props} />;
   }

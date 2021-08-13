@@ -5,8 +5,8 @@ import { v4 as uuidv4 } from "uuid";
 import CustomEditor from "./Editor";
 import { findSlateNode } from "./findNode";
 
-function withList(editor: EditorType) {
-  const { insertBreak } = editor;
+function withColumn(editor: EditorType) {
+  const { insertBreak, insertNode } = editor;
 
   let checkList = false;
 
@@ -42,9 +42,11 @@ function withList(editor: EditorType) {
     }
   };
 
-  editor.insertNode = () => {};
+  editor.insertNode = (node) => {
+    console.log(node);
+  };
 
   return editor;
 }
 
-export default withList;
+export default withColumn;
