@@ -14,9 +14,10 @@ function Toolbar({ id }: { id: string }) {
   const toolbarRef = useRef(null);
   // const previousSelection = useRef<any>(null);
 
-  const [node] = findSlateNode(editor.children, modelCtx.getKey);
-  const path = ReactEditor.findPath(editor as any, node);
-  const nextPath = [path[0] + 1];
+  const [node] =
+    modelCtx.getKey && (findSlateNode(editor.children, modelCtx.getKey) as any);
+  const path = node && ReactEditor.findPath(editor as any, node);
+  const nextPath = path && [path[0] + 1];
   const range: Range = {
     anchor: { path: nextPath, offset: 0 },
     focus: { path: nextPath, offset: 0 },
@@ -37,6 +38,17 @@ function Toolbar({ id }: { id: string }) {
           const top = rect.top;
           // + window.pageYOffset - e.currentTarget.offsetHeight;
 
+          // console.log(JSON.parse(JSON.stringify(editor.children)));
+
+          // console.log(
+          //   rect,
+          //   window.pageYOffset,
+          //   window.innerHeight,
+          //   window.outerHeight,
+          //   window.outerHeight - rect.top,
+          //   e.currentTarget.offsetHeight
+          // );
+
           if (
             !Editor.isEmpty(editor, node as any) ||
             Editor.isVoid(editor, node)
@@ -44,6 +56,9 @@ function Toolbar({ id }: { id: string }) {
             Transforms.insertNodes(editor, block, { at: nextPath });
             Transforms.select(editor, range);
           }
+
+          editor.onChange();
+
           ReactEditor.focus(editor);
           modelCtx.setToolbar(top);
           setTimeout(() => ReactEditor.blur(editor), 600);

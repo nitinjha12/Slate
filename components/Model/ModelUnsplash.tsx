@@ -12,6 +12,8 @@ function ModelUnsplash({ imageClickHandler }: ModelProps) {
   function clickHandler(e: React.MouseEvent<HTMLDivElement>, img: string) {
     imageClickHandler(e, img);
     dataCtx.changeSetModel(false);
+    dataCtx.setToolbar(0);
+    document.body.style.overflow = "visible";
   }
 
   return <Unsplash clickHandler={clickHandler} />;

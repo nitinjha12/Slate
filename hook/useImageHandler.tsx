@@ -28,17 +28,12 @@ const useImageHandler = function () {
         previousSelection.current.focus.path
       );
 
-      console.log(parentNode);
-
-      CustomEditor.toggleBlock({ editor, value: "image" });
-
       Transforms.insertNodes(
         editor!,
 
         {
           type: "image",
           caption: "",
-          // url: value,
           key: uuidv4(),
           src: value,
           children: [{ text: "" }],

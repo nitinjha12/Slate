@@ -99,6 +99,9 @@
 
 .toolbar__parent {
   position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   left: 25px;
   z-index: 500;
   top: 4px;
@@ -120,6 +123,9 @@
   cursor: grab;
   color: inherit;
   border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   .dragIndicator__icon {
     cursor: grab;
@@ -131,10 +137,6 @@
     background-color: rgb(0, 0, 0, 0.05);
   }
 }
-
-// .toolbar__dragndrop {
-//   top: 12px;
-// }
 
 .toolbar__option {
   border-radius: 3px;
@@ -341,9 +343,11 @@
 }
 
 .tableView {
-  position: absolute;
+  position: relative;
   bottom: 0px;
   border-radius: 5px;
+  width: 160px;
+  height: 100%;
   right: -150px;
   background-color: white;
   color: black;

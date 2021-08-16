@@ -18,6 +18,8 @@ const Context = createContext<ContextInterface>({
   setToolbar(bool) {},
   getKey: "",
   setKey(key) {},
+  setSelectedBlock(bool) {},
+  selectedBlock: false,
 });
 
 interface ContextInterface {
@@ -37,6 +39,8 @@ interface ContextInterface {
   setToolbar(bool: number): void;
   getKey: string;
   setKey(key: string): void;
+  selectedBlock: boolean;
+  setSelectedBlock(bool: boolean): void;
 }
 
 interface DataInterface {
@@ -52,6 +56,7 @@ export const Provider = ({ children }: any) => {
   const [dragPath, setDragPath] = useState([0]);
   const [isToolbar, setToolbar] = useState(0);
   const [getKey, setKey] = useState("");
+  const [selectedBlock, setSelectedBlock] = useState(false);
 
   function changeSetModel(bool: boolean) {
     setIsModel(bool);
@@ -82,6 +87,8 @@ export const Provider = ({ children }: any) => {
     setToolbar,
     getKey,
     setKey,
+    selectedBlock,
+    setSelectedBlock,
   };
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

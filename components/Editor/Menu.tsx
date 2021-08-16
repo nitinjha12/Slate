@@ -5,14 +5,16 @@ import { toolbarButtonData } from "./data";
 import { VideoEditor, TableView } from "./SelectEditor";
 import { Transforms, Range } from "slate";
 import { getRange, findSlateNode } from "./findNode";
+import { dropToolbarDataArr } from "components/Editor/data";
 
 function Menu() {
   const modelCtx = useContext(Context);
-  const [activeNum, setActiveNum] = useState(0);
+  const [toolbarOption, setToolbarOption] = useState(false);
   const [isVideoEditor, setVideoEditor] = useState(false);
   const [isTable, setTable] = useState(false);
   const editor: any = useSlate();
   const previousSelection = useRef<Range | null>(null);
+  const toolbarOptionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (editor && editor.selection) {
@@ -23,9 +25,30 @@ function Menu() {
     }
   }, [editor.selection]);
   const { body } = document;
+  // console.log(JSON.parse(JSON.stringify(editor.children)));
+  const [node, path] = findSlateNode(editor.children, modelCtx.getKey);
+
+  // console.log(node, path, modelCtx.getKey);
+  // console.log(editor.children);
+
+  const domNode =
+    !modelCtx.isToolbar && !!node && ReactEditor.toDOMNode(editor, node);
+  const { top, left, bottom, height } =
+    domNode && (domNode.getBoundingClientRect() as any);
+  const topDistance = modelCtx.isToolbar || top;
+  const distance = window.innerHeight - topDistance;
+
+  function checkViewportDistance() {
+    if (distance > topDistance) return true;
+    return false;
+  }
+
+  // console.log(window.innerHeight, domNode.offsetTop, domNode.scrollTop);
+
+  // console.log(top, bottom, left);
 
   useEffect(() => {
-    if (modelCtx.isToolbar) {
+    if (modelCtx.isToolbar || modelCtx.selectedBlock) {
       body.style.overflow = "hidden";
     } else {
       body.style.overflow = "visible";
@@ -33,10 +56,10 @@ function Menu() {
   }, [modelCtx.isToolbar]);
 
   function removeToolbar() {
+    modelCtx.setSelectedBlock(false);
     modelCtx.setToolbar(0);
 
     if (!previousSelection.current && modelCtx.getKey) {
-      const [, path] = findSlateNode(editor.children, modelCtx.getKey);
       const range = getRange(path);
       previousSelection.current = range;
     }
@@ -46,99 +69,181 @@ function Menu() {
     ReactEditor.focus(editor);
   }
 
-  return (
-    <section className="activeToolbar" onClick={() => removeToolbar()}>
-      {/* <div
-        className={`toolbar__buttons ${
-          modelCtx.isLight ? "mode--light" : "mode--dark"
-        } ${modelCtx.isToolbar ? "" : "toolbar__buttons--hide"}`}
-        style={{ top: modelCtx.isToolbar }}
-        onClick={(e) => e.stopPropagation()}
-      ></div> */}
+  function turnIntoHandler() {
+    setToolbarOption(true);
+    console.log(toolbarOptionRef.current, "hey");
+    if (toolbarOptionRef.current) {
+      toolbarOptionRef.current.style.left = "200%";
+    }
+  }
 
+  return (
+    <section
+      className="activeToolbar"
+      onClick={() => {
+        removeToolbar();
+      }}
+    >
       <div
         className="activeToolbar__child"
         style={{
-          position: modelCtx.isToolbar ? "fixed" : "relative",
+          position:
+            modelCtx.isToolbar || modelCtx.selectedBlock ? "fixed" : "relative",
           width: "100vw",
           height: "100vh",
         }}
       >
         <div
-          className="toolbar__options "
+          className="toolbarOption__container"
+          style={{
+            top: checkViewportDistance() && (modelCtx.isToolbar || top),
+            bottom:
+              !checkViewportDistance() && top ? -distance - 180 : -distance,
+            position: "relative",
+            left: left || "30%",
+          }}
+          onMouseEnter={() => {
+            // setToolbarOption(true);
+          }}
           onClick={(e) => e.stopPropagation()}
-          style={{ top: modelCtx.isToolbar }}
         >
-          <div className="toolbar__basicBlock">
-            <p>Basic Blocks</p>
-
-            {toolbarButtonData.slice(0, 13).map((data, i) => (
+          <div className="addToolbar">
+            {((!isVideoEditor && !isTable && !modelCtx.selectedBlock) ||
+              toolbarOption) && (
               <div
-                className={`toolbar__blockBtn ${
-                  editor && data.isActive(editor) ? "btn--toolbar__active" : ""
-                }`}
-                key={i}
-                onPointerDown={(e) => {
-                  data.onMouseDown(e, editor!);
-                  ReactEditor.focus(editor!);
-                  removeToolbar();
+                className="toolbar__options toolbar__options--hover "
+                ref={toolbarOptionRef}
+                onMouseEnter={() => {
+                  setToolbarOption(true);
                 }}
-                style={data.style}
-                title={data.title}
               >
-                <button className={`toolbar__blockBtn--icon  `}>
-                  {data.children.icon}
-                </button>
-                <div className="toolbar__blockBtn--name">
-                  {data.children.name}
-                </div>
+                {blockInfoData.map((data, i) => (
+                  <div className="toolbar__basicBlock" key={i}>
+                    <p className="toolbar__basicBlock__title">
+                      {data.blockName}
+                    </p>
+
+                    {toolbarButtonData
+                      .slice(data.startNum, data.endNum)
+                      .map((data, i) => (
+                        <div
+                          className={`toolbar__blockBtn ${
+                            editor && data.isActive(editor)
+                              ? "btn--toolbar__active"
+                              : ""
+                          }`}
+                          key={i}
+                          onPointerDown={(e) => {
+                            if (data.name === "image") {
+                              modelCtx.changeSetModel(true);
+                              return;
+                            }
+
+                            if (data.name === "video") {
+                              setVideoEditor(true);
+                              return;
+                            }
+                            if (data.name === "table") {
+                              setTable(true);
+                              return;
+                            }
+
+                            if (data.name === "carousel") {
+                              modelCtx.setCarousel(true);
+                              return;
+                            }
+
+                            data.onMouseDown(e, editor!);
+                            ReactEditor.focus(editor!);
+                            removeToolbar();
+                          }}
+                          style={data.style}
+                          title={data.title}
+                        >
+                          <button className={`toolbar__blockBtn--icon  `}>
+                            {data.children.icon}
+                          </button>
+                          <div className="toolbar__blockBtn--name">
+                            {data.children.name}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
+            {isVideoEditor && (
+              <VideoEditor
+                editor={editor}
+                setVideoEditor={setVideoEditor}
+                removeToolbar={removeToolbar}
+              />
+            )}
+            {isTable && (
+              <TableView
+                setTable={setTable}
+                editor={editor}
+                removeToolbar={removeToolbar}
+              />
+            )}
           </div>
-          <div className="toolbar__basicBlock">
-            <p>Media</p>
 
-            {toolbarButtonData.slice(13).map((data, i) => (
-              <div
-                className={`toolbar__blockBtn ${
-                  editor && data.isActive(editor) ? "btn--toolbar__active" : ""
-                }`}
-                key={i}
-                onPointerDown={(e) => {
-                  if (data.name === "video") {
-                    setVideoEditor(true);
-                  }
+          {modelCtx.selectedBlock && (
+            <div className="dropClickToolbar">
+              {dropToolbarDataArr.map((data: any, i: number) => (
+                <div
+                  className="toolbar__blockBtn"
+                  key={i}
+                  onMouseEnter={() => {
+                    if (data.children.name.toLowerCase() === "turn into") {
+                      setTimeout(turnIntoHandler, 0.00001);
 
-                  if (data.name === "image") {
-                    modelCtx.changeSetModel(true);
-                  }
-
-                  if (data.name === "table") {
-                    setTable(true);
-                  }
-
-                  // removeToolbar();
-                }}
-                style={data.style}
-                title={data.title}
-              >
-                <button className={`toolbar__blockBtn--icon  `}>
-                  {data.children.icon}
-                </button>
-                <div className="toolbar__blockBtn--name">
-                  {data.children.name}
+                      return;
+                    }
+                    setToolbarOption(false);
+                  }}
+                  onMouseLeave={() => {
+                    if (data.children.name.toLowerCase() === "turn into")
+                      return;
+                    setToolbarOption(false);
+                  }}
+                  onPointerDown={() => {
+                    data.onMouseDown(editor, path);
+                    removeToolbar();
+                  }}
+                >
+                  <button className={`toolbar__blockBtn--icon`}>
+                    {data.children.icons}
+                  </button>
+                  <div className="toolbar__blockBtn--name">
+                    {data.children.name}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
-        {isVideoEditor && (
-          <VideoEditor editor={editor} setVideoEditor={setVideoEditor} />
-        )}
-        {isTable && <TableView setTable={setTable} editor={editor} />}
       </div>
     </section>
   );
 }
 
 export default Menu;
+
+const blockInfoData = [
+  {
+    blockName: "Basic Block",
+    startNum: 0,
+    endNum: 13,
+  },
+  {
+    blockName: "Media",
+    startNum: 13,
+    endNum: 16,
+  },
+  {
+    blockName: "Grid",
+    startNum: 16,
+    // endNum: 16,
+  },
+];

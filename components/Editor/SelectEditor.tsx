@@ -142,7 +142,7 @@ export function LinkEditor({
   ) : null;
 }
 
-export function VideoEditor({ editor, setVideoEditor }: any) {
+export function VideoEditor({ editor, setVideoEditor, removeToolbar }: any) {
   const [linkUrl, setLinkUrl] = useState("");
   const previousSelection = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -160,6 +160,7 @@ export function VideoEditor({ editor, setVideoEditor }: any) {
     if (isUrl(linkUrl)) {
       CustomEditor.AddingVideoSrc(previousSelection.current, linkUrl);
       setVideoEditor(false);
+      removeToolbar();
     } else {
       setLinkUrl("Url is not valid");
     }
@@ -168,6 +169,7 @@ export function VideoEditor({ editor, setVideoEditor }: any) {
   function onCancel(e: React.MouseEvent) {
     e.preventDefault();
     setVideoEditor(false);
+    removeToolbar();
   }
 
   return (
@@ -196,7 +198,7 @@ export function VideoEditor({ editor, setVideoEditor }: any) {
   );
 }
 
-export function TableView({ editor, setTable }: any) {
+export function TableView({ editor, setTable, removeToolbar }: any) {
   const [dimension, setDimension] = useState({ row: 0, column: 0 });
   const lightCtx = useContext(Context);
   const tableBoxes: JSX.Element[] = [];
@@ -209,6 +211,7 @@ export function TableView({ editor, setTable }: any) {
     });
 
     setTable(false);
+    removeToolbar();
   };
 
   for (let i = 1; i <= 10; i++) {

@@ -7,7 +7,7 @@ import { isLinkNodeAtSelection } from "./helper";
 import { EmbedUrl } from "./EmbedUrl";
 import { ReactEditor } from "slate-react";
 import Table from "./Functions/Table";
-import findDomNode from "./findNode";
+import findDomNode, { findSlateNode } from "./findNode";
 import { v4 as uuidv4 } from "uuid";
 
 const LIST_TYPES = ["bulleted-list", "ordered-list", "toggle-list"];
@@ -393,6 +393,23 @@ const CustomEditor = {
   },
 
   mergeRow() {},
+
+  dropOperation(editor: EditorType, value: string, path: Path) {
+    if (value === "delete") {
+      console.log("deleted");
+      Transforms.removeNodes(editor, { at: path });
+      return;
+    }
+
+    if (value === "duplicate") {
+      const node = JSON.parse(JSON.stringify(editor.children[path[0]]));
+      node.key = uuidv4();
+      Transforms.insertNodes(editor, node, { at: [path[0] + 1] });
+    }
+
+    if (value === "turn into") {
+    }
+  },
 };
 
 export default CustomEditor;

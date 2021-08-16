@@ -6,6 +6,7 @@ import { Play } from "@styled-icons/boxicons-regular/Play";
 import { Cross } from "@styled-icons/entypo/Cross";
 import Context from "context/context";
 import { v4 as uuidv4 } from "uuid";
+import { findSlateNode } from "./findNode";
 
 // interface ToggleListInterface {
 //   title: string;
@@ -15,11 +16,10 @@ import { v4 as uuidv4 } from "uuid";
 function ToggleList({ element, attributes, children }: any) {
   const [toggle, setToggle] = useState(false);
   const [title, setTitle] = useState<string>(element.title || "");
-  // const [height, setHeight] = useState(element.height || "40");
-  const [path, setPath] = useState([0]);
   const editor = useSlate();
   const readonly = useReadOnly();
   const lightCtx = useContext(Context);
+  const [node, path] = findSlateNode(editor.children, lightCtx.getKey);
 
   const titleChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
@@ -37,28 +37,10 @@ function ToggleList({ element, attributes, children }: any) {
   };
 
   function removeHandler(e: React.MouseEvent) {
-    pathHandler(e as any);
-
     Transforms.removeNodes(editor, {
       at: path,
     });
   }
-
-  const pathHandler = (e: React.FocusEvent) => {
-    const editorParent =
-      document.querySelector<HTMLDivElement>(".editor__editable")!;
-
-    let i = 0;
-    for (let child of editorParent.childNodes as any) {
-      if (child === e.currentTarget.parentElement?.parentElement) {
-        break;
-      }
-
-      i++;
-    }
-
-    setPath([i]);
-  };
 
   return (
     <ToggleListStyle
@@ -83,7 +65,6 @@ function ToggleList({ element, attributes, children }: any) {
             <input
               value={title}
               onChange={titleChangeHandler}
-              onFocus={pathHandler}
               className="toggleList__input"
             />
           </>
@@ -95,7 +76,6 @@ function ToggleList({ element, attributes, children }: any) {
           size="22"
           className="toggleList__remove"
           onClick={removeHandler}
-          onMouseEnter={pathHandler as any}
         />
       </div>
 

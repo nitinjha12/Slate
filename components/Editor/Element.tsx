@@ -41,6 +41,9 @@ function DragIndicatorIcon({
           }
           className="toolbar__dragndrop"
           data-id={id}
+          onClick={() => {
+            modelCtx.setSelectedBlock(true);
+          }}
         >
           <DragIndicator
             className={`dragIndicator__icon ${
@@ -63,29 +66,26 @@ const hoverHandler = function (id: string) {
     onMouseEnter(e: React.MouseEvent<HTMLElement>) {
       e.currentTarget.setAttribute("draggable", "true");
       const dragBtn: any = e.currentTarget.childNodes[0];
-      dragBtn.style.display = "inline-block";
+      dragBtn.style.display = "flex";
       modelCtx.setKey(id);
 
-      e.currentTarget!.addEventListener("dragstart", () => {
-        e.currentTarget?.classList.add("draggable--dragging");
-      });
+      // e.currentTarget!.addEventListener("dragstart", () => {
+      //   e.currentTarget?.classList.add("draggable--dragging");
+      // });
 
-      e.currentTarget!.addEventListener("dragend", () => {
-        e.currentTarget?.classList.remove("draggable--dragging");
-      });
+      // e.currentTarget!.addEventListener("dragend", () => {
+      //   e.currentTarget?.classList.remove("draggable--dragging");
+      // });
     },
     onMouseLeave(e: React.MouseEvent) {
       e.currentTarget.setAttribute("draggable", "false");
 
       const dragBtn: any = e.currentTarget.childNodes[0];
-      const addBtn: any = e.currentTarget.childNodes[0].childNodes[0];
       dragBtn.style.display = "none";
-      dragBtn.classList.remove("toolbar__parent--drag");
-      addBtn.style.display = "inline-block";
     },
     onPointerDown(e: React.MouseEvent) {
       const dragBtn: any = e.currentTarget.childNodes[0];
-      dragBtn.style.display = "inline-block";
+      dragBtn.style.display = "flex";
     },
   };
 };
@@ -126,7 +126,7 @@ const Element = {
 
     return (
       <div
-        className="draggableItems my-2 heading-1"
+        className={`draggableItems my-2 heading-1 ${props.element.class}`}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >

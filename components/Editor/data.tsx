@@ -19,8 +19,46 @@ import { Paragraph } from "@styled-icons/bootstrap/Paragraph";
 import { Heading } from "@styled-icons/fa-solid/Heading";
 import { Heading as Heading2 } from "@styled-icons/boxicons-regular/Heading";
 import { Heading as Heading3 } from "@styled-icons/remix-editor/Heading";
+import { Delete } from "@styled-icons/fluentui-system-regular/Delete";
+import { Duplicate } from "@styled-icons/heroicons-outline/Duplicate";
+import { Play } from "@styled-icons/boxicons-regular/Play";
+import TurnInto from "components/icons/TurnInto";
 import CustomEditor from "./Editor";
 import { EditorType, ToolbarButtonDataInterface } from "types";
+import { Path } from "slate";
+
+export const dropEditorData = {
+  delete: {
+    children: { icons: <Delete size="20" />, name: "Delete" },
+    shortcut: "Del",
+  },
+  duplicate: {
+    children: { icons: <Duplicate size="20" />, name: "Duplicate" },
+    shortcut: "Ctr+D",
+  },
+  turnInto: {
+    children: { icons: <TurnInto />, name: "Turn Into" },
+    shortcut: <Play size="20" />,
+  },
+};
+
+const dropEditorDataArr = Object.values(dropEditorData);
+
+export const dropToolbarDataArr: any = [];
+
+for (let data of dropEditorDataArr) {
+  dropToolbarDataArr.push({
+    onMouseDown(editor: EditorType, path: Path) {
+      CustomEditor.dropOperation(
+        editor,
+        data.children.name.toLowerCase(),
+        path
+      );
+    },
+    shortcut: data.shortcut,
+    children: data.children,
+  });
+}
 
 export const customEditorData = {
   p: {
@@ -187,19 +225,20 @@ export const customEditorData = {
     title: "Video",
   },
 
-  // gridLayout: {
-  //   editorData: { value: "grid-layout", type: undefined },
-  //   markBlock: false,
-  //   children: <Grid size="18" />,
-  //   style: {},
-  //   title: "Toggle List",
-  // },
   carousel: {
     editorData: { value: "carousel", type: undefined },
     markBlock: false,
     children: { icon: <ViewCarousel size="18" />, name: "Carousel" },
     style: {},
     title: "Carousel",
+  },
+
+  gridLayout: {
+    editorData: { value: "grid-layout", type: undefined },
+    markBlock: false,
+    children: { icon: <Grid size="18" />, name: "Grid Layout", number: 2 },
+    style: {},
+    title: "Toggle List",
   },
 };
 

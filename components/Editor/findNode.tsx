@@ -7,7 +7,7 @@ export function findSlateNode(
   nodes: any,
   id: string,
   parentId?: string
-): [Descendant, Path] {
+): [Descendant | null, Path] {
   let path: number | number[] = 0;
   let node;
   let gridPosition = 0;
@@ -28,8 +28,10 @@ export function findSlateNode(
   }
 
   if (typeof path === "number") {
+    node = null;
     return [node, [path]];
   } else {
+    node = null;
     return [node, path];
   }
 }
@@ -38,7 +40,7 @@ export function findSlateNodePath(
   editor: EditorType,
   id: string
 ): [Path, Descendant] {
-  const [node, nodePath] = findSlateNode(editor.children, id);
+  const [node, nodePath] = findSlateNode(editor.children, id) as any;
   const path: Path = node && ReactEditor.findPath(editor, node);
 
   return [path, node];
@@ -48,10 +50,7 @@ export function setNewSelection(editor: EditorType, id: string) {
   const [path, node] = findSlateNodePath(editor, id);
 
   if (Path.isPath(path)) {
-    const range: Range = {
-      anchor: { path: path, offset: 0 },
-      focus: { path: path, offset: 0 },
-    };
+    const range = Editor.range(editor, path);
 
     // editor.apply({
     //   type: "set_selection",

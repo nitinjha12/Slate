@@ -60,15 +60,13 @@ export const onDragover = (
   const box = afterEle.getBoundingClientRect();
 
   if (count === 0) {
-    const range: Range = {
+    const range = {
       anchor: { path: dragPath, offset: 0 },
       focus: { path: dragPath, offset: 0 },
     };
-
-    // Transforms.select(editor, range);
-    ReactEditor.blur(editor);
-    window.getSelection()!.removeAllRanges();
-
+    editor.selection = null;
+    // Transforms.setSelection(editor, range);
+    // ReactEditor.blur(editor);
     count++;
   }
 
@@ -81,8 +79,11 @@ export const onDragover = (
     verticalLine.style.display = "none";
     setLayout(false);
   }
-
-  afterEle && afterEle.insertAdjacentElement("afterbegin", dropLine);
+  try {
+    afterEle && afterEle.insertAdjacentElement("afterbegin", dropLine);
+  } catch (err) {
+    console.log(err, dropLine);
+  }
 
   if (afterEle.dataset.id !== dropId) {
     setDropId(afterEle.dataset.id);
@@ -100,21 +101,23 @@ export const onDrop = (
   e.stopPropagation();
   count = 0;
 
+  const nodeData = JSON.parse(JSON.stringify(editor.children));
   const [node]: any = dropId && findSlateNode(editor.children, dropId);
-  const dropPath = node && ReactEditor.findPath(editor, node);
+  let dropPath;
 
-  // const range: Range = {
-  //   anchor: {
-  //     path: dropPath,
-  //     offset: 0,
-  //   },
-  //   focus: {
-  //     path: dropPath,
-  //     offset: 0,
-  //   },
-  // };
+  try {
+    dropPath = node && ReactEditor.findPath(editor, node);
+  } catch (err) {
+    console.log(err);
+    return;
+  }
 
-  // Transforms.select(editor, range);
+  try {
+    // const range = Editor.range(editor, dropPath);
+    // Transforms.select(editor, range);
+  } catch (err) {
+    // console.log(err);
+  }
   // ReactEditor.focus(editor);
 
   const editorContainer = document.querySelector(".editor__container")!;
@@ -139,16 +142,18 @@ export const onDrop = (
     // console.log(index, dropPath);
     if (Path.equals(index, dropPath)) return;
 
-    const nodeData = JSON.parse(JSON.stringify(editor.children));
-    const range: Range = {
+    const range = {
       anchor: { path: dropPath, offset: 0 },
       focus: { path: dropPath, offset: 0 },
     };
 
     Transforms.removeNodes(editor, { at: index });
+    console.log(nodeData[index[0]]);
     Transforms.insertNodes(editor, nodeData[index[0]], { at: dropPath });
+    // Transforms.moveNodes(editor, { at: index, to: dropPath });
     Transforms.select(editor, range);
     ReactEditor.focus(editor);
+    editor.onChange();
   } catch (err) {
     console.log(err);
   }
