@@ -28,14 +28,7 @@ const withKey = (editor: EditorType) => {
         // console.log(op);
         break;
       case "set_selection":
-        // window.getSelection()!.removeAllRanges();
-        // Range.isForward(op.newProperties);
-        // if (!) {
-        //   console.log("gotcha");
-        //   Range.start(op.properties!);
-        // }
         break;
-
       case "insert_node":
       // console.log(op);
     }

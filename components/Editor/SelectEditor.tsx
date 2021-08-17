@@ -101,7 +101,7 @@ export function LinkEditor({
     !showLink ? (
       <form
         className="selectToolbar__linkEditor"
-        style={imageLink ? { paddingTop: "0px" } : {}}
+        // style={imageLink ? { paddingTop: "0px" } : {}}
       >
         <input
           className="input__style"

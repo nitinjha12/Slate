@@ -9,14 +9,23 @@ import { v4 as uuidv4 } from "uuid";
 
 function Toolbar({ id }: { id: string }) {
   const editor = useSlate() as any;
-
   const modelCtx = useContext(Context);
-  const toolbarRef = useRef(null);
-  // const previousSelection = useRef<any>(null);
 
-  const [node] =
-    modelCtx.getKey && (findSlateNode(editor.children, modelCtx.getKey) as any);
-  const path = node && ReactEditor.findPath(editor as any, node);
+  // console.log(modelCtx.getKey);
+
+  const [node, path] =
+    [modelCtx.getKey.id] &&
+    (findSlateNode(
+      editor.children,
+      modelCtx.getKey.id,
+      modelCtx.getKey.parentId
+    ) as any);
+
+  // console.log(node);
+
+  // if (node && node.type === "grid-layout-child") return null;
+
+  // const path = node && node.type === "grid-layout-child"&&ReactEditor.findPath(editor as any, node);
   const nextPath = path && [path[0] + 1];
   const range: Range = {
     anchor: { path: nextPath, offset: 0 },
@@ -30,38 +39,32 @@ function Toolbar({ id }: { id: string }) {
   };
 
   return (
-    <section className={`toolbar `} ref={toolbarRef}>
+    <section className={`toolbar `}>
       <button
         className="toolbar__addButton"
         onClick={(e: React.MouseEvent<HTMLElement>) => {
           const rect = e.currentTarget.getBoundingClientRect();
           const top = rect.top;
           // + window.pageYOffset - e.currentTarget.offsetHeight;
-
-          // console.log(JSON.parse(JSON.stringify(editor.children)));
-
+          console.log(node, modelCtx.getKey);
           // console.log(
-          //   rect,
-          //   window.pageYOffset,
-          //   window.innerHeight,
-          //   window.outerHeight,
-          //   window.outerHeight - rect.top,
-          //   e.currentTarget.offsetHeight
+          //   "state",
+          //   node.type.includes("grid-layout") ||
+          //     !Editor.isEmpty(editor, node as any) ||
+          //     Editor.isVoid(editor, node)
           // );
-
           if (
+            node.type.includes("grid-layout") ||
             !Editor.isEmpty(editor, node as any) ||
             Editor.isVoid(editor, node)
           ) {
             Transforms.insertNodes(editor, block, { at: nextPath });
+            console.log("inserted");
             Transforms.select(editor, range);
           }
-
           editor.onChange();
-
           ReactEditor.focus(editor);
           modelCtx.setToolbar(top);
-          setTimeout(() => ReactEditor.blur(editor), 600);
         }}
         title="edit block"
       >

@@ -48,12 +48,8 @@ export const onDragover = (
     document.querySelector<HTMLDivElement>(".editor__editable")!;
 
   const afterEle: HTMLElement = getDragAfterElement(editorParent, e.clientY);
-  const child = afterEle && (afterEle.childNodes[1] as HTMLElement);
-
-  const dropLine: HTMLElement = document.querySelector(".element--dropLine")!;
-  const verticalLine: HTMLElement = document.querySelector(
-    ".element--dropLineVertical"
-  )!;
+  const child = afterEle.childNodes[0] as HTMLElement;
+  const dropLine: HTMLElement = document.getElementById("element--dropLine")!;
 
   if (dropLine) dropLine.style.display = "block";
 
@@ -70,17 +66,17 @@ export const onDragover = (
     count++;
   }
 
-  if (e.clientX - box.x < 45) {
-    dropLine.style.display = "none";
-    verticalLine.style.display = "block";
-    afterEle.insertAdjacentElement("afterbegin", verticalLine);
-    setLayout(true);
-  } else {
-    verticalLine.style.display = "none";
-    setLayout(false);
-  }
+  // if (e.clientX - box.x < 45) {
+  //   dropLine.style.display = "none";
+  //   verticalLine.style.display = "block";
+  //   afterEle.insertAdjacentElement("afterbegin", verticalLine);
+  //   setLayout(true);
+  // } else {
+  //   verticalLine.style.display = "none";
+  //   setLayout(false);
+  // }
   try {
-    afterEle && afterEle.insertAdjacentElement("afterbegin", dropLine);
+    child && child.insertAdjacentElement("beforebegin", dropLine);
   } catch (err) {
     console.log(err, dropLine);
   }
@@ -103,6 +99,13 @@ export const onDrop = (
 
   const nodeData = JSON.parse(JSON.stringify(editor.children));
   const [node]: any = dropId && findSlateNode(editor.children, dropId);
+
+  const editorContainer = document.querySelector(".editor__container")!;
+  const dropLine: HTMLElement = document.getElementById("element--dropLine")!;
+
+  dropLine.style.display = "none";
+  editorContainer.appendChild(dropLine);
+
   let dropPath;
 
   try {
@@ -120,23 +123,12 @@ export const onDrop = (
   }
   // ReactEditor.focus(editor);
 
-  const editorContainer = document.querySelector(".editor__container")!;
-  const dropLine: HTMLElement = document.querySelector(".element--dropLine")!;
-  const verticalLine: HTMLElement = document.querySelector(
-    ".element--dropLineVertical"
-  )!;
-
-  dropLine.style.display = "none";
-  verticalLine.style.display = "none";
-  editorContainer.appendChild(dropLine);
-  editorContainer.appendChild(verticalLine);
-
   if (!node) return;
 
-  if (layout) {
-    CustomEditor.addGridLayout(editor, dropPath, index);
-    return;
-  }
+  // if (layout) {
+  //   CustomEditor.addGridLayout(editor, dropPath, index);
+  //   return;
+  // }
 
   try {
     // console.log(index, dropPath);

@@ -23,11 +23,6 @@ const useImageHandler = function () {
     if (editor && previousSelection.current) {
       ReactEditor.focus(editor);
 
-      const [parentNode, parentPath] = Editor.parent(
-        editor,
-        previousSelection.current.focus.path
-      );
-
       Transforms.insertNodes(
         editor!,
 
@@ -42,6 +37,8 @@ const useImageHandler = function () {
         { at: previousSelection.current, select: true }
       );
     }
+
+    editor?.onChange();
   };
 
   return { imageClickHandler };

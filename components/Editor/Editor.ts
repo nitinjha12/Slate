@@ -9,6 +9,7 @@ import { ReactEditor } from "slate-react";
 import Table from "./Functions/Table";
 import findDomNode, { findSlateNode } from "./findNode";
 import { v4 as uuidv4 } from "uuid";
+import gridLayout from "./Functions/gridLayout";
 
 const LIST_TYPES = ["bulleted-list", "ordered-list", "toggle-list"];
 const ALIGN_TYPES = ["left-align", "right-align", "center-align"];
@@ -44,7 +45,8 @@ const CustomEditor = {
 
   toggleBlock(
     { editor, value, type = "" }: EditorInterface,
-    markBlock = false
+    markBlock = false,
+    path?: Path
   ) {
     const isActive = this.isBlockActive({ editor, value, type });
     const isList = LIST_TYPES.includes(value!);
@@ -76,7 +78,7 @@ const CustomEditor = {
       key: uuidv4(),
     };
 
-    Transforms.setNodes(editor, newProperties);
+    Transforms.setNodes(editor, newProperties, { at: path });
 
     if (!isActive && isList) {
       const block = { type: value, children: [], key: uuidv4() };
@@ -87,6 +89,8 @@ const CustomEditor = {
           : block
       );
     }
+
+    ReactEditor.focus(editor);
   },
 
   toggleCodeBlock(editor: EditorType, isActive: boolean, format: string) {
@@ -113,15 +117,6 @@ const CustomEditor = {
   },
 
   toggleAlignBlock(editor: EditorType, isActive: boolean, format: string) {
-    // const align = format.split("-");
-
-    // const domNode = findDomNode(
-    //   editor,
-    //   editor.selection?.anchor.path[0]!
-    // ) as HTMLElement;
-
-    // domNode.style.textAlign = align[0];
-
     Transforms.unwrapNodes(editor, {
       match: (n: any) =>
         ALIGN_TYPES.includes(
@@ -138,90 +133,8 @@ const CustomEditor = {
       } as any);
     }
   },
-  addGridLayout(editor: EditorType, num: Path, path: Path) {
-    const newEditor = JSON.parse(JSON.stringify(editor));
-
-    const removeNode = newEditor.children[path[0]];
-    const dropNode = newEditor.children[num[0]];
-
-    console
-      .log
-      // num,
-      // dropNode,
-      // path,
-      // newEditor.children[num[0]],
-      // JSON.parse(JSON.stringify(editor.children[num[0]]))
-      ();
-
-    if (newEditor.children[num[0]].type === "grid-layout") {
-      const totalLength = newEditor.children[num[0]].children.length + 1;
-      const parentKey = uuidv4();
-
-      for (let data of newEditor.children[num[0]].children) {
-        data.width = 100 / totalLength;
-        data.line = true;
-        data.parentKey = parentKey;
-      }
-
-      const block = {
-        type: "grid-layout",
-        key: parentKey,
-        children: [
-          ...newEditor.children[num[0]].children,
-          {
-            children: [removeNode],
-            type: "grid-layout-child",
-            width: 100 / totalLength,
-            line: true,
-            key: uuidv4(),
-            parentKey: parentKey,
-          },
-        ],
-      };
-
-      console.log(block);
-
-      Transforms.removeNodes(editor, { at: path });
-      block.children[block.children.length - 1].line = false;
-
-      Transforms.removeNodes(editor, {
-        match: (n: any) => n.type === "grid-layout",
-        at: num,
-      });
-
-      Transforms.insertNodes(editor, block, { at: num });
-      return;
-    }
-
-    const position = ReactEditor.findPath(editor, editor.children[num[0]]);
-    const parentKey = uuidv4();
-
-    const block = {
-      type: "grid-layout",
-      key: parentKey,
-      children: [
-        {
-          children: [dropNode],
-          width: 50,
-          type: "grid-layout-child",
-          line: true,
-          key: uuidv4(),
-          parentKey: parentKey,
-        },
-        {
-          children: [removeNode],
-          width: 50,
-          type: "grid-layout-child",
-          line: false,
-          key: uuidv4(),
-          parentKey: parentKey,
-        },
-      ],
-    };
-
-    Transforms.removeNodes(editor, { at: path });
-    Transforms.removeNodes(editor, { at: num });
-    Transforms.insertNodes(editor, block, { at: position });
+  addGridLayout(editor: EditorType, num: number, path: Path) {
+    gridLayout(editor, num, path);
   },
 
   toggleLinkAtSelection(editor: EditorType) {

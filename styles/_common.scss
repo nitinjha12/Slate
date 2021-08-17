@@ -173,13 +173,18 @@
 
 .gridLayout {
   display: flex;
-  padding: 10px 80px;
+  // padding: 10px 80px;
   justify-content: center;
   min-height: 200px;
   grid-gap: 1rem;
 
   .gridLayout--dragItem {
     padding: 0px;
+    padding-left: 20px;
+
+    .toolbar__parent {
+      left: -25px !important;
+    }
   }
 
   @media (max-width: 450px) {
@@ -189,6 +194,10 @@
   @media (max-width: 560px) {
     flex-wrap: wrap;
     grid-gap: 5px;
+
+    .gridLayout--dragItem {
+      padding-left: 0px;
+    }
 
     .gridLayout--dragItem {
       width: 100% !important;
@@ -202,11 +211,18 @@
     .draggableItems {
       padding: 0px !important;
 
-      button {
+      .toolbar,
+      .toolbar__dragndrop {
         display: none !important;
       }
     }
   }
+}
+
+.gridLayout__children--verticalLine {
+  height: 100;
+  width: 4px;
+  background-color: #d5eef8;
 }
 
 .gridLayout__sizeoptions {
@@ -338,14 +354,13 @@
 
 .gridLayout--dragItem {
   padding: 0;
-  padding-left: 30px;
 
   .toolbar__parent {
     left: -20px !important;
 
-    .toolbar__addButton--hover {
-      display: none !important;
-    }
+    // .toolbar__addButton--hover {
+    //   display: none !important;
+    // }
   }
 
   button {

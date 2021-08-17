@@ -16,7 +16,7 @@ const Context = createContext<ContextInterface>({
   setDragPath(path) {},
   isToolbar: 0,
   setToolbar(bool) {},
-  getKey: "",
+  getKey: { id: "" },
   setKey(key) {},
   setSelectedBlock(bool) {},
   selectedBlock: false,
@@ -37,10 +37,15 @@ interface ContextInterface {
   setDragPath(path: number[]): void;
   isToolbar: number;
   setToolbar(bool: number): void;
-  getKey: string;
-  setKey(key: string): void;
+  getKey: KeyInterface;
+  setKey(key: KeyInterface): void;
   selectedBlock: boolean;
   setSelectedBlock(bool: boolean): void;
+}
+
+interface KeyInterface {
+  id: string;
+  parentId?: string;
 }
 
 interface DataInterface {
@@ -55,7 +60,7 @@ export const Provider = ({ children }: any) => {
   const [isCarousel, setCarousel] = useState(false);
   const [dragPath, setDragPath] = useState([0]);
   const [isToolbar, setToolbar] = useState(0);
-  const [getKey, setKey] = useState("");
+  const [getKey, setKey] = useState({ id: "" });
   const [selectedBlock, setSelectedBlock] = useState(false);
 
   function changeSetModel(bool: boolean) {

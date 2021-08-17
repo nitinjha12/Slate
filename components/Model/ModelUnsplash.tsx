@@ -13,6 +13,7 @@ function ModelUnsplash({ imageClickHandler }: ModelProps) {
     imageClickHandler(e, img);
     dataCtx.changeSetModel(false);
     dataCtx.setToolbar(0);
+    dataCtx.setSelectedBlock(false);
     document.body.style.overflow = "visible";
   }
 

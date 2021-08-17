@@ -233,12 +233,26 @@ export const customEditorData = {
     title: "Carousel",
   },
 
-  gridLayout: {
+  gridLayout2: {
     editorData: { value: "grid-layout", type: undefined },
     markBlock: false,
-    children: { icon: <Grid size="18" />, name: "Grid Layout", number: 2 },
+    children: { icon: <Grid size="18" />, name: "Add 2 Column", number: 2 },
     style: {},
-    title: "Toggle List",
+    title: "Grid Layout",
+  },
+  gridLayout3: {
+    editorData: { value: "grid-layout", type: undefined },
+    markBlock: false,
+    children: { icon: <Grid size="18" />, name: "Add 3 Column", number: 3 },
+    style: {},
+    title: "Grid Layout",
+  },
+  gridLayout4: {
+    editorData: { value: "grid-layout", type: undefined },
+    markBlock: false,
+    children: { icon: <Grid size="18" />, name: "Add 4 Column", number: 4 },
+    style: {},
+    title: "Grid Layout",
   },
 };
 
@@ -294,7 +308,7 @@ export const toolbarButtonData: Array<ToolbarButtonDataInterface> = [];
 for (let data of customEditorDataArr) {
   if (!data.markBlock && data.editorData.value !== "link") {
     toolbarButtonData.push({
-      onMouseDown(e: React.MouseEvent, editor: EditorType) {
+      onMouseDown(e, editor, path) {
         e.preventDefault();
 
         if (
@@ -312,7 +326,8 @@ for (let data of customEditorDataArr) {
             type: data.editorData.type,
             value: data.editorData.value,
           },
-          data.markBlock
+          data.markBlock,
+          path
         );
       },
       children: data.children,

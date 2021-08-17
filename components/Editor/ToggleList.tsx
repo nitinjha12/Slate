@@ -19,7 +19,7 @@ function ToggleList({ element, attributes, children }: any) {
   const editor = useSlate();
   const readonly = useReadOnly();
   const lightCtx = useContext(Context);
-  const [node, path] = findSlateNode(editor.children, lightCtx.getKey);
+  const [node, path] = findSlateNode(editor.children, lightCtx.getKey.id);
 
   const titleChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);

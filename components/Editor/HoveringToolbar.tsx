@@ -12,12 +12,6 @@ function HoveringToolbar() {
   const focused = ReactEditor.isFocused(editor);
   const modelCtx = useContext(Context);
 
-  useEffect(() => {
-    if (editor && editor.selection) {
-      modelCtx.getEditor(editor as any);
-    }
-  }, [editor.selection, editor]);
-
   if (
     (editor.selection && !Range.isCollapsed(editor.selection)) ||
     (previousSelection && !focused && !editor.selection) ||

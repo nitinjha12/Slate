@@ -1,4 +1,4 @@
-import { Editor } from "slate";
+import { Editor, Path } from "slate";
 import { ReactEditor } from "slate-react";
 import { HistoryEditor } from "slate-history";
 import React from "react";
@@ -24,7 +24,8 @@ export interface ToolbarButtonDataInterface {
     e:
       | React.MouseEvent<HTMLElement, MouseEvent>
       | React.PointerEvent<HTMLSelectElement>,
-    editor: EditorType
+    editor: EditorType,
+    path?: Path
   ): void;
   children: any;
   style?: any;

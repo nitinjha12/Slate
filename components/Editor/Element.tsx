@@ -59,15 +59,26 @@ function DragIndicatorIcon({
   );
 }
 
-const hoverHandler = function (id: string) {
+const hoverHandler = function (id: string, parentId?: string) {
   const modelCtx = useContext(Context);
 
   return {
     onMouseEnter(e: React.MouseEvent<HTMLElement>) {
+      if (
+        e.currentTarget.parentElement?.classList.contains(
+          "gridLayout__children"
+        )
+      ) {
+        return;
+      }
+
       e.currentTarget.setAttribute("draggable", "true");
+      console.log(id, parentId);
+
       const dragBtn: any = e.currentTarget.childNodes[0];
       dragBtn.style.display = "flex";
-      modelCtx.setKey(id);
+
+      modelCtx.setKey({ id, parentId });
 
       // e.currentTarget!.addEventListener("dragstart", () => {
       //   e.currentTarget?.classList.add("draggable--dragging");
@@ -382,30 +393,33 @@ const Element = {
     return (
       <>
         <div
-          className=" gridLayout--dragItem"
-          // {...hoverHandler(props.element.key)}
+          className="draggableItems gridLayout--dragItem"
+          {...hoverHandler(props.element.key, props.element.parentKey)}
           data-id={props.element.key}
           style={{
             width: props.element.width + "%",
           }}
         >
-          {/* <DragIndicatorIcon
+          <DragIndicatorIcon
             id={props.element.key}
             parentId={props.element.parentKey}
-          /> */}
+          />
 
           <div
             className="gridLayout__children"
             {...props.attributes}
             style={{
-              border: readonly ? "none" : "1px solid black",
+              // border: readonly ? "none" : "1px solid black",
+
               position: "relative",
             }}
           >
             {props.children}
           </div>
         </div>
-        {props.element.line && <div className=""></div>}
+        {props.element.line && !readonly && (
+          <div className="gridLayout__children--verticalLine"></div>
+        )}
       </>
     );
   },

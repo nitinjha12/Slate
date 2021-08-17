@@ -6,6 +6,7 @@ import { VideoEditor, TableView } from "./SelectEditor";
 import { Transforms, Range } from "slate";
 import { getRange, findSlateNode } from "./findNode";
 import { dropToolbarDataArr } from "components/Editor/data";
+import CustomEditor from "./Editor";
 
 function Menu() {
   const modelCtx = useContext(Context);
@@ -26,7 +27,11 @@ function Menu() {
   }, [editor.selection]);
   const { body } = document;
   // console.log(JSON.parse(JSON.stringify(editor.children)));
-  const [node, path] = findSlateNode(editor.children, modelCtx.getKey);
+  const [node, path] = findSlateNode(
+    editor.children,
+    modelCtx.getKey.id,
+    modelCtx.getKey.parentId
+  );
 
   // console.log(node, path, modelCtx.getKey);
   // console.log(editor.children);
@@ -37,6 +42,8 @@ function Menu() {
     domNode && (domNode.getBoundingClientRect() as any);
   const topDistance = modelCtx.isToolbar || top;
   const distance = window.innerHeight - topDistance;
+
+  // console.log(topDistance, distance, domNode, node);
 
   function checkViewportDistance() {
     if (distance > topDistance) return true;
@@ -56,6 +63,7 @@ function Menu() {
   }, [modelCtx.isToolbar]);
 
   function removeToolbar() {
+    editor.onChange();
     modelCtx.setSelectedBlock(false);
     modelCtx.setToolbar(0);
 
@@ -63,7 +71,7 @@ function Menu() {
       const range = getRange(path);
       previousSelection.current = range;
     }
-    editor.selection = previousSelection.current!;
+    editor.selection = previousSelection.current;
     Transforms.select(editor, editor.selection);
     body.style.overflow = "visible";
     ReactEditor.focus(editor);
@@ -71,7 +79,7 @@ function Menu() {
 
   function turnIntoHandler() {
     setToolbarOption(true);
-    console.log(toolbarOptionRef.current, "hey");
+
     if (toolbarOptionRef.current) {
       toolbarOptionRef.current.style.left = "200%";
     }
@@ -96,9 +104,9 @@ function Menu() {
         <div
           className="toolbarOption__container"
           style={{
-            top: checkViewportDistance() && (modelCtx.isToolbar || top),
-            bottom:
-              !checkViewportDistance() && top ? -distance - 180 : -distance,
+            top: checkViewportDistance() ? modelCtx.isToolbar || top : distance,
+            // bottom:
+            //   !checkViewportDistance() && top ? -distance - 180 : -distance,
             position: "relative",
             left: left || "30%",
           }}
@@ -153,7 +161,20 @@ function Menu() {
                               return;
                             }
 
-                            data.onMouseDown(e, editor!);
+                            if (data.name === "grid-layout") {
+                              CustomEditor.addGridLayout(
+                                editor,
+                                data.children.number,
+                                path
+                              );
+                              removeToolbar();
+                              return;
+                            }
+                            if (modelCtx.selectedBlock) {
+                              data.onMouseDown(e, editor!, path);
+                            } else {
+                              data.onMouseDown(e, editor!);
+                            }
                             ReactEditor.focus(editor!);
                             removeToolbar();
                           }}

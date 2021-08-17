@@ -106,6 +106,10 @@ function Create() {
   }
 
   useEffect(() => {
+    if (editor && editor.selection) {
+      modelCtx.getEditor(editor as any);
+    }
+
     const newValue = JSON.parse(JSON.stringify(value));
 
     for (let val of newValue) {
@@ -125,7 +129,7 @@ function Create() {
     //   }
     // }
     // setValue(newValue);
-  }, [value.length]);
+  }, [editor.selection, value.length]);
 
   function replaceListItem() {
     const newValue = JSON.parse(JSON.stringify(value));
@@ -240,14 +244,6 @@ function Create() {
               <EditorNav isWriting={isWriting} setWriting={setWriting} />
             </section>
 
-            <div
-              className="element--dropLine"
-              style={{ display: "none" }}
-            ></div>
-            <div
-              className="element--dropLineVertical"
-              style={{ display: "none" }}
-            ></div>
             <HoveringToolbar />
 
             <Editable
@@ -267,6 +263,16 @@ function Create() {
               readOnly={!isWriting}
               placeholder="Start writing from here..."
             />
+
+            <div
+              className="element--dropLine"
+              id="element--dropLine"
+              style={{ display: "none" }}
+            ></div>
+            <div
+              className="element--dropLineVertical"
+              style={{ display: "none" }}
+            ></div>
           </div>
         </Slate>
       </section>
