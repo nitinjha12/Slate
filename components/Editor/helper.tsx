@@ -1,8 +1,9 @@
-import Element, { Leaf } from "./Element";
+import Element from "./Element";
 import { DefaultElement } from "slate-react";
 import { Editor, Path, Point, Range, Transforms } from "slate";
 import { EditorType, EditorInterface } from "types";
 import { v4 as uuidv4 } from "uuid";
+import Leaf from "./Functions/Leaf";
 
 export const useEditorConfig = () => {
   return { renderElement, renderLeaf };

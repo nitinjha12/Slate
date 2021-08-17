@@ -73,7 +73,6 @@ const hoverHandler = function (id: string, parentId?: string) {
       }
 
       e.currentTarget.setAttribute("draggable", "true");
-      console.log(id, parentId);
 
       const dragBtn: any = e.currentTarget.childNodes[0];
       dragBtn.style.display = "flex";
@@ -473,74 +472,3 @@ const Element = {
 };
 
 export default Element;
-
-export const Leaf = function (props: any) {
-  let el = <>{props.children}</>;
-
-  if (props.leaf.leafCode) {
-    el = <code>{el}</code>;
-  }
-
-  const DefaultLeaf = (props: any) => (
-    <span
-      {...props.attributes}
-      style={{
-        fontWeight: props.leaf.bold ? "bold" : "normal",
-        fontStyle: props.leaf.italic ? "italic" : "normal",
-        textDecoration:
-          props.leaf.underline && props.leaf.strikeThrough
-            ? "underline line-through"
-            : props.leaf.strikeThrough
-            ? "line-through"
-            : props.leaf.underline && "underline",
-        verticalAlign: props.leaf.super ? "super " : props.leaf.sub && "sub",
-      }}
-    >
-      {el}
-    </span>
-  );
-
-  // if (props.leaf.placeholder) {
-  //   return (
-  //     <>
-  //       <DefaultLeaf {...props} />
-  //       <span
-  //         style={{ opacity: 0.8, position: "absolute", top: 0, color: "black" }}
-  //         contentEditable={false}
-  //       >
-  //         Type / to open menu
-  //       </span>
-  //     </>
-  //   );
-  // }
-
-  return <DefaultLeaf {...props} />;
-
-  // if (props.leaf.bold) {
-  //   el = <strong>{el}</strong>;
-  // }
-
-  // if (props.leaf.code) {
-  //   el = <code>{el}</code>;
-  // }
-
-  // if (props.leaf.italic) {
-  //   el = <em>{el}</em>;
-  // }
-
-  // if (props.leaf.underline) {
-  //   el = <u>{el}</u>;
-  // }
-
-  // if (props.leaf.strikeThrough) {
-  //   el = <del>{el}</del>;
-  // }
-
-  // if (props.leaf.super) {
-  //   el = <sup>{el}</sup>;
-  // }
-
-  // if (props.leaf.sub) {
-  //   el = <sub>{el}</sub>;
-  // }
-};

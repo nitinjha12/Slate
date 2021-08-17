@@ -3,7 +3,7 @@ import Context from "context/context";
 import { ReactEditor, useSlate } from "slate-react";
 import { toolbarButtonData } from "./data";
 import { VideoEditor, TableView } from "./SelectEditor";
-import { Transforms, Range } from "slate";
+import { Transforms, Range, Path, Editor } from "slate";
 import { getRange, findSlateNode } from "./findNode";
 import { dropToolbarDataArr } from "components/Editor/data";
 import CustomEditor from "./Editor";
@@ -27,11 +27,13 @@ function Menu() {
   }, [editor.selection]);
   const { body } = document;
   // console.log(JSON.parse(JSON.stringify(editor.children)));
-  const [node, path] = findSlateNode(
+  const [node]: any = findSlateNode(
     editor.children,
     modelCtx.getKey.id,
     modelCtx.getKey.parentId
   );
+
+  const path = node && ReactEditor.findPath(editor, node);
 
   // console.log(node, path, modelCtx.getKey);
   // console.log(editor.children);
@@ -84,6 +86,8 @@ function Menu() {
       toolbarOptionRef.current.style.left = "200%";
     }
   }
+
+  console.log(node, path);
 
   return (
     <section
@@ -170,7 +174,10 @@ function Menu() {
                               removeToolbar();
                               return;
                             }
-                            if (modelCtx.selectedBlock) {
+                            if (
+                              modelCtx.selectedBlock &&
+                              !node!.type.includes("grid")
+                            ) {
                               data.onMouseDown(e, editor!, path);
                             } else {
                               data.onMouseDown(e, editor!);
