@@ -24,22 +24,24 @@ function ToggleList({ element, attributes, children }: any) {
   const titleChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
 
-    Transforms.setNodes(
-      editor,
-      {
-        title: e.target.value,
-        key: uuidv4(),
-      } as any,
-      {
-        at: path,
-      }
-    );
+    path &&
+      Transforms.setNodes(
+        editor,
+        {
+          title: e.target.value,
+          key: uuidv4(),
+        } as any,
+        {
+          at: path,
+        }
+      );
   };
 
   function removeHandler(e: React.MouseEvent) {
-    Transforms.removeNodes(editor, {
-      at: path,
-    });
+    path &&
+      Transforms.removeNodes(editor, {
+        at: path,
+      });
   }
 
   return (
