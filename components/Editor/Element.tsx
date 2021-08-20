@@ -13,7 +13,7 @@ import { DragIndicator } from "@styled-icons/material-sharp/DragIndicator";
 import { Plus } from "@styled-icons/bootstrap/Plus";
 import { onMouseEnter } from "./Dragndrop";
 import Context from "context/context";
-import { findSlateNodePath, setNewSelection } from "./findNode";
+import { findSlateNodePath, setNewSelection, findSlateNode } from "./findNode";
 import Toolbar from "./Toolbar";
 
 function DragIndicatorIcon({
@@ -26,15 +26,19 @@ function DragIndicatorIcon({
   const modelCtx = useContext(Context);
   const editor = useSlate();
   const readOnly = useReadOnly();
+  const [, path] = findSlateNode(editor.children, id);
 
   return !readOnly ? (
     <>
+      {/* {useMemo(
+        () => ( */}
       <div
         className="toolbar__parent "
         style={{ display: "none" }}
         contentEditable={false}
       >
-        <Toolbar id={id} />
+        <Toolbar />
+
         <button
           onMouseEnter={(e) =>
             onMouseEnter(e, editor as any, modelCtx.setDragPath, parentId)
@@ -42,6 +46,14 @@ function DragIndicatorIcon({
           className="toolbar__dragndrop"
           data-id={id}
           onClick={() => {
+            path &&
+              Transforms.setNodes(
+                editor,
+                {
+                  class: "editor__element--parent activenode__element",
+                } as any,
+                { at: path }
+              );
             modelCtx.setSelectedBlock(true);
           }}
         >
@@ -53,6 +65,9 @@ function DragIndicatorIcon({
           />
         </button>
       </div>
+      {/* ),
+        []
+      )} */}
     </>
   ) : (
     <span style={{ display: "none" }}></span>
@@ -128,12 +143,6 @@ const Element = {
     );
   },
   Heading1(props: any) {
-    const heading = document.getElementById("heading-1");
-
-    if (heading?.innerHTML === "") {
-      heading.innerHTML = "Heading 1";
-    }
-
     return (
       <div
         className={`draggableItems my-2 heading-1 ${props.element.class}`}

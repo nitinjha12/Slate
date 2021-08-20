@@ -225,13 +225,13 @@ export const customEditorData = {
     title: "Video",
   },
 
-  carousel: {
-    editorData: { value: "carousel", type: undefined },
-    markBlock: false,
-    children: { icon: <ViewCarousel size="18" />, name: "Carousel" },
-    style: {},
-    title: "Carousel",
-  },
+  // carousel: {
+  //   editorData: { value: "carousel", type: undefined },
+  //   markBlock: false,
+  //   children: { icon: <ViewCarousel size="18" />, name: "Carousel" },
+  //   style: {},
+  //   title: "Carousel",
+  // },
 
   gridLayout2: {
     editorData: { value: "grid-layout", type: undefined },

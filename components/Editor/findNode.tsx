@@ -7,7 +7,7 @@ export function findSlateNode(
   nodes: any,
   id: string,
   parentId?: string
-): [Descendant | null, Path] {
+): [Descendant | null, Path | null] {
   let path: number | number[] = 0;
   let node;
   let gridPosition = 0;
@@ -27,13 +27,9 @@ export function findSlateNode(
     }
   }
 
-  if (typeof path === "number") {
-    node = null;
-    return [node, [path]];
-  } else {
-    node = null;
-    return [node, path];
-  }
+  node = null;
+  path = null as any;
+  return [node, path] as [any, Path];
 }
 
 export function findSlateNodePath(

@@ -27,16 +27,11 @@ function Menu() {
   }, [editor.selection]);
   const { body } = document;
   // console.log(JSON.parse(JSON.stringify(editor.children)));
-  const [node]: any = findSlateNode(
+  const [node, path]: any = findSlateNode(
     editor.children,
     modelCtx.getKey.id,
     modelCtx.getKey.parentId
   );
-
-  const path = node && ReactEditor.findPath(editor, node);
-
-  // console.log(node, path, modelCtx.getKey);
-  // console.log(editor.children);
 
   const domNode =
     !modelCtx.isToolbar && !!node && ReactEditor.toDOMNode(editor, node);
@@ -87,12 +82,15 @@ function Menu() {
     }
   }
 
-  console.log(node, path);
-
   return (
     <section
       className="activeToolbar"
       onClick={() => {
+        Transforms.setNodes(
+          editor,
+          { class: "editor__element--parent" } as any,
+          { at: path }
+        );
         removeToolbar();
       }}
     >
@@ -108,10 +106,12 @@ function Menu() {
         <div
           className="toolbarOption__container"
           style={{
-            top: checkViewportDistance() ? modelCtx.isToolbar || top : distance,
-            // bottom:
-            //   !checkViewportDistance() && top ? -distance - 180 : -distance,
-            position: "relative",
+            top: checkViewportDistance() && topDistance,
+            bottom:
+              !checkViewportDistance() && modelCtx.selectedBlock
+                ? distance
+                : distance + 300,
+            position: "absolute",
             left: left || "30%",
           }}
           onMouseEnter={() => {
@@ -174,6 +174,7 @@ function Menu() {
                               removeToolbar();
                               return;
                             }
+                            console.log(node);
                             if (
                               modelCtx.selectedBlock &&
                               !node!.type.includes("grid")
@@ -267,11 +268,11 @@ const blockInfoData = [
   {
     blockName: "Media",
     startNum: 13,
-    endNum: 16,
+    endNum: 15,
   },
   {
     blockName: "Grid",
-    startNum: 16,
+    startNum: 15,
     // endNum: 16,
   },
 ];
