@@ -211,12 +211,12 @@ const CustomEditor = {
 
     return !!match;
   },
-  AddingVideoSrc(editor: EditorType, src: string) {
+  AddingVideoSrc(editor: EditorType, src: string, path: Path | null) {
     const { selection } = editor;
 
     const embedUrl = EmbedUrl(src);
 
-    if (selection) {
+    if (path) {
       Transforms.insertNodes(
         editor,
 
@@ -226,7 +226,7 @@ const CustomEditor = {
           children: [{ text: "" }],
           key: uuidv4(),
         } as any,
-        { at: selection }
+        { at: path }
       );
     }
   },

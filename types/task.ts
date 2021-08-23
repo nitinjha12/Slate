@@ -29,6 +29,7 @@ export interface ToolbarButtonDataInterface {
   ): void;
   children: any;
   style?: any;
+  desc?: string;
   name: string | undefined;
   title: string | undefined;
   isActive(editor: EditorType): boolean;

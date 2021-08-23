@@ -23,18 +23,18 @@ const decoratorFunction = ([node, path]: [any, Path], editor: EditorType) => {
 
 export default decoratorFunction;
 
-function leafNodeTraversal(node: any, path: number): boolean {
-  console.log(node);
-  if (node && node.length && node[0].text) {
-    if (node[0].text === "") return true;
-    else return false;
-  }
+// function leafNodeTraversal(node: any, path: number): boolean {
+//   console.log(node);
+//   if (node && node.length && node[0].text) {
+//     if (node[0].text === "") return true;
+//     else return false;
+//   }
 
-  if (node && node.length && node[path]) {
-    return leafNodeTraversal(node[path], path);
-  }
+//   if (node && node.length && node[path]) {
+//     return leafNodeTraversal(node[path], path);
+//   }
 
-  if (node) return leafNodeTraversal(node.children, path);
+//   if (node) return leafNodeTraversal(node.children, path);
 
-  return false;
-}
+//   return false;
+// }

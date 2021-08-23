@@ -10,6 +10,7 @@ import { EditorType } from "types";
 import { EmbedUrl } from "./EmbedUrl";
 import { useContext } from "react";
 import Context from "context/context";
+import { findSlateNode } from "./findNode";
 // import { useSlate } from "slate-react";
 
 export function LinkEditor({
@@ -142,7 +143,12 @@ export function LinkEditor({
   ) : null;
 }
 
-export function VideoEditor({ editor, setVideoEditor, removeToolbar }: any) {
+export function VideoEditor({
+  editor,
+  setVideoEditor,
+  removeToolbar,
+  path,
+}: any) {
   const [linkUrl, setLinkUrl] = useState("");
   const previousSelection = useRef<any>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -158,7 +164,7 @@ export function VideoEditor({ editor, setVideoEditor, removeToolbar }: any) {
     e.preventDefault();
 
     if (isUrl(linkUrl)) {
-      CustomEditor.AddingVideoSrc(previousSelection.current, linkUrl);
+      CustomEditor.AddingVideoSrc(previousSelection.current, linkUrl, path);
       setVideoEditor(false);
       removeToolbar();
     } else {

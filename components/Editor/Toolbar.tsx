@@ -56,7 +56,6 @@ function Toolbar() {
             !Editor.isEmpty(editor, node as any) ||
             Editor.isVoid(editor, node)
           ) {
-            console.log(nextPath);
             Transforms.insertNodes(editor, block, { at: nextPath });
             Transforms.select(editor, range);
           }

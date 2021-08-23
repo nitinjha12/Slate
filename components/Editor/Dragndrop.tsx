@@ -51,7 +51,7 @@ export const onDragover = (
   const child = afterEle.childNodes[0] as HTMLElement;
   const dropLine: HTMLElement = document.getElementById("element--dropLine")!;
 
-  // if (dropLine) dropLine.style.display = "block";
+  if (dropLine) dropLine.style.display = "block";
 
   const box = afterEle.getBoundingClientRect();
 
@@ -76,7 +76,7 @@ export const onDragover = (
   //   setLayout(false);
   // }
   try {
-    // child && child.insertAdjacentElement("beforebegin", dropLine);
+    afterEle && afterEle.insertAdjacentElement("afterbegin", dropLine);
   } catch (err) {
     console.log(err, dropLine);
   }

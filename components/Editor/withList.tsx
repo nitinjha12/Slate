@@ -6,7 +6,7 @@ import CustomEditor from "./Editor";
 import { findSlateNode } from "./findNode";
 
 function withList(editor: EditorType) {
-  const { insertBreak } = editor;
+  const { insertBreak, deleteForward, deleteBackward } = editor;
 
   let checkList = false;
 
@@ -42,7 +42,9 @@ function withList(editor: EditorType) {
     }
   };
 
-  editor.insertNode = () => {};
+  // editor.deleteBackward = (unit) => {
+  //   console.log("delete", unit);
+  // };
 
   return editor;
 }

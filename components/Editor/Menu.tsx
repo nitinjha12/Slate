@@ -7,6 +7,7 @@ import { Transforms, Range, Path, Editor } from "slate";
 import { getRange, findSlateNode } from "./findNode";
 import { dropToolbarDataArr } from "components/Editor/data";
 import CustomEditor from "./Editor";
+import Image from "next/image";
 
 function Menu() {
   const modelCtx = useContext(Context);
@@ -40,16 +41,10 @@ function Menu() {
   const topDistance = modelCtx.isToolbar || top;
   const distance = window.innerHeight - topDistance;
 
-  // console.log(topDistance, distance, domNode, node);
-
   function checkViewportDistance() {
     if (distance > topDistance) return true;
     return false;
   }
-
-  // console.log(window.innerHeight, domNode.offsetTop, domNode.scrollTop);
-
-  // console.log(top, bottom, left);
 
   useEffect(() => {
     if (modelCtx.isToolbar || modelCtx.selectedBlock) {
@@ -79,6 +74,8 @@ function Menu() {
 
     if (toolbarOptionRef.current) {
       toolbarOptionRef.current.style.left = "200%";
+      if (!checkViewportDistance())
+        toolbarOptionRef.current.style.bottom = "0%";
     }
   }
 
@@ -108,14 +105,10 @@ function Menu() {
           style={{
             top: checkViewportDistance() && topDistance,
             bottom:
-              !checkViewportDistance() && modelCtx.selectedBlock
-                ? distance
-                : distance + 300,
+              !checkViewportDistance() &&
+              ((modelCtx.selectedBlock ? distance : distance + 300) as any),
             position: "absolute",
             left: left || "30%",
-          }}
-          onMouseEnter={() => {
-            // setToolbarOption(true);
           }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -174,7 +167,7 @@ function Menu() {
                               removeToolbar();
                               return;
                             }
-                            console.log(node);
+
                             if (
                               modelCtx.selectedBlock &&
                               !node!.type.includes("grid")
@@ -189,11 +182,23 @@ function Menu() {
                           style={data.style}
                           title={data.title}
                         >
-                          <button className={`toolbar__blockBtn--icon  `}>
-                            {data.children.icon}
-                          </button>
+                          {typeof data.children.icon !== "string" ? (
+                            <button className={`toolbar__blockBtn--icon  `}>
+                              {data.children.icon}
+                            </button>
+                          ) : (
+                            <Image
+                              width="40"
+                              height="40"
+                              src={"/" + data.children.icon}
+                              alt={data.children.name}
+                            />
+                          )}
                           <div className="toolbar__blockBtn--name">
                             {data.children.name}
+                            <span className="toolbar__blockBtn--subname">
+                              {data.desc}
+                            </span>
                           </div>
                         </div>
                       ))}
@@ -206,6 +211,7 @@ function Menu() {
                 editor={editor}
                 setVideoEditor={setVideoEditor}
                 removeToolbar={removeToolbar}
+                path={path}
               />
             )}
             {isTable && (
@@ -223,6 +229,7 @@ function Menu() {
                 <div
                   className="toolbar__blockBtn"
                   key={i}
+                  style={{ height: "40px" }}
                   onMouseEnter={() => {
                     if (data.children.name.toLowerCase() === "turn into") {
                       setTimeout(turnIntoHandler, 0.00001);
@@ -244,7 +251,7 @@ function Menu() {
                   <button className={`toolbar__blockBtn--icon`}>
                     {data.children.icons}
                   </button>
-                  <div className="toolbar__blockBtn--name">
+                  <div className="toolbar__blockBtn--name justify-content-center align-items-center">
                     {data.children.name}
                   </div>
                 </div>
