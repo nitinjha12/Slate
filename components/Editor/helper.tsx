@@ -118,8 +118,8 @@ export const initialValue = [
   },
   {
     type: "image",
-    src: "/bigo.png",
-    caption: "Big O",
+    src: "/routes.png",
+    caption: "Routes",
     key: uuidv4(),
     children: [{ text: "" }],
   },
