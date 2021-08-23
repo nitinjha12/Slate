@@ -49,9 +49,17 @@ export const onDragover = (
 
   const afterEle: HTMLElement = getDragAfterElement(editorParent, e.clientY);
   const child = afterEle.childNodes[0] as HTMLElement;
-  // const dropLine: HTMLElement = document.getElementById("element--dropLine")!;
 
-  // if (dropLine) dropLine.style.display = "block";
+  const dropLine: HTMLElement = document.querySelector(".element--dropLine")!;
+
+  if (!dropLine) {
+    console.log("got");
+    const newDropLine = document.createElement("div");
+    newDropLine.classList.add("element--dropLine");
+    editorParent.appendChild(newDropLine);
+  }
+
+  if (dropLine) dropLine.style.display = "block";
 
   const box = afterEle.getBoundingClientRect();
 
@@ -76,7 +84,7 @@ export const onDragover = (
   //   setLayout(false);
   // }
   try {
-    // afterEle && afterEle.insertAdjacentElement("afterbegin", dropLine);
+    afterEle && afterEle.insertAdjacentElement("afterbegin", dropLine);
   } catch (err) {
     // console.log(err, dropLine);
   }
@@ -101,10 +109,10 @@ export const onDrop = (
   const [node]: any = dropId && findSlateNode(editor.children, dropId);
 
   const editorContainer = document.querySelector(".editor__container")!;
-  const dropLine: HTMLElement = document.getElementById("element--dropLine")!;
+  const dropLine: HTMLElement = document.querySelector(".element--dropLine")!;
 
-  // dropLine.style.display = "none";
-  // editorContainer.appendChild(dropLine);
+  dropLine.style.display = "none";
+  editorContainer.appendChild(dropLine);
 
   let dropPath;
 
@@ -139,8 +147,13 @@ export const onDrop = (
       focus: { path: dropPath, offset: 0 },
     };
 
-    Transforms.removeNodes(editor, { at: index });
-    console.log(nodeData[index[0]]);
+    const voidEle = ["image", "video"];
+
+    Transforms.removeNodes(editor, {
+      at: index,
+      voids: voidEle.includes(nodeData[index[0]].type),
+    });
+    // console.log(nodeData[index[0]]);
     Transforms.insertNodes(editor, nodeData[index[0]], { at: dropPath });
     // Transforms.moveNodes(editor, { at: index, to: dropPath });
     Transforms.select(editor, range);

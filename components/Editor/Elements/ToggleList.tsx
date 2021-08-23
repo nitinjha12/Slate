@@ -6,7 +6,7 @@ import { Play } from "@styled-icons/boxicons-regular/Play";
 import { Cross } from "@styled-icons/entypo/Cross";
 import Context from "context/context";
 import { v4 as uuidv4 } from "uuid";
-import { findSlateNode } from "./findNode";
+import { findSlateNode } from "../findNode";
 
 // interface ToggleListInterface {
 //   title: string;

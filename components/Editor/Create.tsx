@@ -268,7 +268,6 @@ function Create() {
 
             <div
               className="element--dropLine"
-              id="element--dropLine"
               style={{ display: "none" }}
             ></div>
             <div

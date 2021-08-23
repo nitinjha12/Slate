@@ -3,7 +3,7 @@ import { useEffect, useRef, useMemo } from "react";
 import { useSlate, useReadOnly } from "slate-react";
 import { Editor, Transforms, Path } from "slate";
 import React, { useState, useContext } from "react";
-import ToggleList from "./ToggleList";
+import ToggleList from "./Elements/ToggleList";
 import Video from "./Elements/Video";
 import Table from "./Elements/Table";
 import HorizontalLine from "./Elements/Line";

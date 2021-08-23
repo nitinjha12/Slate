@@ -42,9 +42,13 @@ function withList(editor: EditorType) {
     }
   };
 
-  // editor.deleteBackward = (unit) => {
-  //   console.log("delete", unit);
-  // };
+  editor.deleteBackward = (unit) => {
+    console.log("delete", unit);
+
+    // if(Editor.isEmpty(unit))
+
+    deleteBackward(unit);
+  };
 
   return editor;
 }
