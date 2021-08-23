@@ -76,6 +76,7 @@ const CustomEditor = {
     const newProperties: Partial<any> = {
       type: isActive ? "paragraph" : isList ? "list-item" : value,
       key: uuidv4(),
+      // children: [{ text: "" }],
     };
 
     Transforms.setNodes(editor, newProperties, { at: path });

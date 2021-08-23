@@ -27,7 +27,7 @@ function Menu() {
     }
   }, [editor.selection]);
   const { body } = document;
-  // console.log(JSON.parse(JSON.stringify(editor.children)));
+
   const [node, path]: any = findSlateNode(
     editor.children,
     modelCtx.getKey.id,
@@ -55,6 +55,10 @@ function Menu() {
   }, [modelCtx.isToolbar]);
 
   function removeToolbar() {
+    Transforms.setNodes(editor, { class: "editor__element--parent" } as any, {
+      at: path,
+    });
+
     editor.onChange();
     modelCtx.setSelectedBlock(false);
     modelCtx.setToolbar(0);
@@ -83,11 +87,6 @@ function Menu() {
     <section
       className="activeToolbar"
       onClick={() => {
-        Transforms.setNodes(
-          editor,
-          { class: "editor__element--parent" } as any,
-          { at: path }
-        );
         removeToolbar();
       }}
     >

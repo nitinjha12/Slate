@@ -49,9 +49,9 @@ export const onDragover = (
 
   const afterEle: HTMLElement = getDragAfterElement(editorParent, e.clientY);
   const child = afterEle.childNodes[0] as HTMLElement;
-  const dropLine: HTMLElement = document.getElementById("element--dropLine")!;
+  // const dropLine: HTMLElement = document.getElementById("element--dropLine")!;
 
-  if (dropLine) dropLine.style.display = "block";
+  // if (dropLine) dropLine.style.display = "block";
 
   const box = afterEle.getBoundingClientRect();
 
@@ -76,9 +76,9 @@ export const onDragover = (
   //   setLayout(false);
   // }
   try {
-    afterEle && afterEle.insertAdjacentElement("afterbegin", dropLine);
+    // afterEle && afterEle.insertAdjacentElement("afterbegin", dropLine);
   } catch (err) {
-    console.log(err, dropLine);
+    // console.log(err, dropLine);
   }
 
   if (afterEle.dataset.id !== dropId) {
@@ -103,8 +103,8 @@ export const onDrop = (
   const editorContainer = document.querySelector(".editor__container")!;
   const dropLine: HTMLElement = document.getElementById("element--dropLine")!;
 
-  dropLine.style.display = "none";
-  editorContainer.appendChild(dropLine);
+  // dropLine.style.display = "none";
+  // editorContainer.appendChild(dropLine);
 
   let dropPath;
 
