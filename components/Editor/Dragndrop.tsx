@@ -63,13 +63,7 @@ export const onDragover = (
   const box = afterEle.getBoundingClientRect();
 
   if (count === 0) {
-    const range = {
-      anchor: { path: dragPath, offset: 0 },
-      focus: { path: dragPath, offset: 0 },
-    };
     editor.selection = null;
-    // Transforms.setSelection(editor, range);
-    // ReactEditor.blur(editor);
     count++;
   }
 
@@ -104,7 +98,6 @@ export const onDrop = (
   e.stopPropagation();
   count = 0;
 
-  const nodeData = JSON.parse(JSON.stringify(editor.children));
   const [node, path]: any = dropId && findSlateNode(editor.children, dropId);
 
   const editorContainer = document.querySelector(".editor__container")!;
@@ -129,6 +122,10 @@ export const onDrop = (
       anchor: { path: dropPath, offset: 0 },
       focus: { path: dropPath, offset: 0 },
     };
+
+    const nodeData = JSON.parse(JSON.stringify(editor.children));
+
+    // console.log(nodeData[index[0]]);
 
     Transforms.removeNodes(editor, {
       at: index,

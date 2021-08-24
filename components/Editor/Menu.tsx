@@ -77,7 +77,7 @@ function Menu() {
     setToolbarOption(true);
 
     if (toolbarOptionRef.current) {
-      toolbarOptionRef.current.style.left = "200%";
+      toolbarOptionRef.current.style.left = "180%";
       if (!checkViewportDistance())
         toolbarOptionRef.current.style.bottom = "0%";
     }

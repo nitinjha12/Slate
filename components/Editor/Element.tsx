@@ -43,8 +43,9 @@ function DragIndicatorIcon({
           onMouseEnter={(e) =>
             onMouseEnter(e, editor as any, modelCtx.setDragPath, parentId)
           }
-          className="toolbar__dragndrop"
+          className="toolbar__dragndrop ele-tooltip"
           data-id={id}
+          data-tooltip="Drag to move 	&#xa; Click to open menu"
           onClick={() => {
             path &&
               Transforms.setNodes(

@@ -45,7 +45,8 @@ function Toolbar() {
   return (
     <section className={`toolbar `}>
       <button
-        className="toolbar__addButton"
+        className="toolbar__addButton ele-tooltip"
+        data-tooltip="Click to add a block below"
         onClick={(e: React.MouseEvent<HTMLElement>) => {
           const rect = e.currentTarget.getBoundingClientRect();
           const top = rect.top;
