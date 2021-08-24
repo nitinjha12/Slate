@@ -32,6 +32,8 @@ export function findSlateNode(
   return [node, path] as [any, Path];
 }
 
+function findSlateNodeWithRecursion() {}
+
 export function findSlateNodePath(
   editor: EditorType,
   id: string

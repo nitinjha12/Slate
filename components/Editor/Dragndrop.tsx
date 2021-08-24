@@ -48,12 +48,11 @@ export const onDragover = (
     document.querySelector<HTMLDivElement>(".editor__editable")!;
 
   const afterEle: HTMLElement = getDragAfterElement(editorParent, e.clientY);
-  const child = afterEle.childNodes[0] as HTMLElement;
+  // const child = afterEle.childNodes[0] as HTMLElement;
 
   const dropLine: HTMLElement = document.querySelector(".element--dropLine")!;
 
   if (!dropLine) {
-    console.log("got");
     const newDropLine = document.createElement("div");
     newDropLine.classList.add("element--dropLine");
     editorParent.appendChild(newDropLine);
@@ -106,7 +105,7 @@ export const onDrop = (
   count = 0;
 
   const nodeData = JSON.parse(JSON.stringify(editor.children));
-  const [node]: any = dropId && findSlateNode(editor.children, dropId);
+  const [node, path]: any = dropId && findSlateNode(editor.children, dropId);
 
   const editorContainer = document.querySelector(".editor__container")!;
   const dropLine: HTMLElement = document.querySelector(".element--dropLine")!;
@@ -114,22 +113,7 @@ export const onDrop = (
   dropLine.style.display = "none";
   editorContainer.appendChild(dropLine);
 
-  let dropPath;
-
-  try {
-    dropPath = node && ReactEditor.findPath(editor, node);
-  } catch (err) {
-    console.log(err);
-    return;
-  }
-
-  try {
-    // const range = Editor.range(editor, dropPath);
-    // Transforms.select(editor, range);
-  } catch (err) {
-    // console.log(err);
-  }
-  // ReactEditor.focus(editor);
+  const dropPath = path;
 
   if (!node) return;
 
@@ -139,7 +123,6 @@ export const onDrop = (
   // }
 
   try {
-    // console.log(index, dropPath);
     if (Path.equals(index, dropPath)) return;
 
     const range = {
@@ -147,11 +130,8 @@ export const onDrop = (
       focus: { path: dropPath, offset: 0 },
     };
 
-    const voidEle = ["image", "video"];
-
     Transforms.removeNodes(editor, {
       at: index,
-      voids: voidEle.includes(nodeData[index[0]].type),
     });
     // console.log(nodeData[index[0]]);
     Transforms.insertNodes(editor, nodeData[index[0]], { at: dropPath });
@@ -164,96 +144,34 @@ export const onDrop = (
   }
 };
 
-function swapArray(fromindex: number, toIndex: number, arr: any) {
-  let updatedArr = [...arr];
-  const removedArr = updatedArr.splice(fromindex, 1);
+// function swapArray(fromindex: number, toIndex: number, arr: any) {
+//   let updatedArr = [...arr];
+//   const removedArr = updatedArr.splice(fromindex, 1);
 
-  updatedArr.splice(toIndex, 0, removedArr[0]);
-  return updatedArr;
-}
+//   updatedArr.splice(toIndex, 0, removedArr[0]);
+//   return updatedArr;
+// }
 
-function useTransform(editor: EditorType, index: number, position: number) {
-  const newEditor = JSON.parse(JSON.stringify(editor));
-  const selection = JSON.parse(JSON.stringify(editor.selection));
-  const removedNode = newEditor.children[index];
+// function useTransform(editor: EditorType, index: number, position: number) {
+//   const newEditor = JSON.parse(JSON.stringify(editor));
+//   const selection = JSON.parse(JSON.stringify(editor.selection));
+//   const removedNode = newEditor.children[index];
 
-  selection.anchor.path[0] = position;
-  selection.focus.path[0] = position;
+//   selection.anchor.path[0] = position;
+//   selection.focus.path[0] = position;
 
-  console.log(index, position);
+//   console.log(index, position);
 
-  Transforms.removeNodes(editor, {
-    at: editor.selection!,
-  });
-
-  Transforms.insertNodes(editor, removedNode, {
-    at: [position],
-  });
-
-  const newSlection = JSON.parse(JSON.stringify(selection));
-
-  newSlection.anchor.path[0] = position - 1;
-  newSlection.focus.path[0] = position - 1;
-}
-
-// export const toolbarOnMouseEnter = (
-//   editor: EditorType,
-//   setDraggableEle: Function
-// ) => {
-//   const index: number = editor.selection!.anchor.path[0];
-//   const editorParent =
-//     document.querySelector<HTMLDivElement>(".editor__editable")!;
-
-//   const dragBtn = document.querySelector<HTMLButtonElement>(
-//     ".toolbar__dragndrop"
-//   );
-
-//   const dragIcon = document.querySelector<HTMLElement>(".dragIndicator__icon");
-
-//   const path = editor.selection!.anchor.path[0];
-//   let eleHeight = 0;
-//   const selected: any = editor.children[path];
-
-//   if (selected.type === "heading-1") {
-//     eleHeight = 11;
-//   } else if (selected.type === "heading-2") {
-//     eleHeight = 5;
-//   }
-
-//   const ele: any = editorParent.childNodes[index];
-
-//   ele.insertAdjacentElement("afterbegin", dragBtn);
-
-//   dragBtn!.style.top = `0px`;
-//   dragBtn!.style.left = "20px";
-//   // dragIcon!.style.cursor = "grab";
-
-//   ele.setAttribute("draggable", true);
-//   ele.setAttribute("contenteditable", false);
-
-//   setDraggableEle(ele);
-
-//   ele!.addEventListener("dragstart", () => {
-//     ele?.classList.add("draggable--dragging");
+//   Transforms.removeNodes(editor, {
+//     at: editor.selection!,
 //   });
 
-//   ele!.addEventListener("dragend", () => {
-//     ele?.classList.remove("draggable--dragging");
+//   Transforms.insertNodes(editor, removedNode, {
+//     at: [position],
 //   });
-// };
 
-// export const toolbarOnMouseLeave = (draggableEle: HTMLElement) => {
-//   const dragBtn = document.querySelector<HTMLButtonElement>(
-//     ".toolbar__dragndrop"
-//   );
-//   const addBtn = document.querySelector(".toolbar__addButton");
+//   const newSlection = JSON.parse(JSON.stringify(selection));
 
-//   addBtn?.appendChild(dragBtn!);
-
-//   dragBtn!.style.left = "30px";
-//   dragBtn!.style.top = `10px`;
-
-//   draggableEle?.setAttribute("draggable", "false");
-//   draggableEle?.classList.remove("draggable--dragging");
-//   draggableEle?.setAttribute("contenteditable", "true");
-// };
+//   newSlection.anchor.path[0] = position - 1;
+//   newSlection.focus.path[0] = position - 1;
+// }

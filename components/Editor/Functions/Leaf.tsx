@@ -1,3 +1,6 @@
+import { Editor } from "slate";
+import { useSlateStatic } from "slate-react";
+
 const Leaf = function (props: any) {
   let el = <>{props.children}</>;
 
@@ -43,6 +46,13 @@ const Leaf = function (props: any) {
   }
 
   function getPlaceholder(placeholder: string) {
+    const editor = useSlateStatic();
+
+    const [parent]: any = Editor.parent(editor, editor.selection!, {
+      edge: "end",
+      depth: 3,
+    });
+
     return (
       <>
         <DefaultLeaf {...props} />
@@ -50,7 +60,7 @@ const Leaf = function (props: any) {
           style={{
             opacity: 0.3,
             position: "absolute",
-            top: 10,
+            top: parent?.type?.includes("grid") ? 0 : 10,
             fontWeight: "500" as any,
           }}
           contentEditable={false}

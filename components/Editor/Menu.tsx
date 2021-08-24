@@ -175,6 +175,7 @@ function Menu() {
                             } else {
                               data.onMouseDown(e, editor!);
                             }
+                            Transforms.select(editor, getRange(path));
                             ReactEditor.focus(editor!);
                             removeToolbar();
                           }}

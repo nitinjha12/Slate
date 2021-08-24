@@ -12,13 +12,14 @@ function withList(editor: EditorType) {
 
   editor.insertBreak = () => {
     const { selection } = editor;
+    const LIST_TYPES = ["bulleted-list", "ordered-list"];
 
     if (selection) {
       const [list]: any = Editor.nodes(editor, {
         match: (n: any) => {
           if (
             n.type &&
-            n.type.includes("list") &&
+            LIST_TYPES.includes(n.type) &&
             Editor.isEmpty(editor, n.children[n.children.length - 1])
           ) {
             CustomEditor.toggleBlock({ editor, value: n.type });
@@ -43,9 +44,19 @@ function withList(editor: EditorType) {
   };
 
   editor.deleteBackward = (unit) => {
-    console.log("delete", unit);
+    const [list]: any = Editor.nodes(editor, {
+      match: (n: any) => n?.type?.includes("list"),
+    });
 
-    // if(Editor.isEmpty(unit))
+    if (
+      list &&
+      list[0].children.length === 1 &&
+      list[0].children[0].children[0].text.length < 1
+    ) {
+      CustomEditor.toggleBlock({ editor, value: list[0].type });
+      return;
+    }
+    // if (list) Transforms.delete(editor);
 
     deleteBackward(unit);
   };
