@@ -70,6 +70,8 @@ const renderElement = (props: any) => {
       return <Element.CenterAlign {...props} />;
     case "right-align":
       return <Element.RightAlign {...props} />;
+    case "quote":
+      return <Element.Quote {...props} />;
     case "link":
       return <Element.Link {...props} />;
     case "image":

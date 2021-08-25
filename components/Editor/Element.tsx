@@ -15,6 +15,7 @@ import { onMouseEnter } from "./Dragndrop";
 import Context from "context/context";
 import { findSlateNodePath, setNewSelection, findSlateNode } from "./findNode";
 import Toolbar from "./Toolbar";
+import Quote from "./Elements/Quote";
 
 function DragIndicatorIcon({
   id,
@@ -128,6 +129,7 @@ const Element = {
     return (
       <div
         className={`draggableItems my-2 ${props.element.class}`}
+        style={props.element.alignStyle}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -167,6 +169,7 @@ const Element = {
     return (
       <div
         className={`draggableItems my-2 ${props.element.class}`}
+        style={props.element.alignStyle}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -186,6 +189,7 @@ const Element = {
     return (
       <div
         className={`draggableItems my-2 ${props.element.class}`}
+        style={props.element.alignStyle}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -205,6 +209,7 @@ const Element = {
     return (
       <div
         className={`draggableItems my-2 ${props.element.class}`}
+        style={props.element.alignStyle}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -220,6 +225,7 @@ const Element = {
     return (
       <div
         className={`draggableItems my-2 ${props.element.class}`}
+        style={props.element.alignStyle}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -235,6 +241,7 @@ const Element = {
     return (
       <div
         className={`draggableItems my-2 ${props.element.class}`}
+        style={props.element.alignStyle}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -260,6 +267,7 @@ const Element = {
     return (
       <div
         className={`draggableItems my-2 ${props.element.class}`}
+        style={props.element.alignStyle}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -269,10 +277,25 @@ const Element = {
       </div>
     );
   },
+  Quote(props: any) {
+    return (
+      <div
+        className={`draggableItems my-2 ${props.element.class}`}
+        style={props.element.alignStyle}
+        {...hoverHandler(props.element.key)}
+        data-id={props.element.key}
+      >
+        <DragIndicatorIcon id={props.element.key} />
+
+        <Quote {...props} />
+      </div>
+    );
+  },
   LeftAlign(props: any) {
     return (
       <div
         className={`draggableItems my-2 ${props.element.class}`}
+        style={props.element.alignStyle}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -288,6 +311,7 @@ const Element = {
     return (
       <div
         className={`draggableItems my-2 ${props.element.class}`}
+        style={props.element.alignStyle}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -303,6 +327,7 @@ const Element = {
     return (
       <div
         className={`draggableItems my-2 ${props.element.class}`}
+        style={props.element.alignStyle}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -328,6 +353,7 @@ const Element = {
       <>
         <div
           className={`draggableItems my-2 ${props.element.class}`}
+          style={props.element.alignStyle}
           {...hoverHandler(props.element.key)}
           data-id={props.element.key}
         >
@@ -355,6 +381,7 @@ const Element = {
     return (
       <div
         className={`draggableItems my-2 ${props.element.class}`}
+        style={props.element.alignStyle}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -438,6 +465,7 @@ const Element = {
     return (
       <div
         className={`draggableItems my-2 ${props.element.class}`}
+        style={props.element.alignStyle}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -454,6 +482,7 @@ const Element = {
     return (
       <div
         className={`draggableItems my-2 ${props.element.class}`}
+        style={props.element.alignStyle}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >
@@ -470,6 +499,7 @@ const Element = {
     return (
       <div
         className={`draggableItems my-2 ${props.element.class}`}
+        style={props.element.alignStyle}
         {...hoverHandler(props.element.key)}
         data-id={props.element.key}
       >

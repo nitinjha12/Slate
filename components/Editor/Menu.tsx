@@ -168,12 +168,20 @@ function Menu() {
                             }
 
                             if (
-                              modelCtx.selectedBlock &&
-                              !node!.type.includes("grid")
+                              node!.type.includes("grid") &&
+                              (path.length > 1 || !editor.selection)
                             ) {
-                              data.onMouseDown(e, editor!, path);
+                              path.push(node.children.length - 1);
+                            }
+
+                            if (
+                              modelCtx.selectedBlock &&
+                              (path.length === 3 ||
+                                !node!.type.includes("grid"))
+                            ) {
+                              data.onMouseDown(e, editor, path);
                             } else {
-                              data.onMouseDown(e, editor!);
+                              data.onMouseDown(e, editor);
                             }
                             Transforms.select(editor, getRange(path));
                             ReactEditor.focus(editor!);

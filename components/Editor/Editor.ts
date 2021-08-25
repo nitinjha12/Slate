@@ -52,12 +52,17 @@ const CustomEditor = {
     const isList = LIST_TYPES.includes(value!);
 
     if (value && ALIGN_TYPES.includes(value)) {
-      this.toggleAlignBlock(editor, isActive, value);
+      this.toggleAlignBlock(editor, value, path);
       return;
     }
 
     if (value === "code") {
-      this.toggleCodeBlock(editor, isActive, value);
+      this.toggleCodeBlock(editor, isActive, value, path);
+      return;
+    }
+
+    if (value === "quote") {
+      this.toggleCodeBlock(editor, isActive, value, path);
       return;
     }
 
@@ -72,6 +77,7 @@ const CustomEditor = {
           !Editor.isEditor(n) && (Element.isElement(n) as any) && n.type
         ),
       split: true,
+      at: path,
     });
     const newProperties: Partial<any> = {
       type: isActive ? "paragraph" : isList ? "list-item" : value,
@@ -87,52 +93,59 @@ const CustomEditor = {
         editor,
         ["toggle-list"].includes(value!)
           ? ({ ...block, title: "Title" } as any)
-          : block
+          : block,
+        { at: path }
       );
     }
 
     ReactEditor.focus(editor);
   },
 
-  toggleCodeBlock(editor: EditorType, isActive: boolean, format: string) {
+  toggleCodeBlock(
+    editor: EditorType,
+    isActive: boolean,
+    format: string,
+    path?: Path
+  ) {
     Transforms.unwrapNodes(editor, {
       match: (n: any) =>
         !Editor.isEditor(n) &&
         (Element.isElement(n) as any) &&
         n.type === format,
       split: true,
+      at: path,
     });
 
-    Transforms.setNodes(editor, {
-      type: isActive ? "paragraph" : "span",
-      key: uuidv4(),
-    } as any);
+    Transforms.setNodes(
+      editor,
+      {
+        type: isActive ? "paragraph" : "span",
+        key: uuidv4(),
+      } as any,
+      { at: path }
+    );
 
     if (!isActive) {
-      Transforms.wrapNodes(editor, {
-        type: format,
-        children: [],
-        key: uuidv4(),
-      } as any);
+      Transforms.wrapNodes(
+        editor,
+        {
+          type: format,
+          children: [],
+          key: uuidv4(),
+        } as any,
+        { at: path }
+      );
     }
   },
 
-  toggleAlignBlock(editor: EditorType, isActive: boolean, format: string) {
-    Transforms.unwrapNodes(editor, {
-      match: (n: any) =>
-        ALIGN_TYPES.includes(
-          !Editor.isEditor(n) && (Element.isElement(n) as any) && n.type
-        ),
-      split: true,
-    });
+  toggleAlignBlock(editor: EditorType, format: string, path?: Path) {
+    const align = format.split("-");
 
-    if (!isActive) {
-      Transforms.wrapNodes(editor, {
-        type: format,
-        children: [],
-        key: uuidv4(),
-      } as any);
-    }
+    Transforms.setNodes(
+      editor,
+      { alignStyle: { textAlign: align[0] } } as any,
+      { at: path }
+    );
   },
   addGridLayout(editor: EditorType, num: number, path: Path) {
     gridLayout(editor, num, path);

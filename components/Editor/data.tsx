@@ -191,6 +191,14 @@ export const customEditorData = {
     title: "Toggle List",
     desc: "Toggles can hide and show content inside.",
   },
+  quote: {
+    editorData: { value: "quote", type: undefined },
+    markBlock: false,
+    children: { icon: "toolbar/quote.png", name: "Quote" },
+    style: {},
+    title: "Quote",
+    desc: "Capture a quote.",
+  },
   leftAlign: {
     editorData: { value: "left-align", type: undefined },
     markBlock: false,
