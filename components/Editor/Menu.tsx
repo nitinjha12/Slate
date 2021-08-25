@@ -278,16 +278,16 @@ const blockInfoData = [
   {
     blockName: "Basic Block",
     startNum: 0,
-    endNum: 13,
+    endNum: 14,
   },
   {
     blockName: "Media",
-    startNum: 13,
-    endNum: 15,
+    startNum: 14,
+    endNum: 16,
   },
   {
     blockName: "Grid",
-    startNum: 15,
+    startNum: 16,
     // endNum: 16,
   },
 ];

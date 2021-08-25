@@ -3,7 +3,7 @@ import { ReactEditor, useSlateStatic } from "slate-react";
 import { Transforms, Location, Range, Editor, Path, Node, Span } from "slate";
 import CustomEditor from "./Editor";
 import Context from "context/context";
-import { findSlateNode } from "./findNode";
+import { findSlateNode, getRange } from "./findNode";
 
 export const onMouseEnter = (
   e: React.MouseEvent<HTMLElement>,
@@ -126,6 +126,17 @@ export const onDrop = (
     const nodeData = JSON.parse(JSON.stringify(editor.children));
 
     // console.log(nodeData[index[0]]);
+
+    // Transforms.delete(editor, {
+    //   at: index,
+    // });
+
+    // Transforms.setPoint(editor, getRange(index).anchor);
+
+    // Transforms.deselect(editor);
+    // Transforms.select(editor, index);
+
+    // Transforms.unwrapNodes(editor, { at: index });
 
     Transforms.removeNodes(editor, {
       at: index,

@@ -44,6 +44,8 @@ function ToggleList({ element, attributes, children }: any) {
       });
   }
 
+  // console.log(children, editor.normalizeNode([node!, path!]));
+
   return (
     <ToggleListStyle
       className={`toggleListStyle ${toggle ? "pb-3" : ""} ${
